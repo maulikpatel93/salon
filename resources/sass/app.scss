@@ -1,9 +1,39 @@
 // Fonts
-@import url('https://fonts.googleapis.com/css?family=Nunito');
+@import url("https://fonts.googleapis.com/css?family=Nunito");
 //node_modules  package list
-@import '~@fortawesome/fontawesome-free/css/all.min.css';
-// Variables
-@import 'variables';
+@import "~@fortawesome/fontawesome-free/css/all.min.css";
 
+@import "~bootstrap/scss/functions";
+@import "theme/bootstrap-variables";
+@import "~bootstrap/scss/bootstrap";
+
+@import "variables";
+@import "theme/variables";
+@import "theme/variables-alt";
+@import "theme/mixins";
+
+@import "theme/parts/core";
+@import "theme/parts/components";
+@import "theme/parts/extra-components";
+@import "theme/parts/pages";
+@import "theme/parts/plugins";
+@import "theme/parts/miscellaneous";
+// Variables
+// @import 'variables';
+
+@import "~bootstrap/scss/bootstrap-utilities";
+
+//Generate utilites for Cursor
+$utilities: map-merge(
+    $utilities,
+    (
+        "cursor": (
+            property: cursor,
+            values: auto default pointer wait text move help not-allowed,
+        ),
+    )
+);
 // Bootstrap
-@import '~bootstrap/scss/bootstrap';
+@import "~bootstrap/scss/bootstrap";
+// @import "bootstrap";
+// @import "../../src/scss/theme";

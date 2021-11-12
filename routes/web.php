@@ -4,9 +4,10 @@ use Illuminate\Support\Facades\Route;
 
 //Admin Panel
 use App\Http\Controllers\Auth\AdminController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ModulesController;
 //Web Panel
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Admin\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +50,7 @@ Route::prefix('admin')->name('admin.')->group(function(){
         // Route::view('/home', 'admin.dashboard')->name('dashboard');
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('/logout', [AdminController::class, 'logout'])->name('logout');
+        Route::get('/modules', [ModulesController::class, 'index'])->name('modules');
     });
 });
 // Route::get('home', [HomeController::class, 'index'])->name('home');
@@ -57,5 +59,3 @@ Route::prefix('admin')->name('admin.')->group(function(){
 // Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function () {
 //     Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 // });
-
-

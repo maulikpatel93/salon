@@ -10,10 +10,12 @@ class DashboardController extends Controller
     public function __construct()
     {
         $this->middleware('auth:admin');
+        parent::__construct();
     }
 
     public function index()
     {
-         return view('admin.dashboard');
+        global $user;
+        return view('admin.dashboard');
     }
 }

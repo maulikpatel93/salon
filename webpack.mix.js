@@ -30,6 +30,18 @@ const mix = require("laravel-mix");
 mix.js("resources/js/app.js", "public/js")
     .js("resources/js/jquery.js", "public/js")
     .copy("vendor/jquery-form/form/dist/jquery.form.min.js", "public/js")
+    .copy(
+        "node_modules/icheck-bootstrap/icheck-bootstrap.min.css",
+        "public/plugins/icheck-bootstrap"
+    )
+    .copy(
+        "node_modules/jquery-pjax/jquery.pjax.js",
+        "public/plugins/jquery-pjax"
+    )
+    .js("resources/js/library/AdminLTE.js", "public/js")
+    .copy("resources/js/library/adminlte.min.js", "public/js")
+    .copy("resources/js/library/demo.js", "public/js")
+    .copy("resources/js/myfunction.js", "public/js")
     .sass("resources/sass/app.scss", "public/css")
     .sass("resources/sass/styles.scss", "public/css");
 

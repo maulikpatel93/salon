@@ -1,26 +1,30 @@
-$whiteColor:#fff;
-$blackColor:#000;
-$primaryColor:#1266f1;
-$secondaryColor:#b23cfd;
-$successColor:#00913b;
-$dangerColor:#f80c35;
-$warningColor:#d99000;
-$infoColor:#16b5ea;
-$lightColor:#e8e8e8;
-$darkColor:#131313;
+$whiteColor: #fff;
+$blackColor: #000;
+$primaryColor: #1266f1;
+$secondaryColor: #b23cfd;
+$successColor: #00913b;
+$dangerColor: #f80c35;
+$warningColor: #d99000;
+$infoColor: #16b5ea;
+$lightColor: #e8e8e8;
+$darkColor: #131313;
 
-$borderPrimaryColor:#0e52c1;
-$borderSecondaryColor:#ba50fd;
-$borderSuccessColor:#1abe5c;
-$borderDangerColor:#fa4665;
-$borderWarningColor:#ffb21a;
-$borderInfoColor:#4dc6ef;
-$borderLightColor:#fbfbfb;
-$borderDarkColor:#1e1e1e;
+$borderPrimaryColor: #0e52c1;
+$borderSecondaryColor: #ba50fd;
+$borderSuccessColor: #1abe5c;
+$borderDangerColor: #fa4665;
+$borderWarningColor: #ffb21a;
+$borderInfoColor: #4dc6ef;
+$borderLightColor: #fbfbfb;
+$borderDarkColor: #1e1e1e;
 
-.btn-primary, .btn-success, .btn-danger, .btn-secondary{
+.btn-primary,
+.btn-success,
+.btn-danger,
+.btn-secondary {
     color: $whiteColor !important;
 }
+
 // body{
 //     background-color: $darkColor;
 // }
@@ -28,3 +32,23 @@ $borderDarkColor:#1e1e1e;
 // .btn.btn-primary{
 //     background-color: $primaryColor;
 // }
+
+.form-inline {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-flow: row wrap;
+    flex-flow: row wrap;
+    -ms-flex-align: center;
+    align-items: center;
+}
+
+.form-inline .form-check {
+    width: 100%;
+}
+.navbar {
+    padding: 0.5rem 0.5rem;
+}
+.navbar-expand .navbar-nav .nav-link {
+    padding-right: 1rem;
+    padding-left: 1rem;
+}

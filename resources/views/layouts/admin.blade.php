@@ -9,7 +9,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="csrf-token" content="_token">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name') }}</title>
 
 
     <!-- Fonts -->
@@ -18,20 +18,20 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('css/styles.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('css/custom.css') }}" rel="stylesheet" type="text/css">
     <script src="{{ asset('js/jquery.js') }}" type="text/javascript"></script>
     @stack('after-styles')
 </head>
 
-<body>
-    <div class="container" id="app">
-        @yield('content')
-    </div>
+<body class="hold-transition login-page">
+    @yield('content')
     @stack('before-scripts')
     <script src="{{ asset('js/app.js') }}" defer></script>
     <script src="{{ asset('js/jquery.form.min.js') }}" defer></script>
     <script type="text/javascript" src="{{ asset('plugins/jsvalidation/jsvalidation.js')}}"></script>
+    <script src="{{ asset('js/AdminLTE.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/myfunction.js') }}" type="text/javascript"></script>
     @stack('after-scripts')
     @yield('pagescript')
 </body>

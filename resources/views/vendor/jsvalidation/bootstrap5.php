@@ -7,7 +7,12 @@
                 errorClass: 'invalid-feedback',
 
                 errorPlacement: function (error, element) {
-                    error.insertAfter(element);
+                    var type = element.attr("type");
+                    if(type === 'password'){
+                        error.insertAfter(element.next());
+                    }else{
+                        error.insertAfter(element);
+                    }
                 },
                 highlight: function (element) {
                     $(element).removeClass('is-valid').addClass('is-invalid'); // add the Bootstrap error class to the control group

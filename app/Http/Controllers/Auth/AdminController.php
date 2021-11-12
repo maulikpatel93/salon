@@ -52,9 +52,9 @@ class AdminController extends Controller
             'password' => $inputVal['password'],
             'role_id' => 1
         ];
+        $remember_me = (isset($inputVal['remember']) && $inputVal['remember'] == 'on')  ? true : false;
         $responseData = [];
-        if(Auth::guard('admin')->attempt($credentials)){
-            $user = Auth::user();
+        if(Auth::guard('admin')->attempt($credentials, $remember_me)){
             $responseData['status'] = 200;
             $responseData['message'] = 'Success';
             $responseData['url'] = route('admin.dashboard');
