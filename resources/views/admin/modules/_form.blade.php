@@ -1,7 +1,5 @@
 @php
     $formname = 'moduleform';
-    echo '<pre>'; print_r($model->id); echo '<pre>';dd();
-
 @endphp
 {{ Form::open([
     'route' => 'admin.modules.update',
@@ -10,19 +8,18 @@
     'name' => $formname,
     'enableAjaxSubmit' => 1]) }}
     <div id="formerror" class="formerror"></div>
-
     <div class="input-group mb-3">
-        {{ Form::text('email', old('email'), [
+        {{ Form::text('email', $model->email, [
         "class" => "form-control",
         'id'=> $formname.'-email',
         'placeholder'=> 'Email',
-        'autocomplete' => 'email',
+        'autocomplete' => 'email'
         ]) }}
     </div>
-    <div class="row">
-        <div class="col-12">
-            {{ Form::button('Login', ['type'=>'submit','class' => 'btn btn-primary d-block w-100 mt-3',
+    <div class="">
+        {{ Form::button('Save', ['type'=>'submit','class' => 'btn btn-primary',
             'id' => $formname.'-submit']); }}
-        </div>
+        {{ Form::button('Close', ['type'=>'button','class' => 'btn btn-secondary',
+            'id' => $formname.'-close', 'data-bs-dismiss' => 'modal']); }}
     </div>
     {{ Form::close() }}

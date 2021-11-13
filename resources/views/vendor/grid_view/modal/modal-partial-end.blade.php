@@ -1,10 +1,11 @@
             @php
-                $footer = isset($modal['footer']) ? $modal['footer'] : true;
+                $footer = isset($modal['footer']) ? $modal['footer'] : false;
+                $footerContent = isset($modal['footer']['content']) ? $modal['footer']['content'] : '';
                 $footerOptions = isset($modal['footerOptions']) ? array_merge([], $modal['footerOptions']) : [];
                 $footerOptionsClass = (isset($footerOptions['class'])) ? 'id='.$footerOptions['class'] : '';
                 $footerOptionsId = (isset($footerOptions['id'])) ? 'id='.$footerOptions['id'] : '';
 
-                $closeButtonFooter = isset($modal['closeButtonFooter']) ? $modal['closeButtonFooter'] : true;
+                $closeButtonFooter = isset($modal['closeButtonFooter']) ? $modal['closeButtonFooter'] : false;
                 if ($closeButtonFooter !== false) {
                     if(is_array($closeButtonFooter)){
                         $closeButtonFooter = array_merge([
@@ -23,7 +24,7 @@
                     }
 
                 }
-                $submitButton = isset($modal['submitButton']) ? $modal['submitButton'] : true;
+                $submitButton = isset($modal['submitButton']) ? $modal['submitButton'] : false;
                 if ($submitButton !== false) {
                     if(is_array($submitButton)){
                         $submitButton = array_merge([
@@ -47,6 +48,9 @@
             </div>
             @if($footer)
             <div class="modal-footer {!! $footerOptionsClass !!}" {!! $footerOptionsId !!}>
+                @if($footerContent)
+                    {!! $footerContent !!}
+                @endif
                 @if($closeButtonFooter)
                     <button type="{!! $closeButtonFooter['type'] !!}" class="{!! $closeButtonFooter['class'] !!}" data-bs-dismiss="{!! $closeButtonFooter['data-bs-dismiss'] !!}">{!! $closeButtonFooter['label'] !!}</button>
                 @endif

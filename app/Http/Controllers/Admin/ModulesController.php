@@ -27,12 +27,13 @@ class ModulesController extends Controller
 
     public function create()
     {
-        return view('admin.modules.create');
+        $model = new User();
+        return view('admin.modules.create', ['model' => $model]);
     }
 
     public function store(StoreUsersRequest $request)
     {
-        return view('admin.modules.update', ['model' => $model]);
+        // return view('admin.modules.create', ['model' => $model]);
     }
 
     public function edit($id)
