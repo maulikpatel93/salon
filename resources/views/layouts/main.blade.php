@@ -28,6 +28,7 @@
     <!-- /.navbar -->
     <!-- Site wrapper -->
     <div class="wrapper">
+        @include('layouts.loader')
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
             <!-- Left navbar links -->
@@ -115,7 +116,7 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="{{ route('admin.modules') }}" class="nav-link">
+                                    <a href="{{ route('admin.modules.index') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Modules</p>
                                     </a>
@@ -166,6 +167,8 @@
         </aside>
         <!-- /.control-sidebar -->
     </div>
+    @yield('modal')
+    {{-- @include('grid_view::modal.container') --}}
     <!-- ./wrapper -->
     @stack('before-scripts')
     <script src="{{ asset('js/app.js') }}" defer></script>

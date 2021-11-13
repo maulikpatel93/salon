@@ -50,7 +50,17 @@ Route::prefix('admin')->name('admin.')->group(function(){
         // Route::view('/home', 'admin.dashboard')->name('dashboard');
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('/logout', [AdminController::class, 'logout'])->name('logout');
-        Route::get('/modules', [ModulesController::class, 'index'])->name('modules');
+
+        //Modules
+        Route::prefix('modules')->name('modules.')->group(function() {
+            Route::get('/', [ModulesController::class, 'index'])->name('index');
+            Route::post('/create', [ModulesController::class, 'create'])->name('create');
+            Route::post('/store', [ModulesController::class, 'store'])->name('store');
+            Route::post('/edit/{id}', [ModulesController::class, 'edit'])->name('edit');
+            Route::post('/update', [ModulesController::class, 'update'])->name('update');
+            Route::post('/view', [ModulesController::class, 'view'])->name('view');
+            Route::get('/delete', [ModulesController::class, 'delete'])->name('delete');
+        });
     });
 });
 // Route::get('home', [HomeController::class, 'index'])->name('home');

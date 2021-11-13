@@ -24,4 +24,45 @@ class ModulesController extends Controller
             'dataProvider' => $dataProvider
         ]);
     }
+
+    public function create()
+    {
+        return view('admin.modules.create');
+    }
+
+    public function store(StoreUsersRequest $request)
+    {
+        return view('admin.modules.update', ['model' => $model]);
+    }
+
+    public function edit($id)
+    {
+        $model = User::find($id);
+        return view('admin.modules.update', ['model' => $model]);
+    }
+
+    public function update(UpdateUsersRequest $request, User $user)
+    {
+        //return view('admin.modules.update', ['model' => $model]);
+    }
+
+    public function view()
+    {
+        return view('admin.modules.view');
+    }
+
+    public function delete()
+    {
+
+    }
+
+    public function statusupdate()
+    {
+
+    }
+
+    public function apply()
+    {
+
+    }
 }

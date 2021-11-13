@@ -1,7 +1,16 @@
 @extends('layouts.main')
-<?php
-$title = 'Modules';
-?>
+@php
+    $title = 'Modules';
+    $title_single = 'Module';
+    $createbtn = '<a href="'.route('admin.modules.create').'" class="btn btn-primary showbsmodal" title="Add '.$title_single.'" data-bs-toggle="modal" data-bs-target="#crud_form_modal">Add</a>';
+    $applydropdown = '<select class="form-select w-auto" id="applyoption">
+        <option value="">--Select--</option>
+        <option value="Active">Active</option>
+        <option value="Inactive">InActive</option>
+        <option value="Delete">InActive</option>
+        </select>';
+
+@endphp
 @section('title')
 {{ $title }}
 @endsection
@@ -34,9 +43,9 @@ $title = 'Modules';
         'pjax' => true,
         'rowsPerPage' => 10, // The number of rows in one page. By default 10.
         'title' => 'List', // It can be empty ''
-        'strictFilters' => true, // If true, then a searching by filters will be strict, using an equal '=' SQL operator instead of 'like'.
+        'strictFilters' => false, // If true, then a searching by filters will be strict, using an equal '=' SQL operator instead of 'like'.
         'rowsFormAction' => '/admin/pages/deletion', // Route url to send slected checkbox items for deleting rows, for example.
-        'useSendButtonAnyway' => true, // If true, even if there are no checkbox column, the main send button will be displayed.
+        'useSendButtonAnyway' => false, // If true, even if there are no checkbox column, the main send button will be displayed.
         'searchButtonLabel' => 'Find',
         'columnFields' => [
                 [
@@ -60,18 +69,39 @@ $title = 'Modules';
                     'label' => 'Actions', // Optional
                     'class' => Itstructure\GridView\Columns\ActionColumn::class, // Required
                     'actionTypes' => [ // Required
-                        'view',
-                        'edit' => function ($data) {
-                            return '/admin/pages/' . $data->id . '/edit';
-                        },
+                        [
+                            'class' => Itstructure\GridView\Actions\View::class, // Required
+                            'url' => function ($model) { // Optional
+                                return route('admin.modules.view', ['id' => $model->id]);
+                            },
+                            'htmlAttributes' => [ // Optional
+                                'class' => 'showbsmodal',
+                                'title' => 'View '.$title_single,
+                                'data-bs-toggle' => "modal",
+                                'data-bs-target' => "#crud_form_modal"
+                            ]
+                        ],
+                        [
+                            'class' => Itstructure\GridView\Actions\Edit::class, // Required
+                            'url' => function ($model) { // Optional
+                                return route('admin.modules.edit', ['id' => $model->id]);
+                            },
+                            'htmlAttributes' => [ // Optional
+                                'class' => 'showbsmodal',
+                                'title' => 'Update '.$title_single,
+                                'data-bs-toggle' => "modal",
+                                'data-bs-target' => "#crud_form_modal"
+                            ]
+                        ],
                         [
                             'class' => Itstructure\GridView\Actions\Delete::class, // Required
-                            'url' => function ($data) { // Optional
-                                return '/admin/pages/' . $data->id . '/delete';
+                            'url' => function ($model) { // Optional
+                                return route('admin.modules.delete', ['id' => $model->id]);
                             },
                             'htmlAttributes' => [ // Optional
                                 'target' => '_blank',
-                                'style' => 'color: yellow; font-size: 16px;',
+                                'title' => 'Delete '.$title_single,
+                                'class' => '',
                                 'onclick' => 'return window.confirm("Are you sure you want to delete?");'
                             ]
                         ],
@@ -80,12 +110,63 @@ $title = 'Modules';
             ],
             // set your toolbar
             'toolbar' =>  [
-                'content' => '<button type="button" class="btn btn-success" title="Add Book">Add</button>',
-                'resetbtn' => ['class' => 'btn btn-warning ms-2 me-2', 'onclick'=>'dsa'],
+                'content' => '<div class="btn-group" role="group">
+                                '.$createbtn.'
+                                <a href="'.route("admin.modules.index").'" class="btn btn-secondary" title="Refresh Module"><i class="fas fa-refresh"></i></a>
+                            </div>
+                            ',
+                'resetbtn' => ['class' => 'btn btn-warning ms-2'],
                 'searchbtn' => ['class' => 'btn btn-primary'],
+                'applybtn' => $applydropdown.'<button type="button" class="btn btn-success ms-2" title="Add Book">Apply</button>',
             ],
         ];
         @endphp
         @gridView($gridData)
     </div>
 @endsection
+
+@section('modal')
+{!! Modal::start([
+    'options' => ['id' => 'crud_form_modal'],
+    'title' => 'Create Module',
+    'header' => true,
+    'size' => 'modal-md',
+    'clientOptions' => [
+        'backdrop' => true,
+        'keyboard' => true
+    ]
+  ]) !!}
+ @include('layouts.loadercontent', ['name' => $title_single, 'loader' => 'div'])
+<div id="modalContent"></div>
+{!! Modal::end() !!}
+@endsection
+
+@section('pagescript')
+<script>
+    $(document).ready(function() {
+        var nameloader = '.{!! $title_single !!}_loader';
+        $('.showbsmodal').click(function(){
+            $('#crud_form_modal').find('#crud_form_modal-label').html($(this).attr('title'));
+            var data = {
+                "_token": "{{ csrf_token() }}",
+            }
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('href'),
+                data: data,
+                beforeSend: function() {
+                    $(nameloader).show();
+                },
+                success: function(response) {
+                    $('#crud_form_modal').find('#modalContent').html(response);
+                },
+                complete: function() {
+                    $(nameloader).hide();
+                },
+                dataType: 'html'
+            });
+        });
+    });
+</script>
+@endsection
+
