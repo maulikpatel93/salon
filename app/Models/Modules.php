@@ -16,6 +16,7 @@ class Modules extends Model
      */
     protected $table = 'modules';
 
+    protected $appends = ['isNewRecord'];
     /**
      * The attributes that are mass assignable.
      *
@@ -49,4 +50,9 @@ class Modules extends Model
     protected $casts = [
         'is_active_at' => 'datetime',
     ];
+
+    public function getIsNewRecordAttribute()
+     {
+          return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
+     }
 }

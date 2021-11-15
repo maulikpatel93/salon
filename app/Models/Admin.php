@@ -18,6 +18,8 @@ class Admin extends Authenticatable
      * @var string
      */
     protected $table = 'users';
+
+    protected $appends = ['isNewRecord'];
     /**
      * The attributes that are mass assignable.
      *
@@ -49,4 +51,8 @@ class Admin extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function getIsNewRecordAttribute()
+     {
+          return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
+     }
 }

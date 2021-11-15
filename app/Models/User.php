@@ -12,6 +12,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    protected $appends = ['isNewRecord'];
     /**
      * The attributes that are mass assignable.
      *
@@ -42,4 +43,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function getIsNewRecordAttribute()
+     {
+          return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
+     }
 }

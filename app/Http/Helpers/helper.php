@@ -53,26 +53,6 @@ if (! function_exists('access')) {
     }
 }
 
-if (! function_exists('history')) {
-    /**
-     * Access the history facade anywhere.
-     */
-    function history()
-    {
-        return app('history');
-    }
-}
-
-if (! function_exists('gravatar')) {
-    /**
-     * Access the gravatar helper.
-     */
-    function gravatar()
-    {
-        return app('gravatar');
-    }
-}
-
 if (! function_exists('includeRouteFiles')) {
     /**
      * Loops through a folder and requires all PHP files
@@ -162,27 +142,6 @@ if (! function_exists('getRouteUrl')) {
     }
 }
 
-if (! function_exists('renderMenuItems')) {
-    /**
-     * render sidebar menu items after permission check.
-     */
-    function renderMenuItems($items, $viewName = 'backend.includes.partials.sidebar-item')
-    {
-        foreach ($items as $item) {
-            // if(!empty($item->url) && !Route::has($item->url)) {
-            //     return;
-            // }
-            if (! empty($item->view_permission_id)) {
-                if (access()->allow($item->view_permission_id)) {
-                    echo view($viewName, compact('item'));
-                }
-            } else {
-                echo view($viewName, compact('item'));
-            }
-        }
-    }
-}
-
 if (! function_exists('checkDatabaseConnection')) {
     /**
      * @return bool
@@ -196,5 +155,26 @@ if (! function_exists('checkDatabaseConnection')) {
         } catch (Exception $ex) {
             return false;
         }
+    }
+}
+
+
+if (! function_exists('encode')) {
+    /**
+     * @return bool
+     */
+    function encode($str)
+    {
+        return base64_encode($str);
+    }
+}
+
+if (! function_exists('decode')) {
+    /**
+     * @return bool
+     */
+    function decode($str)
+    {
+        return base64_decode($str);
     }
 }

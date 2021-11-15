@@ -57,9 +57,13 @@ Route::prefix('admin')->name('admin.')->group(function(){
             Route::post('/create', [ModulesController::class, 'create'])->name('create');
             Route::post('/store', [ModulesController::class, 'store'])->name('store');
             Route::post('/edit/{id}', [ModulesController::class, 'edit'])->name('edit');
-            Route::post('/update', [ModulesController::class, 'update'])->name('update');
+            Route::post('/update/{id}', [ModulesController::class, 'update'])->name('update');
             Route::post('/view', [ModulesController::class, 'view'])->name('view');
             Route::get('/delete', [ModulesController::class, 'delete'])->name('delete');
+            Route::post('/isactive/{id}', [ModulesController::class, 'isactive'])->name('isactive');
+
+            //Dependent-Dropdown
+            Route::post('/childmenu', [ModulesController::class, 'childmenu'])->name('childmenu');
         });
     });
 });

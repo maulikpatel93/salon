@@ -2,6 +2,7 @@
 @php
     $title = 'Modules';
     $title_single = 'Module';
+    $unique_title = str_replace(' ', '_', strtolower($title_single));; //without space
     $createbtn = '<a href="'.route('admin.modules.create').'" class="btn btn-primary showbsmodal" title="Add '.$title_single.'" data-bs-toggle="modal" data-bs-target="#crud_form_modal">Add</a>';
     $applydropdown = '<select class="form-select w-auto" id="applyoption">
         <option value="">--Select--</option>
@@ -32,9 +33,10 @@
 </section>
 @endsection
 @section('content')
-    <div class="container">
+
         @php
         $gridData = [
+         'id' => 'gridtable',
         'dataProvider' => $dataProvider,
         'useFilters' => true,
         'paginatorOptions' => [ // Here you can set some options of paginator Illuminate\Pagination\LengthAwarePaginator, used in a package.
@@ -54,16 +56,52 @@
                     'attribute' => 'id'
                 ],
                 [
-                    'label' => 'First Name', // Column label.
-                    'attribute' => 'first_name', // Attribute, by which the row column data will be taken from a model.
+                    'label' => 'Title', // Column label.
+                    'attribute' => 'title', // Attribute, by which the row column data will be taken from a model.
                 ],
                 [
-                    'label' => 'Last Name',
-                    'attribute' => 'last_name',
+                    'label' => 'Type',
+                    'attribute' => 'type',
                     'value' => function ($row) {
-                            return $row->last_name;
+                            return $row->type;
                         },
-                    'sort' => 'last_name' // To sort rows. Have to set if an 'attribute' is not defined for column.
+                    'sort' => 'type' // To sort rows. Have to set if an 'attribute' is not defined for column.
+                ],
+                [
+                    'label' => 'Functionality', // Column label.
+                    'attribute' => 'functionality', // Attribute, by which the row column data will be taken from a model.
+                ],
+                [
+                    'label' => 'Active', // Column label.
+                    'value' => function ($model) { // You can set 'value' as a callback function to get a row data value dynamically.
+                            $btnbg = ($model->is_active == 1) ? 'success' : 'danger';
+                            $active = ($model->is_active == 1) ? 'Active' : 'InActive';
+                            return Html::link('javascript:void(0)',
+                                            $active,
+                                            [
+                                                'class' => 'btn btn-' . $btnbg . ' btn-sm',
+                                                'id' => 'is_active_' . $model->id,
+                                                'title' => $model->is_active,
+                                                'onclick' => '$.post({
+                                                    url: "'.route('admin.modules.isactive').'",
+                                                    success: function (response) {
+                                                    // $.pjax.reload({container: "#gridtable-pjax"});
+                                                },
+                                            }); return false;'
+                                    ]
+                            );
+                        return '<span class="icon fas '.($row->is_active == 1 ? 'fa-check' : 'fa-times').'"></span>';
+                    },
+                    'filter' => [ // For dropdown it is necessary to set 'data' array. Array keys are for html <option> tag values, array values are for titles.
+                        'class' => Itstructure\GridView\Filters\DropdownFilter::class, // REQUIRED. For this case it is necessary to set 'class'.
+                        'name' => 'active', // REQUIRED if 'attribute' is not defined for column.
+                        'data' => [ // REQUIRED.
+                            0 => 'No active',
+                            1 => 'Active',
+                        ]
+                    ],
+                    'format' => 'html', // To render column content without lossless of html tags, set 'html' formatter.
+                    'sort' => 'active' // To sort rows. Have to set if an attribute is not defined for column.
                 ],
                 [
                     'label' => 'Actions', // Optional
@@ -72,7 +110,7 @@
                         [
                             'class' => Itstructure\GridView\Actions\View::class, // Required
                             'url' => function ($model) { // Optional
-                                return route('admin.modules.view', ['id' => $model->id]);
+                                return route('admin.modules.view', ['id' => encode($model->id)]);
                             },
                             'htmlAttributes' => [ // Optional
                                 'class' => 'showbsmodal',
@@ -84,7 +122,7 @@
                         [
                             'class' => Itstructure\GridView\Actions\Edit::class, // Required
                             'url' => function ($model) { // Optional
-                                return route('admin.modules.edit', ['id' => $model->id]);
+                                return route('admin.modules.edit', ['id' => encode($model->id)]);
                             },
                             'htmlAttributes' => [ // Optional
                                 'class' => 'showbsmodal',
@@ -96,7 +134,7 @@
                         [
                             'class' => Itstructure\GridView\Actions\Delete::class, // Required
                             'url' => function ($model) { // Optional
-                                return route('admin.modules.delete', ['id' => $model->id]);
+                                return route('admin.modules.delete', ['id' => encode($model->id)]);
                             },
                             'htmlAttributes' => [ // Optional
                                 'target' => '_blank',
@@ -112,7 +150,8 @@
             'toolbar' =>  [
                 'content' => '<div class="btn-group" role="group">
                                 '.$createbtn.'
-                                <a href="'.route("admin.modules.index").'" class="btn btn-secondary" title="Refresh Module"><i class="fas fa-refresh"></i></a>
+                                <a href="'.route("admin.modules.index").'" class="btn btn-secondary" title="Refresh Module" data-trigger-pjax=1
+                           data-pjax-target="#gridtable-pjax"><i class="fas fa-refresh"></i></a>
                             </div>
                             ',
                 'resetbtn' => ['class' => 'btn btn-warning ms-2'],
@@ -122,7 +161,6 @@
         ];
         @endphp
         @gridView($gridData)
-    </div>
 @endsection
 
 @section('modal')
@@ -136,7 +174,7 @@
         'keyboard' => true
     ]
   ]) !!}
- @include('layouts.loadercontent', ['name' => $title_single, 'loader' => 'div'])
+ @include('layouts.loadercontent', ['name' => $unique_title, 'loader' => 'div'])
 <div id="modalContent"></div>
 {!! Modal::end() !!}
 @endsection
@@ -144,7 +182,7 @@
 @section('pagescript')
 <script>
     $(document).ready(function() {
-        var nameloader = '.{!! $title_single !!}_loader';
+        var nameloader = '.{!! $unique_title !!}_loader';
         $('.showbsmodal').click(function(){
             $('#crud_form_modal').find('#crud_form_modal-label').html($(this).attr('title'));
             var data = {
@@ -159,6 +197,7 @@
                 },
                 success: function(response) {
                     $('#crud_form_modal').find('#modalContent').html(response);
+                    
                 },
                 complete: function() {
                     $(nameloader).hide();
@@ -167,6 +206,7 @@
             });
         });
     });
+
 </script>
 @endsection
 

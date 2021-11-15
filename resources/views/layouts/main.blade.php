@@ -18,8 +18,10 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('plugins/dependent-dropdown/css/dependent-dropdown.min.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('css/styles.css') }}" rel="stylesheet" type="text/css">
     <script src="{{ asset('js/jquery.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('plugins/dependent-dropdown/js/dependent-dropdown.min.js') }}" type="text/javascript"></script>
     @stack('after-styles')
 </head>
 
@@ -176,11 +178,21 @@
     <script type="text/javascript" src="{{ asset('plugins/jsvalidation/jsvalidation.js')}}"></script>
     <script src="{{ asset('js/AdminLTE.js') }}" type="text/javascript"></script>
     <script src="{{ asset('plugins/jquery-pjax/jquery.pjax.js') }}" type="text/javascript"></script>
+    
     <script src="{{ asset('js/demo.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/myfunction.js') }}" type="text/javascript"></script>
+    {{-- <script src="{{ asset('js/grid.js') }}" type="text/javascript"></script> --}}
     @stack('after-scripts')
     @yield('pagescript')
     @endauth
+    <script type="text/javascript">
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    </script>
+        
 </body>
 
 </html>

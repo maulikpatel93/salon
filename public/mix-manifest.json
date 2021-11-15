@@ -4,9 +4,11 @@
     "/js/AdminLTE.js": "/js/AdminLTE.js",
     "/css/app.css": "/css/app.css",
     "/css/styles.css": "/css/styles.css",
+    "/plugins/dependent-dropdown/css/dependent-dropdown.min.css": "/plugins/dependent-dropdown/css/dependent-dropdown.min.css",
     "/js/jquery.form.min.js": "/js/jquery.form.min.js",
     "/plugins/icheck-bootstrap/icheck-bootstrap.min.css": "/plugins/icheck-bootstrap/icheck-bootstrap.min.css",
     "/plugins/jquery-pjax/jquery.pjax.js": "/plugins/jquery-pjax/jquery.pjax.js",
+    "/plugins/dependent-dropdown/js/dependent-dropdown.min.js": "/plugins/dependent-dropdown/js/dependent-dropdown.min.js",
     "/js/adminlte.min.js": "/js/adminlte.min.js",
     "/js/demo.js": "/js/demo.js",
     "/js/myfunction.js": "/js/myfunction.js"

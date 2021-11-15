@@ -5,7 +5,7 @@
     <!-- /.login-logo -->
     <div class="card card-outline card-primary">
         <div class="card-header text-center">
-            <a href="" class="h1">{{ config('app.name') }}</a>
+            <a href="" class="h1">{{ app_name() }}</a>
         </div>
         <div class="card-body">
             <p class="login-box-msg">{{ __('Sign in to start your session') }}</p>

@@ -29,6 +29,12 @@ const mix = require("laravel-mix");
 //     .sass("resources/sass/styles.scss", "public/css");
 mix.js("resources/js/app.js", "public/js")
     .js("resources/js/jquery.js", "public/js")
+    //css
+    .copy(
+        "node_modules/dependent-dropdown/css/dependent-dropdown.min.css",
+        "public/plugins/dependent-dropdown/css"
+    )
+    //js
     .copy("vendor/jquery-form/form/dist/jquery.form.min.js", "public/js")
     .copy(
         "node_modules/icheck-bootstrap/icheck-bootstrap.min.css",
@@ -37,6 +43,10 @@ mix.js("resources/js/app.js", "public/js")
     .copy(
         "node_modules/jquery-pjax/jquery.pjax.js",
         "public/plugins/jquery-pjax"
+    )
+    .copy(
+        "node_modules/dependent-dropdown/js/dependent-dropdown.min.js",
+        "public/plugins/dependent-dropdown/js"
     )
     .js("resources/js/library/AdminLTE.js", "public/js")
     .copy("resources/js/library/adminlte.min.js", "public/js")
