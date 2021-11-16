@@ -1,6 +1,5 @@
 {{-- <div class="col-lg-{!! $bootstrapColWidth !!}"> --}}
-    <a href="{!! $url !!}" @if(!empty($htmlAttributes)) {!! $htmlAttributes !!} @endif >
+    <a href="{!! $url !!}" @if(!empty($htmlAttributes)) {!! $htmlAttributes !!} @endif class="ms-1 me-1" >
         <i class="fas fa-eye"></i>
-    </a>&nbsp
+    </a>
 {{-- </div> --}}
-<div class="d-lg-none">&nbsp</div>

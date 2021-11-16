@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    {{-- <meta name="viewport" content="width=device-width, initial-scale=1"> --}}
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="csrf-token" content="_token">
@@ -20,6 +21,7 @@
     <link href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('plugins/dependent-dropdown/css/dependent-dropdown.min.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('css/styles.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('plugins/sweetalert2/css/sweetalert2.css') }}" rel="stylesheet" type="text/css">
     <script src="{{ asset('js/jquery.js') }}" type="text/javascript"></script>
     <script src="{{ asset('plugins/dependent-dropdown/js/dependent-dropdown.min.js') }}" type="text/javascript"></script>
     @stack('after-styles')
@@ -156,7 +158,9 @@
             @yield('breadcrumb')
             <!-- Main content -->
             <section class="content">
-                @yield('content')
+                <div class="container-fluid">
+                    @yield('content')
+                </div>
             </section>
             <!-- /.content -->
         </div>
@@ -178,10 +182,12 @@
     <script type="text/javascript" src="{{ asset('plugins/jsvalidation/jsvalidation.js')}}"></script>
     <script src="{{ asset('js/AdminLTE.js') }}" type="text/javascript"></script>
     <script src="{{ asset('plugins/jquery-pjax/jquery.pjax.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('plugins/sweetalert2/js/sweetalert2.all.min.js') }}" type="text/javascript"></script>
     
+    <script src="{{ asset('js/grid.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/sweetalert2.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/demo.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/myfunction.js') }}" type="text/javascript"></script>
-    {{-- <script src="{{ asset('js/grid.js') }}" type="text/javascript"></script> --}}
     @stack('after-scripts')
     @yield('pagescript')
     @endauth
@@ -192,7 +198,7 @@
         }
     });
     </script>
-        
+    @stack('grid_js')  
 </body>
 
 </html>

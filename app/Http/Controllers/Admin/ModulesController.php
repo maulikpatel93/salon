@@ -7,6 +7,8 @@ use App\Http\Requests\ModuleRequest;
 use Illuminate\Http\Request;
 use Itstructure\GridView\DataProviders\EloquentDataProvider;
 use App\Models\Modules;
+use App\Http\Middleware\Pjax;
+use Symfony\Component\HttpFoundation\Response;
 
 class ModulesController extends Controller
 {
@@ -20,8 +22,13 @@ class ModulesController extends Controller
         parent::__construct();
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        // $request->headers->set('X-PJAX', true);
+        // $request->headers->set('X-PJAX-Container', '#gridtable-pjax');
+        
+        // echo '<pre>'; print_r($request->headers); echo '<pre>';dd();
+
         // global $user;
         $dataProvider = new EloquentDataProvider(Modules::query());
         return view('admin.modules.index',[
@@ -45,7 +52,7 @@ class ModulesController extends Controller
         if($request->ajax() && $model->create($inputVal)){
             $responseData['status'] = 200;
             $responseData['message'] = 'Success';
-            $responseData['url'] = route('admin.modules.index');
+            $responseData['url'] = false;
             return response()->json($responseData);
         }
         return redirect()->route('admin.modules.index');
@@ -53,7 +60,7 @@ class ModulesController extends Controller
 
     public function edit($id)
     {
-        $model = Modules::find(decode($id));
+        $model = $this->findModel(decode($id));
         return view('admin.modules.update', ['model' => $model]);
     }
 
@@ -63,22 +70,22 @@ class ModulesController extends Controller
         $inputVal = $request->all();
         $inputVal['controller'] = $inputVal['controller'] ?? '';
         $inputVal['action'] = $inputVal['action'] ?? '';
-        $model = Modules::find(decode($id));
+        $model = $this->findModel(decode($id));
         if($request->ajax() && $model->update($inputVal)){
             $responseData['status'] = 200;
             $responseData['message'] = 'Success';
-            $responseData['url'] = route('admin.modules.index');
+            $responseData['url'] = false;
             return response()->json($responseData);
         }
         return redirect()->route('admin.modules.index');
     }
 
-    public function view()
+    public function view(Request $request, $id)
     {
         return view('admin.modules.view');
     }
 
-    public function delete()
+    public function delete(Request $request, $id)
     {
 
     }
@@ -86,17 +93,68 @@ class ModulesController extends Controller
     public function isactive(Request $request, $id)
     {
         if ($request->ajax()) {
-            $model = $this->findModel($id);
-            $model->status = ($model->status == self::ACTIVE) ? self::INACTIVE : self::ACTIVE;
-            $model->status_at = Yii::$app->BackFunctions->currentDateTime();
+            $model = $this->findModel(decode($id));
+            $model->is_active = ($model->is_active == self::ACTIVE) ? self::INACTIVE : self::ACTIVE;
+            $model->is_active_at = currentDateTime();
             return $model->save();
         }
     }
 
-    public function apply()
+    public function applystatus(Request $request)
     {
-        
+        if ($request->ajax()) {
+            $inputall = $request->all();
+            if (isset($inputall['applyoption'])) {
+                $inputall['applyoption'] = ($inputall['applyoption'] == 'Active') ? '1' : '0';
+                if ($inputall['applyoption'] == self::ACTIVE) {
+                    // if(empty(Yii::$app->BackFunctions->checkaccess('statusupdate', Yii::$app->controller->id))){
+                    //     throw new \yii\web\HttpException('403',"You don't have permission to access on this role.");
+                    // }   
+                    if (isset($inputall['keylist']) && $inputall['keylist']) {
+                        foreach ($inputall['keylist'] as $id) {
+                            $model = $this->findModel($id);
+                            $model->is_active = '1';
+                            $model->is_active_at = currentDateTime();
+                            $model->save();
+                        }
+                    }
+                } elseif ($inputall['applyoption'] == self::INACTIVE) {
+                    // if(empty(Yii::$app->BackFunctions->checkaccess('statusupdate', Yii::$app->controller->id))){
+                    //     throw new \yii\web\HttpException('403',"You don't have permission to access on this role.");
+                    // }
+                    if (isset($inputall['keylist']) && $inputall['keylist']) {
+                        foreach ($inputall['keylist'] as $id) {
+                            $model = $this->findModel($id);
+                            $model->is_active = '0';
+                            $model->is_active_at = currentDateTime();
+                            $model->save();
+                        }
+                    }
+                } elseif ($inputall['keylist'] == self::DELETE) {
+                    // if(empty(Yii::$app->BackFunctions->checkaccess('delete', Yii::$app->controller->id))){
+                    //     throw new \yii\web\HttpException('403',"You don't have permission to access on this role.");
+                    // }
+                    if (isset($inputall['delete']) && $inputall['delete']) {
+                        foreach ($inputall['delete'] as $id) {
+                            $this->findModel($id)->delete();
+                        }
+                    }
+                }
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
+
+    protected function findModel($id) {
+        if (($model = Modules::find($id)) !== null) {
+            return $model;
+        }
+
+        throw new Exception('The requested page does not exist.');
+    }
+    
 
     public function childmenu()
     {
@@ -126,5 +184,12 @@ class ModulesController extends Controller
             }
         }
         return response()->json(['output' => '', 'selected' => '']);
+    }
+
+    protected function addPjaxHeaders(Request $request)
+    {
+        $request->headers->set('X-PJAX', true);
+        $request->headers->set('X-PJAX-Container', '#pjax-container');
+        return $request;
     }
 }

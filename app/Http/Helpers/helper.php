@@ -178,3 +178,25 @@ if (! function_exists('decode')) {
         return base64_decode($str);
     }
 }
+
+if (! function_exists('currentDateTime')) {
+    function currentDateTime() {
+        $format = 'Y-m-d H:i:s';
+        return date($format);
+    }
+}
+if (! function_exists('currentDate')) {
+    function currentDate() {
+        $format = 'Y-m-d';
+        return date($format);
+    }
+}
+if (! function_exists('currentTime')) {
+    function currentTime($format = '24') {
+        $format = 'H:i:s';
+        if ($format == 12) {
+            $format = 'H:i A';
+        }
+        return date($format);
+    }
+}

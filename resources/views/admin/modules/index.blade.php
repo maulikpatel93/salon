@@ -3,13 +3,17 @@
     $title = 'Modules';
     $title_single = 'Module';
     $unique_title = str_replace(' ', '_', strtolower($title_single));; //without space
-    $createbtn = '<a href="'.route('admin.modules.create').'" class="btn btn-primary showbsmodal" title="Add '.$title_single.'" data-bs-toggle="modal" data-bs-target="#crud_form_modal">Add</a>';
-    $applydropdown = '<select class="form-select w-auto" id="applyoption">
+    $createbtn = '<a href="'.route('admin.modules.create').'" class="btn btn-primary showModalButton" title="Add '.$title_single.'" data-bs-toggle="modal" data-bs-target="#gridviewModal">Add</a>';
+    $applydropdown = '<select class="form-select w-auto me-3" name="applyoption" id="applyoption">
         <option value="">--Select--</option>
         <option value="Active">Active</option>
         <option value="Inactive">InActive</option>
-        <option value="Delete">InActive</option>
+        <option value="Delete">Delete</option>
         </select>';
+
+    $applySubmit = Form::button('Apply', ['class' => 'btn btn-primary', 'id' => 'applysubmit', 'onclick' => 'applyjs(this);']);
+    $applyafter = $applydropdown.' '.$applySubmit;
+
 
 @endphp
 @section('title')
@@ -25,18 +29,18 @@
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-end">
             <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item active">Gallery</li>
+            <li class="breadcrumb-item active">{{ $title }}</li>
           </ol>
         </div>
       </div>
     </div><!-- /.container-fluid -->
 </section>
 @endsection
-@section('content')
 
+@section('content')
         @php
         $gridData = [
-         'id' => 'gridtable',
+        'id' => 'gridtable',
         'dataProvider' => $dataProvider,
         'useFilters' => true,
         'paginatorOptions' => [ // Here you can set some options of paginator Illuminate\Pagination\LengthAwarePaginator, used in a package.
@@ -46,9 +50,8 @@
         'rowsPerPage' => 10, // The number of rows in one page. By default 10.
         'title' => 'List', // It can be empty ''
         'strictFilters' => false, // If true, then a searching by filters will be strict, using an equal '=' SQL operator instead of 'like'.
-        'rowsFormAction' => '/admin/pages/deletion', // Route url to send slected checkbox items for deleting rows, for example.
+        'rowsFormAction' => route('admin.modules.applystatus'), // Route url to send slected checkbox items for deleting rows, for example.
         'useSendButtonAnyway' => false, // If true, even if there are no checkbox column, the main send button will be displayed.
-        'searchButtonLabel' => 'Find',
         'columnFields' => [
                 [
                     'class' => Itstructure\GridView\Columns\CheckboxColumn::class,
@@ -81,11 +84,11 @@
                                             [
                                                 'class' => 'btn btn-' . $btnbg . ' btn-sm',
                                                 'id' => 'is_active_' . $model->id,
-                                                'title' => $model->is_active,
+                                                'title' => $active,
                                                 'onclick' => '$.post({
-                                                    url: "'.route('admin.modules.isactive').'",
+                                                    url: "'.route('admin.modules.isactive',['id'=>encode($model->id)]).'",
                                                     success: function (response) {
-                                                    // $.pjax.reload({container: "#gridtable-pjax"});
+                                                    $.pjax.reload({container: "#gridtable-pjax"});
                                                 },
                                             }); return false;'
                                     ]
@@ -94,14 +97,14 @@
                     },
                     'filter' => [ // For dropdown it is necessary to set 'data' array. Array keys are for html <option> tag values, array values are for titles.
                         'class' => Itstructure\GridView\Filters\DropdownFilter::class, // REQUIRED. For this case it is necessary to set 'class'.
-                        'name' => 'active', // REQUIRED if 'attribute' is not defined for column.
+                        'name' => 'is_active', // REQUIRED if 'attribute' is not defined for column.
                         'data' => [ // REQUIRED.
                             0 => 'No active',
                             1 => 'Active',
                         ]
                     ],
                     'format' => 'html', // To render column content without lossless of html tags, set 'html' formatter.
-                    'sort' => 'active' // To sort rows. Have to set if an attribute is not defined for column.
+                    'sort' => 'is_active' // To sort rows. Have to set if an attribute is not defined for column.
                 ],
                 [
                     'label' => 'Actions', // Optional
@@ -113,10 +116,8 @@
                                 return route('admin.modules.view', ['id' => encode($model->id)]);
                             },
                             'htmlAttributes' => [ // Optional
-                                'class' => 'showbsmodal',
+                                'class' => 'showModalButton ms-1 me-1',
                                 'title' => 'View '.$title_single,
-                                'data-bs-toggle' => "modal",
-                                'data-bs-target' => "#crud_form_modal"
                             ]
                         ],
                         [
@@ -125,10 +126,8 @@
                                 return route('admin.modules.edit', ['id' => encode($model->id)]);
                             },
                             'htmlAttributes' => [ // Optional
-                                'class' => 'showbsmodal',
+                                'class' => 'showModalButton ms-1 me-1',
                                 'title' => 'Update '.$title_single,
-                                'data-bs-toggle' => "modal",
-                                'data-bs-target' => "#crud_form_modal"
                             ]
                         ],
                         [
@@ -139,7 +138,7 @@
                             'htmlAttributes' => [ // Optional
                                 'target' => '_blank',
                                 'title' => 'Delete '.$title_single,
-                                'class' => '',
+                                'class' => 'ms-1 me-1',
                                 'onclick' => 'return window.confirm("Are you sure you want to delete?");'
                             ]
                         ],
@@ -150,13 +149,11 @@
             'toolbar' =>  [
                 'content' => '<div class="btn-group" role="group">
                                 '.$createbtn.'
-                                <a href="'.route("admin.modules.index").'" class="btn btn-secondary" title="Refresh Module" data-trigger-pjax=1
-                           data-pjax-target="#gridtable-pjax"><i class="fas fa-refresh"></i></a>
+                                <a href="'.route("admin.modules.index").'" class="btn btn-secondary" title="Refresh Module" data-trigger-pjax="1" ><i class="fas fa-refresh"></i></a>
                             </div>
                             ',
                 'resetbtn' => ['class' => 'btn btn-warning ms-2'],
-                'searchbtn' => ['class' => 'btn btn-primary'],
-                'applybtn' => $applydropdown.'<button type="button" class="btn btn-success ms-2" title="Add Book">Apply</button>',
+                'applybtn' => $applyafter,
             ],
         ];
         @endphp
@@ -165,7 +162,7 @@
 
 @section('modal')
 {!! Modal::start([
-    'options' => ['id' => 'crud_form_modal'],
+    'options' => ['id' => 'gridviewModal'],
     'title' => 'Create Module',
     'header' => true,
     'size' => 'modal-md',
@@ -181,32 +178,56 @@
 
 @section('pagescript')
 <script>
-    $(document).ready(function() {
-        var nameloader = '.{!! $unique_title !!}_loader';
-        $('.showbsmodal').click(function(){
-            $('#crud_form_modal').find('#crud_form_modal-label').html($(this).attr('title'));
-            var data = {
-                "_token": "{{ csrf_token() }}",
+    var nameloader = '.{!! $unique_title !!}_loader';
+    $(document).on('click', '.showModalButton', function () {
+        document.getElementById('gridviewModal-label').innerHTML = $(this).attr('title');
+        var data = {
+            "_token": "{{ csrf_token() }}",
+        }
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('href'),
+            data: data,
+            beforeSend: function () {
+                $('#gridviewModal').modal('show');
+                $('#gridviewModal').find('#modalContent').html('');
+                $(nameloader).show();
+            },
+            success: function (response) {
+                $('#gridviewModal').find('#modalContent').html(response);
+            },
+            complete: function () {
+                $(nameloader).hide();
             }
-            $.ajax({
-                type: 'POST',
-                url: $(this).attr('href'),
-                data: data,
-                beforeSend: function() {
-                    $(nameloader).show();
-                },
-                success: function(response) {
-                    $('#crud_form_modal').find('#modalContent').html(response);
-                    
-                },
-                complete: function() {
-                    $(nameloader).hide();
-                },
-                dataType: 'html'
-            });
         });
+        return false;
     });
-
+    function applyjs(e) {
+            var confirmbtn = confirmationAlert(
+                e,
+                "Are you sure want to Apply?",
+                "text"
+            );
+            if (confirmbtn == true) {
+                var keys=[];
+                $('.kv-grid-table').find("input[name='delete[]']:checked").each(function () {
+                    keys.push($(this).val());
+                });
+                // var myform = document.getElementById("grid_view_rows_form");
+                // var fd = new FormData(myform);
+                var applyoption = $("#applyoption").val();
+                $.post({
+                    url: $("#grid_view_rows_form").attr("action"),
+                    data: {keylist: keys, applyoption: applyoption},
+                    // processData: false,
+                    // contentType: false,
+                    success: function(response) {
+                        //alert('I did it! Processed checked rows.')
+                        $.pjax.reload({ container: "#gridtable-pjax" });
+                    },
+                });
+            }
+        }
 </script>
 @endsection
 

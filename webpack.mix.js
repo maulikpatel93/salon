@@ -34,6 +34,10 @@ mix.js("resources/js/app.js", "public/js")
         "node_modules/dependent-dropdown/css/dependent-dropdown.min.css",
         "public/plugins/dependent-dropdown/css"
     )
+    .sass(
+        "node_modules/sweetalert2/src/sweetalert2.scss",
+        "public/plugins/sweetalert2/css"
+    )
     //js
     .copy("vendor/jquery-form/form/dist/jquery.form.min.js", "public/js")
     .copy(
@@ -48,6 +52,12 @@ mix.js("resources/js/app.js", "public/js")
         "node_modules/dependent-dropdown/js/dependent-dropdown.min.js",
         "public/plugins/dependent-dropdown/js"
     )
+    .js(
+        "node_modules/sweetalert2/src/sweetalert2.js",
+        "public/plugins/sweetalert2/js"
+    )
+    .copy("resources/js/grid.js", "public/js")
+    .copy("resources/js/sweetalert2.js", "public/js")
     .js("resources/js/library/AdminLTE.js", "public/js")
     .copy("resources/js/library/adminlte.min.js", "public/js")
     .copy("resources/js/library/demo.js", "public/js")

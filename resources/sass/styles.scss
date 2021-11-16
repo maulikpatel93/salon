@@ -8,7 +8,6 @@ $warningColor: #d99000;
 $infoColor: #16b5ea;
 $lightColor: #e8e8e8;
 $darkColor: #131313;
-
 $borderPrimaryColor: #0e52c1;
 $borderSecondaryColor: #ba50fd;
 $borderSuccessColor: #1abe5c;
@@ -17,7 +16,6 @@ $borderWarningColor: #ffb21a;
 $borderInfoColor: #4dc6ef;
 $borderLightColor: #fbfbfb;
 $borderDarkColor: #1e1e1e;
-
 .btn-primary,
 .btn-success,
 .btn-danger,
@@ -28,11 +26,9 @@ $borderDarkColor: #1e1e1e;
 // body{
 //     background-color: $darkColor;
 // }
-
 // .btn.btn-primary{
 //     background-color: $primaryColor;
 // }
-
 .form-inline {
     display: -ms-flexbox;
     display: flex;
@@ -45,9 +41,11 @@ $borderDarkColor: #1e1e1e;
 .form-inline .form-check {
     width: 100%;
 }
+
 .navbar {
     padding: 0.5rem 0.5rem;
 }
+
 .navbar-expand .navbar-nav .nav-link {
     padding-right: 1rem;
     padding-left: 1rem;
@@ -63,7 +61,8 @@ $borderDarkColor: #1e1e1e;
     flex-wrap: wrap;
     justify-content: flex-start;
 }
-.preloader{
+
+.preloader {
     opacity: 0.8;
     background-color: #131313;
 }
@@ -71,7 +70,7 @@ $borderDarkColor: #1e1e1e;
 .preloader5 {
     text-align: center;
     left: 0;
-    right:0;
+    right: 0;
     top: 50%;
     position: absolute;
 }
@@ -81,95 +80,95 @@ $borderDarkColor: #1e1e1e;
     padding: 11px;
     margin: 0 0.6em;
     background: $whiteColor;
-    border-radius: 100%
+    border-radius: 100%;
 }
 
 .preloader5 .l {
     -webkit-animation: pulse 1s infinite linear;
-    animation: pulse 1s infinite linear
+    animation: pulse 1s infinite linear;
 }
 
 .preloader5 .m {
     -webkit-animation: pulse 1s infinite linear;
     animation: pulse 1s infinite linear;
     -webkit-animation-delay: 0.2s;
-    animation-delay: 0.2s
+    animation-delay: 0.2s;
 }
 
 .preloader5 .r {
     -webkit-animation: pulse 1s infinite linear;
     animation: pulse 1s infinite linear;
     -webkit-animation-delay: 0.4s;
-    animation-delay: 0.4s
+    animation-delay: 0.4s;
 }
 
 @-webkit-keyframes pulse {
     10% {
         -webkit-transform: scale(1);
-        transform: scale(1)
+        transform: scale(1);
     }
     20% {
         -webkit-transform: scale(1);
-        transform: scale(1)
+        transform: scale(1);
     }
     30% {
         -webkit-transform: scale(1.7);
-        transform: scale(1.7)
+        transform: scale(1.7);
     }
     50% {
         -webkit-transform: scale(1.7);
-        transform: scale(1.7)
+        transform: scale(1.7);
     }
     70% {
         -webkit-transform: scale(1.7);
-        transform: scale(1.7)
+        transform: scale(1.7);
     }
     80% {
         -webkit-transform: scale(1);
-        transform: scale(1)
+        transform: scale(1);
     }
     90% {
         -webkit-transform: scale(1);
-        transform: scale(1)
+        transform: scale(1);
     }
     100% {
         -webkit-transform: scale(1);
-        transform: scale(1)
+        transform: scale(1);
     }
 }
 
 @keyframes pulse {
     10% {
         -webkit-transform: scale(1);
-        transform: scale(1)
+        transform: scale(1);
     }
     20% {
         -webkit-transform: scale(1);
-        transform: scale(1)
+        transform: scale(1);
     }
     30% {
         -webkit-transform: scale(1.7);
-        transform: scale(1.7)
+        transform: scale(1.7);
     }
     50% {
         -webkit-transform: scale(1.7);
-        transform: scale(1.7)
+        transform: scale(1.7);
     }
     70% {
         -webkit-transform: scale(1.7);
-        transform: scale(1.7)
+        transform: scale(1.7);
     }
     80% {
         -webkit-transform: scale(1);
-        transform: scale(1)
+        transform: scale(1);
     }
     90% {
         -webkit-transform: scale(1);
-        transform: scale(1)
+        transform: scale(1);
     }
     100% {
         -webkit-transform: scale(1);
-        transform: scale(1)
+        transform: scale(1);
     }
 }
 
@@ -179,8 +178,9 @@ $borderDarkColor: #1e1e1e;
     background-color: $darkColor;
     position: fixed;
     z-index: 999999;
-    top: 0
+    top: 0;
 }
+
 .theme_loader_applymodal {
     height: 100%;
     width: 100%;
@@ -192,10 +192,11 @@ $borderDarkColor: #1e1e1e;
     left: 0px;
     border-radius: 4px;
 }
+
 .theme_loader_div {
     height: 100%;
     width: 100%;
-    background-color:$darkColor;
+    background-color: $darkColor;
     position: absolute;
     z-index: 5;
     top: 0;
@@ -203,10 +204,11 @@ $borderDarkColor: #1e1e1e;
     left: 0px;
     border-radius: 0px 0px 4px 4px;
 }
+
 .theme_loader_fix {
     height: 100%;
     width: 100%;
-    background-color:$darkColor;
+    background-color: $darkColor;
     position: fixed;
     z-index: 1060;
     top: 0;
@@ -214,6 +216,56 @@ $borderDarkColor: #1e1e1e;
     left: 0px;
     border-radius: 0px 0px 4px 4px;
 }
+
 #modalContent {
     min-height: 100px;
+}
+
+.kv-grid-loading {
+    position: relative;
+    overflow: hidden;
+    max-height: 100%;
+}
+
+.kv-grid-loading .kv-loader-overlay {
+    display: block;
+}
+
+.kv-loader-overlay {
+    background: transparent;
+    position: absolute;
+    opacity: 0.6;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+.kv-grid-loading .card,
+.kv-grid-loading .table {
+    background: transparent;
+    opacity: 0.6;
+}
+
+.kv-loader {
+    position: absolute;
+    background: #fff url("../../public/img/loading.gif") center center no-repeat !important;
+    width: 100px;
+    height: 100px;
+    top: 50%;
+    left: 50%;
+}
+
+.kv-panel-after {
+    padding: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.kv-panel-pager {
+    height: 34px;
+}
+
+.card .kv-grid-table {
+    margin: 0;
 }

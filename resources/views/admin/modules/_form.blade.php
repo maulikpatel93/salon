@@ -7,7 +7,7 @@
 {{ Form::open([
     'url' => $formRoute,
     'class'=>'',
-    'id' => 'my-form',
+    'id' => 'gridview-form',
     'name' => $formName,
     'modal' => 1,
     'loader' => $unique_title,
@@ -78,8 +78,13 @@
     </div>
     {{ Form::close() }}
 
-    {!! JsValidator::formRequest('App\Http\Requests\ModuleRequest', '#my-form'); !!}
+    {!! JsValidator::formRequest('App\Http\Requests\ModuleRequest', '#gridview-form'); !!}
     <script>
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
        $('#moduleform-type').depdrop('init');
         $('#moduleform-parent_menu_id').depdrop({
             depends: ['moduleform-type'],

@@ -51,7 +51,7 @@ jQuery(document).ready(function() {
             rules: <?= json_encode($validator['rules']); ?>,
             submitHandler: function(form) {
                 var formname = $(form).attr('name');
-                console.log(formname);
+                var formid = $(form).attr('id');
                 var enableAjaxSubmit = $(form).attr('enableAjaxSubmit');
                 var enableModal = $(form).attr('modal');
                 var submitButtonName = $(`#${formname}-submit`).html();
@@ -81,13 +81,9 @@ jQuery(document).ready(function() {
                                             'alert alert-danger p-1');
                                     }
                                     $('#formerror').addClass('alert alert-success p-1');
-
-                                    if (response.url) {
-                                        location.reload(response.url);
-                                    }
-                                    if (enableModal === '1' || enableModal === 1) {
-                                        $(`#${formname}`).modal('hide');
-                                    }
+                                }
+                                if (response.url) {
+                                    location.reload(response.url);
                                 }
                             }
                         },
@@ -95,6 +91,12 @@ jQuery(document).ready(function() {
                             $(nameloader).hide();
                             $(`#${formname}-submit`).attr("disabled", false);
                             $(`#${formname}-submit`).html(submitButtonName);
+                            if (enableModal === '1' || enableModal === 1) {
+                                if(formid == 'gridview-form'){
+                                    $(`#gridviewModal`).modal('hide');
+                                    $.pjax.reload({container: "#gridtable-pjax"});
+                                }
+                            }
                         },
                         error: function(response) {
                             console.log('error');

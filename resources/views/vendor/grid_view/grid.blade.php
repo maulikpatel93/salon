@@ -12,8 +12,31 @@ $checkboxesExist = false;
         border-width: 0;
     }
 </style>
+@php
+$resetbtnOption = 'class="btn btn-warning"';
+$searchbtnOption = 'class="btn btn-primary"';
+if(isset($toolbar['resetbtn']) && $toolbar['resetbtn']){
+    $keys = array_keys($toolbar['resetbtn']);
+    $values = array_values($toolbar['resetbtn']);
+    $attribute = [];
+    for($i=0; $i<count($keys); $i++){
+        $attribute[] = $keys[$i].'="'.$values[$i].'"';
+    }
+    $resetbtnOption = ($attribute) ? implode(' ', $attribute) : '';
+}
+
+if(isset($toolbar['searchbtn']) && $toolbar['searchbtn']){
+    $keys = array_keys($toolbar['searchbtn']);
+    $values = array_values($toolbar['searchbtn']);
+    $attribute = [];
+    for($i=0; $i<count($keys); $i++){
+        $attribute[] = $keys[$i].'="'.$values[$i].'"';
+    }
+    $searchbtnOption = ($attribute) ? implode(' ', $attribute) : '';
+}
+@endphp
 <div id="gridtable-pjax" data-pjax-container="" data-pjax-push-state data-pjax-timeout="1000">
-    <div class="kv-loader-overlay"><div class="kv-loader"></div>
+    <div class="kv-loader-overlay"><div class="kv-loader"></div></div>
     <div class="{!! $id !!}" class="grid-view is-bs4 kv-grid-bs4 hide-resize" >
         <div class="card">
             <div class="card-header">
@@ -50,34 +73,11 @@ $checkboxesExist = false;
                         @endphp
                     @endisset
                     @if ($useFilters)
-                    @php
-                    $resetbtnOption = 'class="btn btn-warning"';
-                    $searchbtnOption = 'class="btn btn-primary"';
-                    if(isset($toolbar['resetbtn']) && $toolbar['resetbtn']){
-                        $keys = array_keys($toolbar['resetbtn']);
-                        $values = array_values($toolbar['resetbtn']);
-                        $attribute = [];
-                        for($i=0; $i<count($keys); $i++){
-                            $attribute[] = $keys[$i].'="'.$values[$i].'"';
-                        }
-                        $resetbtnOption = ($attribute) ? implode(' ', $attribute) : '';
-                    }
-
-                    if(isset($toolbar['searchbtn']) && $toolbar['searchbtn']){
-                        $keys = array_keys($toolbar['searchbtn']);
-                        $values = array_values($toolbar['searchbtn']);
-                        $attribute = [];
-                        for($i=0; $i<count($keys); $i++){
-                            $attribute[] = $keys[$i].'="'.$values[$i].'"';
-                        }
-                        $searchbtnOption = ($attribute) ? implode(' ', $attribute) : '';
-                    }
-                    @endphp
                     <div class="btn-group" role="group">
                         <button id="grid_view_reset_button" type="button" @php echo $resetbtnOption @endphp>{{
                             $resetButtonLabel }}</button>
-                        <button id="grid_view_search_button" type="button" @php echo $searchbtnOption @endphp>{{
-                            $searchButtonLabel }}</button>
+                        {{-- <button id="grid_view_search_button" type="button" @php echo $searchbtnOption @endphp>{{
+                            $searchButtonLabel }} <i class="fas fa-filter"></i></button> --}}
                     </div>
                     @endif
                 </div>
@@ -101,7 +101,7 @@ $checkboxesExist = false;
                                     @if($useFilters)
                                     {{ $column_obj->getLabel() }}
                                     @else
-                                    <input type="checkbox" id="grid_view_checkbox_main" class="form-check-input"
+                                    <input type="checkbox" id="grid_view_checkbox_main" class="form-check-input kv-all-select"
                                         @if($paginator->count() == 0) disabled="disabled" @endif />
                                     @endif
 
@@ -115,22 +115,22 @@ $checkboxesExist = false;
                                 @endforeach
                             </tr>
                             @if ($useFilters)
-                            <tr>
-                                <form action="" method="get" id="grid_view_filters_form">
+                            <tr class="filter-header" id="gridtablefilter">
+                                <form action="" method="get" id="grid_view_filters_form" data-trigger-pjax="0" >
                                     <td></td>
                                     @foreach($columnObjects as $column_obj)
-                                    <td>
-                                        @if($column_obj instanceof \Itstructure\GridView\Columns\CheckboxColumn)
-                                        <div class="text-center">
-                                        <input type="checkbox" id="grid_view_checkbox_main" class="form-check-input"
-                                            @if($paginator->count() == 0) disabled="disabled" @endif />
-                                        </div>
-                                        @else
-                                        {!! $column_obj->getFilter()->render() !!}
-                                        @endif
-                                    </td>
+                                        <td>
+                                            @if($column_obj instanceof \Itstructure\GridView\Columns\CheckboxColumn)
+                                            <div class="text-center">
+                                            <input type="checkbox" id="grid_view_checkbox_main" class="form-check-input kv-all-select"
+                                                @if($paginator->count() == 0) disabled="disabled" @endif />
+                                            </div>
+                                            @else
+                                            {!! $column_obj->getFilter()->render() !!}
+                                            @endif
+                                        </td>
                                     @endforeach
-                                    <input type="submit" class="d-none">
+                                    <button type="submit" class="btn btn-outline-primary grid-filter-button d-none"  id="grid-filter-button" title="filter data">Filter&nbsp;<i class="fas fa-filter"></i></button>
                                 </form>
                             </tr>
                             @endif
@@ -139,15 +139,19 @@ $checkboxesExist = false;
                         <form action="{{ $rowsFormAction }}" method="post" id="grid_view_rows_form">
                             <tbody>
                                 @foreach($paginator->items() as $key => $row)
-                                <tr>
+                                <tr class="gridtable">
                                     <td>{{ ($paginator->currentPage() - 1) * $paginator->perPage() + $key + 1 }}</td>
                                     @foreach($columnObjects as $column_obj)
-                                    <td>{!! $column_obj->render($row) !!}</td>
+                                    @if($column_obj instanceof \Itstructure\GridView\Columns\CheckboxColumn)
+                                    <td class="kv-row-select text-center">{!! $column_obj->render($row) !!}</td>
+                                    @else
+                                    <td class="">{!! $column_obj->render($row) !!}</td>
+                                    @endif
                                     @endforeach
                                 </tr>
                                 @endforeach
                             </tbody>
-                            <tfoot>
+                            {{-- <tfoot>
                                 <tr>
                                     <td colspan="{{ count($columnObjects) + 1 }}">
                                         <div class="mx-1">
@@ -166,11 +170,28 @@ $checkboxesExist = false;
                                         </div>
                                     </td>
                                 </tr>
-                            </tfoot>
+                            </tfoot> --}}
                             <input type="hidden" value="{!! csrf_token() !!}" name="_token">
                         </form>
                     </table>
                 </div>
+            </div>
+            <div class="kv-panel-after p-3">
+                <div class="row">
+                    <div class="col-12 col-xl-4 text-center text-xl-start d-flex">
+                        @if(isset($toolbar['applybtn']))
+                            {!! $toolbar['applybtn'] !!}
+                        @elseif (($checkboxesExist || $useSendButtonAnyway) && $paginator->count() > 0)
+                                <button type="submit" class="btn btn-danger">{{ $sendButtonLabel }}</button>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">    
+                <div class="kv-panel-pager text-center">
+                    {{ $paginator->render('grid_view::pagination') }}
+                </div>
+                <div class="clearfix"></div>
             </div>
         </div>
     </div>
@@ -180,7 +201,6 @@ $checkboxesExist = false;
         $('#grid_view_checkbox_main').click(function (event) {
             $('input[role="grid-view-checkbox-item"]').prop('checked', event.target.checked);
         });
-
         $('#grid_view_search_button').click(function () {
             $('#grid_view_filters_form').submit();
         });
@@ -191,3 +211,27 @@ $checkboxesExist = false;
         });
     });
 </script>
+@push('grid_js')
+    <script>
+      (function($) {
+        var grid = "#gridtable-pjax";
+        var filterForm = "";
+        var searchForm = "";
+        _grids.grid.init({
+          id: grid,
+        //   filterForm: filterForm,
+          dateRangeSelector: '.date-range',
+        //   searchForm: searchForm,
+          pjax: {
+            pjaxOptions: {
+              scrollTo: false,
+            },
+            // what to do after a PJAX request. Js plugins have to be re-intialized
+            afterPjax: function(e) {
+              _grids.init();
+            },
+          },
+        });
+      })(jQuery);
+    </script>
+@endpush
