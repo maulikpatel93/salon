@@ -156,26 +156,25 @@ class ModulesController extends Controller
     }
     
 
-    public function childmenu()
+    public function childmenu(Request $request)
     {
         $out = [];
         if (isset($_POST['depdrop_parents'])) {
             
             $type = empty($_POST['depdrop_parents'][0]) ? null : $_POST['depdrop_parents'][0];
             // $parent_menu_id = empty($_POST['depdrop_parents'][1]) ? null : $_POST['depdrop_parents'][1];
-
+            $type_id = isset($_REQUEST['type_id']) ? $_REQUEST['type_id'] : '';
+            $parent_menu_id = isset($_REQUEST['parent_menu_id']) ? $_REQUEST['parent_menu_id'] : '';
             $list = [];
             if ($type == 'Submenu') {
-                $list = Modules::find()->where(['parent_menu_id' => 0, 'parent_submenu_id' => 0])->where(['title', '!=', ''])->get();
+                $list = Modules::where(['parent_submenu_id' => null, 'type'=>'Menu'])->where('title', '!=', '')->get()->pluck(['id' => 'title'])->toArray();
                 // $list = Modules::find();
             } elseif ($type == 'Subsubmenu' && ($parent_menu_id == 0 || empty($parent_menu_id))) {
                 $list = Modules::find()->where(['menu_id' => $menu_id, 'parent_menu_id' => 0, 'parent_submenu_id' => 0])->andWhere(['!=', 'title', ''])->asArray()->all();
             }
-            // echo '<pre>'; print_r($list); echo '<pre>';dd();
-
             $selected = null;
             if ($type != null && count($list) > 0) {
-                $selected = '';
+                $selected = $parent_menu_id;
                 foreach ($list as $key => $value) {
                     $out[] = ['id' => $key, 'name' => $value];
                 }

@@ -39,10 +39,7 @@ if(isset($toolbar['searchbtn']) && $toolbar['searchbtn']){
     <div class="kv-loader-overlay"><div class="kv-loader"></div></div>
     <div class="{!! $id !!}" class="grid-view is-bs4 kv-grid-bs4 hide-resize" >
         <div class="card">
-            <div class="card-header">
-                @if($title)
-                <h2 class="card-title">{!! $title !!}</h2>
-                @endif
+            <div class="card-header bg-primary text-white">
                 <div class="float-end">
                     @if ($paginator->onFirstPage())
                     {!! trans('grid_view::grid.page-info', [
@@ -64,6 +61,9 @@ if(isset($toolbar['searchbtn']) && $toolbar['searchbtn']){
                     ]) !!}
                     @endif
                 </div>
+                @if($title)
+                <h5 class="m-0">{!! $title !!}</h5>
+                @endif
             </div>
             <div class="kv-panel-before">
                 <div class="btn-toolbar kv-grid-toolbar toolbar-container float-end">
@@ -82,13 +82,13 @@ if(isset($toolbar['searchbtn']) && $toolbar['searchbtn']){
                     @endif
                 </div>
             </div>
-            <div class="card-body">
+            <div class="">
                 <div class="table-responsive kv-grid-container" id="{!! $id !!}-container">
                     <table
                         class="kv-grid-table table @if($tableBordered) table-bordered @endif @if($tableStriped) table-striped @endif @if($tableHover) table-hover @endif @if($tableSmall) table-sm @endif">
                         <thead>
                             <tr>
-                                <th width="5%">#</th>
+                                <th width="5%" class="text-center">#</th>
                                 @foreach($columnObjects as $column_obj)
                                 <th {!! $column_obj->buildHtmlAttributes() !!}>
 
@@ -140,7 +140,7 @@ if(isset($toolbar['searchbtn']) && $toolbar['searchbtn']){
                             <tbody>
                                 @foreach($paginator->items() as $key => $row)
                                 <tr class="gridtable">
-                                    <td>{{ ($paginator->currentPage() - 1) * $paginator->perPage() + $key + 1 }}</td>
+                                    <td class="text-center">{{ ($paginator->currentPage() - 1) * $paginator->perPage() + $key + 1 }}</td>
                                     @foreach($columnObjects as $column_obj)
                                     @if($column_obj instanceof \Itstructure\GridView\Columns\CheckboxColumn)
                                     <td class="kv-row-select text-center">{!! $column_obj->render($row) !!}</td>
@@ -215,11 +215,11 @@ if(isset($toolbar['searchbtn']) && $toolbar['searchbtn']){
     <script>
       (function($) {
         var grid = "#gridtable-pjax";
-        var filterForm = "";
+        var filterForm = "#grid_view_filters_form";
         var searchForm = "";
         _grids.grid.init({
           id: grid,
-        //   filterForm: filterForm,
+          filterForm: filterForm,
           dateRangeSelector: '.date-range',
         //   searchForm: searchForm,
           pjax: {

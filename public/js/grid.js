@@ -240,17 +240,16 @@ var _grids = _grids || {};
                         var _this3 = this;
 
                         var form = $(this.opts.filterForm);
-
                         if (form.length > 0) {
                             $(document).on(
                                 "submit",
                                 this.opts.filterForm,
                                 function(event) {
-                                    $.pjax.submit(
-                                        event,
-                                        _this3.opts.id,
-                                        _this3.opts.pjax.pjaxOptions
-                                    );
+                                    // $.pjax.submit(
+                                    //     event,
+                                    //     _this3.opts.id,
+                                    //     _this3.opts.pjax.pjaxOptions
+                                    // );
                                 }
                             );
                         }
@@ -350,7 +349,7 @@ var _grids = _grids || {};
             var obj = new grid(options);
             obj.bindPjax();
             // obj.search();
-            // obj.filter();
+            obj.filter();
         };
     })(jQuery);
 

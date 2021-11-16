@@ -116,7 +116,7 @@
                                 return route('admin.modules.view', ['id' => encode($model->id)]);
                             },
                             'htmlAttributes' => [ // Optional
-                                'class' => 'showModalButton ms-1 me-1',
+                                'class' => 'showModalButton text-warning ms-1 me-1',
                                 'title' => 'View '.$title_single,
                             ]
                         ],
@@ -126,7 +126,7 @@
                                 return route('admin.modules.edit', ['id' => encode($model->id)]);
                             },
                             'htmlAttributes' => [ // Optional
-                                'class' => 'showModalButton ms-1 me-1',
+                                'class' => 'showModalButton text-primary ms-1 me-1',
                                 'title' => 'Update '.$title_single,
                             ]
                         ],
@@ -138,7 +138,7 @@
                             'htmlAttributes' => [ // Optional
                                 'target' => '_blank',
                                 'title' => 'Delete '.$title_single,
-                                'class' => 'ms-1 me-1',
+                                'class' => 'text-danger ms-1 me-1',
                                 'onclick' => 'return window.confirm("Are you sure you want to delete?");'
                             ]
                         ],

@@ -3,6 +3,7 @@
     $unique_title = str_replace(' ', '_', strtolower($title_single)); //without space
     $formName = $title_single.'form';
     $formRoute = (!$model->id) ? route('admin.modules.store') : route('admin.modules.update', ['id' => encode($model->id)]);
+    $childmenu = route('admin.modules.childmenu', ['type_id' => $model->type, 'parent_menu_id' => $model->parent_menu_id]);
 @endphp
 {{ Form::open([
     'url' => $formRoute,
@@ -67,7 +68,7 @@
         "class" => "form-select",
         'id'=> $formName.'-parent_menu_id',
         'placeholder'=> '',
-         'data-url' => route('admin.modules.childmenu') 
+         'data-url' => $childmenu 
         ]) }}
     </div>
     <div class="float-end">
@@ -88,7 +89,8 @@
        $('#moduleform-type').depdrop('init');
         $('#moduleform-parent_menu_id').depdrop({
             depends: ['moduleform-type'],
-            url: '{!! route('admin.modules.childmenu') !!}',
-
+            url: '{!! $childmenu !!}',
+            initDepends: ['moduleform-type'], // initial ajax loading will be fired first for parent-1, then child-1, and child-2
+            initialize: true,
         });
     </script>
