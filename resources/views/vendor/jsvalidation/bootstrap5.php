@@ -1,14 +1,22 @@
 <script>
 jQuery(document).ready(function() {
 
-    $("<?= $validator['selector']; ?>").each(function() {
+    $("<?=$validator['selector'];?>").each(function() {
         $(this).validate({
             errorElement: 'div',
             errorClass: 'invalid-feedback',
 
             errorPlacement: function(error, element) {
                 var type = element.attr("type");
-                if (type === 'password') {
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent());
+                }else if (type === 'radio' && element.parent('.radio-inline').length) {
+                    error.insertAfter(element.parent().parent());
+                }else if (type === 'checkbox' || element.prop('type') === 'radio') {
+                    error.appendTo(element.parent().parent());
+                }else if(element.hasClass('select2') && element.next('.select2-container').length) {
+                    error.insertAfter(element.next('.select2-container'));
+                }else if (type === 'password') {
                     error.insertAfter(element.next());
                 } else {
                     error.insertAfter(element);
@@ -21,8 +29,8 @@ jQuery(document).ready(function() {
 
             <?php if (isset($validator['ignore']) && is_string($validator['ignore'])): ?>
 
-            ignore: "<?= $validator['ignore']; ?>",
-            <?php endif; ?>
+            ignore: "<?=$validator['ignore'];?>",
+            <?php endif;?>
 
 
             unhighlight: function(element) {
@@ -43,12 +51,12 @@ jQuery(document).ready(function() {
 
                 $('html, body').animate({
                     scrollTop: $(validator.errorList[0].element).offset().top
-                }, <?= Config::get('jsvalidation.duration_animate') ?>);
+                }, <?=Config::get('jsvalidation.duration_animate')?>);
 
             },
-            <?php endif; ?>
+            <?php endif;?>
 
-            rules: <?= json_encode($validator['rules']); ?>,
+            rules: <?=json_encode($validator['rules']);?>,
             submitHandler: function(form) {
                 var formname = $(form).attr('name');
                 var formid = $(form).attr('id');

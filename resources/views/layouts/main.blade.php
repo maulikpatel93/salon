@@ -16,14 +16,17 @@
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
-    <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet" type="text/css">
+    <!-- plugin css-->
     <link href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('plugins/dependent-dropdown/css/dependent-dropdown.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('plugins/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css">
+    @yield('pluginsCss')
+    <!-- Styles -->
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('css/styles.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('plugins/sweetalert2/css/sweetalert2.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('plugins/sweetalert2/css/sweetalert2.min.css') }}" rel="stylesheet" type="text/css">
+    <!-- common script-->
     <script src="{{ asset('js/jquery.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('plugins/dependent-dropdown/js/dependent-dropdown.min.js') }}" type="text/javascript"></script>
     @stack('after-styles')
 </head>
 
@@ -103,7 +106,7 @@
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
                         <li class="nav-item">
-                            <a href="../widgets.html" class="nav-link">
+                            <a href="{{ route('admin.dashboard') }}" class="nav-link">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>
                                     Dashboard
@@ -126,13 +129,13 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="" class="nav-link">
+                                    <a href="{{ route('admin.permissions.index') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Permission</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="" class="nav-link">
+                                    <a href="{{ route('admin.roles.index') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Roles</p>
                                     </a>
@@ -177,13 +180,20 @@
     {{-- @include('grid_view::modal.container') --}}
     <!-- ./wrapper -->
     @stack('before-scripts')
+    <!-- common js -->
     <script src="{{ asset('js/app.js') }}" defer></script>
     <script src="{{ asset('js/jquery.form.min.js') }}" defer></script>
-    <script type="text/javascript" src="{{ asset('plugins/jsvalidation/jsvalidation.js')}}"></script>
     <script src="{{ asset('js/AdminLTE.js') }}" type="text/javascript"></script>
+    <!-- plugin js -->
+    <script type="text/javascript" src="{{ asset('plugins/jsvalidation/jsvalidation.js')}}"></script>
+    <script src="{{ asset('plugins/dependent-dropdown/js/dependent-dropdown.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('plugins/jquery-pjax/jquery.pjax.js') }}" type="text/javascript"></script>
     <script src="{{ asset('plugins/sweetalert2/js/sweetalert2.all.min.js') }}" type="text/javascript"></script>
-    
+    <script src="{{ asset('plugins/handlebars/handlebars.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('plugins/select2/js/select2.full.min.js') }}" type="text/javascript"></script>
+    @yield('pluginsJs')
+    <!-- script js -->
+    <script src="{{ asset('js/cloneData.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/grid.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/sweetalert2.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/demo.js') }}" type="text/javascript"></script>

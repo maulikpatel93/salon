@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AdminController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ModulesController;
+use App\Http\Controllers\Admin\PermissionsController;
 //Web Panel
 use App\Http\Controllers\Auth\LoginController;
 
@@ -59,12 +60,38 @@ Route::prefix('admin')->name('admin.')->group(function(){
             Route::post('/edit/{id}', [ModulesController::class, 'edit'])->name('edit');
             Route::post('/update/{id}', [ModulesController::class, 'update'])->name('update');
             Route::post('/view/{id}', [ModulesController::class, 'view'])->name('view');
-            Route::get('/delete', [ModulesController::class, 'delete'])->name('delete');
+            Route::get('/delete/{id}', [ModulesController::class, 'delete'])->name('delete');
             Route::post('/isactive/{id}', [ModulesController::class, 'isactive'])->name('isactive');
             Route::post('/applystatus', [ModulesController::class, 'applystatus'])->name('applystatus');
 
             //Dependent-Dropdown
             Route::post('/childmenu', [ModulesController::class, 'childmenu'])->name('childmenu');
+        });
+
+        //Permissions
+        Route::prefix('permissions')->name('permissions.')->group(function() {
+            Route::get('/', [PermissionsController::class, 'index'])->name('index');
+            Route::post('/create', [PermissionsController::class, 'create'])->name('create');
+            Route::post('/store', [PermissionsController::class, 'store'])->name('store');
+            Route::post('/edit/{id}', [PermissionsController::class, 'edit'])->name('edit');
+            Route::post('/update/{id}', [PermissionsController::class, 'update'])->name('update');
+            Route::post('/view/{id}', [PermissionsController::class, 'view'])->name('view');
+            Route::get('/delete/{id}', [PermissionsController::class, 'delete'])->name('delete');
+            Route::post('/isactive/{id}', [PermissionsController::class, 'isactive'])->name('isactive');
+            Route::post('/applystatus', [PermissionsController::class, 'applystatus'])->name('applystatus');
+        });
+
+        //Roles
+        Route::prefix('roles')->name('roles.')->group(function() {
+            Route::get('/', [ModulesController::class, 'index'])->name('index');
+            Route::post('/create', [ModulesController::class, 'create'])->name('create');
+            Route::post('/store', [ModulesController::class, 'store'])->name('store');
+            Route::post('/edit/{id}', [ModulesController::class, 'edit'])->name('edit');
+            Route::post('/update/{id}', [ModulesController::class, 'update'])->name('update');
+            Route::post('/view/{id}', [ModulesController::class, 'view'])->name('view');
+            Route::get('/delete/{id}', [ModulesController::class, 'delete'])->name('delete');
+            Route::post('/isactive/{id}', [ModulesController::class, 'isactive'])->name('isactive');
+            Route::post('/applystatus', [ModulesController::class, 'applystatus'])->name('applystatus');
         });
     });
 });

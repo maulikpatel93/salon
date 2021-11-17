@@ -29,34 +29,40 @@ const mix = require("laravel-mix");
 //     .sass("resources/sass/styles.scss", "public/css");
 mix.js("resources/js/app.js", "public/js")
     .js("resources/js/jquery.js", "public/js")
-    //css
-    .copy(
-        "node_modules/dependent-dropdown/css/dependent-dropdown.min.css",
-        "public/plugins/dependent-dropdown/css"
-    )
-    .sass(
-        "node_modules/sweetalert2/src/sweetalert2.scss",
-        "public/plugins/sweetalert2/css"
-    )
-    //js
+    //jquery-form
     .copy("vendor/jquery-form/form/dist/jquery.form.min.js", "public/js")
-    .copy(
-        "node_modules/icheck-bootstrap/icheck-bootstrap.min.css",
-        "public/plugins/icheck-bootstrap"
-    )
+    //jquery-pjax
     .copy(
         "node_modules/jquery-pjax/jquery.pjax.js",
         "public/plugins/jquery-pjax"
     )
-    .copy(
-        "node_modules/dependent-dropdown/js/dependent-dropdown.min.js",
+    //icheck-bootstrap
+    .copyDirectory(
+        "node_modules/icheck-bootstrap/",
+        "public/plugins/icheck-bootstrap"
+    )
+    //dependent-dropdown
+    .copyDirectory(
+        "node_modules/dependent-dropdown/css/",
+        "public/plugins/dependent-dropdown/css"
+    )
+    .copyDirectory(
+        "node_modules/dependent-dropdown/js/",
         "public/plugins/dependent-dropdown/js"
     )
-    .js(
-        "node_modules/sweetalert2/src/sweetalert2.js",
-        "public/plugins/sweetalert2/js"
+    .copyDirectory(
+        "node_modules/dependent-dropdown/img/",
+        "public/plugins/dependent-dropdown/img"
     )
+    //sweetalert2
+    .copyDirectory(
+        "node_modules/sweetalert2/dist/",
+        "public/plugins/sweetalert2"
+    )
+    .copyDirectory("node_modules/select2/dist/", "public/plugins/select2")
+    .copyDirectory("node_modules/handlebars/dist/", "public/plugins/handlebars")
     .copy("resources/js/grid.js", "public/js")
+    .copy("resources/assets/cloneData/cloneData.js", "public/js")
     .copy("resources/js/sweetalert2.js", "public/js")
     .js("resources/js/library/AdminLTE.js", "public/js")
     .copy("resources/js/library/adminlte.min.js", "public/js")

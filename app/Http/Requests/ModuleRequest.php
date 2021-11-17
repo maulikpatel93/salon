@@ -29,4 +29,11 @@ class ModuleRequest extends FormRequest
             'type' => 'required',
         ];
     }
+
+    public function messages()
+    {
+        return [
+            // 'email' => 'Please Select Role',
+        ];
+    }
 }

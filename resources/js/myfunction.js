@@ -8,6 +8,13 @@ $(document).ready(function() {
             input.attr("type", "password");
         }
     });
+
+    $(".select2").select2({
+        dropdownParent: $("#gridviewModal"),
+        width: "100%",
+        allowClear: true,
+    });
+    // $.fn.modal.Constructor.prototype.enforceFocus = function() {};
 });
 
 function dependentdropdown(id, depends, url) {

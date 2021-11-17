@@ -137,7 +137,6 @@
                                 return route('admin.modules.delete', ['id' => encode($model->id)]);
                             },
                             'htmlAttributes' => [ // Optional
-                                'target' => '_blank',
                                 'title' => 'Delete '.$title_single,
                                 'class' => 'text-danger ms-1 me-1',
                                 'onclick' => 'return window.confirm("Are you sure you want to delete?");'

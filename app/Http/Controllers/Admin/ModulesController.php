@@ -4,17 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ModuleRequest;
+use App\Models\Modules;
 use Illuminate\Http\Request;
 use Itstructure\GridView\DataProviders\EloquentDataProvider;
-use App\Models\Modules;
-use App\Http\Middleware\Pjax;
-use Symfony\Component\HttpFoundation\Response;
 
 class ModulesController extends Controller
 {
-    const ACTIVE = '1';
-    const INACTIVE = '0';
-    const DELETE = 'Yes';
+    const ACTIVE = 'Active';
+    const INACTIVE = 'Inactive';
+    const ACTIVE_INT = '1';
+    const INACTIVE_INT = '0';
+    const DELETE = 'Delete';
 
     public function __construct()
     {
@@ -24,15 +24,10 @@ class ModulesController extends Controller
 
     public function index(Request $request)
     {
-        // $request->headers->set('X-PJAX', true);
-        // $request->headers->set('X-PJAX-Container', '#gridtable-pjax');
-        
-        // echo '<pre>'; print_r($request->headers); echo '<pre>';dd();
-
         // global $user;
         $dataProvider = new EloquentDataProvider(Modules::query());
-        return view('admin.modules.index',[
-            'dataProvider' => $dataProvider
+        return view('admin.modules.index', [
+            'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -47,9 +42,9 @@ class ModulesController extends Controller
         $inputVal = $request->all();
         $inputVal['controller'] = $inputVal['controller'] ?? '';
         $inputVal['action'] = $inputVal['action'] ?? '';
-        
+
         $model = new Modules();
-        if($request->ajax() && $model->create($inputVal)){
+        if ($request->ajax() && $model->create($inputVal)) {
             $responseData['status'] = 200;
             $responseData['message'] = 'Success';
             $responseData['url'] = false;
@@ -71,7 +66,7 @@ class ModulesController extends Controller
         $inputVal['controller'] = $inputVal['controller'] ?? '';
         $inputVal['action'] = $inputVal['action'] ?? '';
         $model = $this->findModel(decode($id));
-        if($request->ajax() && $model->update($inputVal)){
+        if ($request->ajax() && $model->update($inputVal)) {
             $responseData['status'] = 200;
             $responseData['message'] = 'Success';
             $responseData['url'] = false;
@@ -87,14 +82,15 @@ class ModulesController extends Controller
 
     public function delete(Request $request, $id)
     {
-
+        Modules::where('id', decode($id))->delete();
+        return redirect()->route('admin.modules.index');
     }
 
     public function isactive(Request $request, $id)
     {
         if ($request->ajax()) {
             $model = $this->findModel(decode($id));
-            $model->is_active = ($model->is_active == self::ACTIVE) ? self::INACTIVE : self::ACTIVE;
+            $model->is_active = ($model->is_active == self::ACTIVE_INT) ? self::INACTIVE_INT : self::ACTIVE_INT;
             $model->is_active_at = currentDateTime();
             return $model->save();
         }
@@ -105,11 +101,10 @@ class ModulesController extends Controller
         if ($request->ajax()) {
             $inputall = $request->all();
             if (isset($inputall['applyoption'])) {
-                $inputall['applyoption'] = ($inputall['applyoption'] == 'Active') ? '1' : '0';
                 if ($inputall['applyoption'] == self::ACTIVE) {
                     // if(empty(Yii::$app->BackFunctions->checkaccess('statusupdate', Yii::$app->controller->id))){
                     //     throw new \yii\web\HttpException('403',"You don't have permission to access on this role.");
-                    // }   
+                    // }
                     if (isset($inputall['keylist']) && $inputall['keylist']) {
                         foreach ($inputall['keylist'] as $id) {
                             $model = $this->findModel($id);
@@ -130,13 +125,14 @@ class ModulesController extends Controller
                             $model->save();
                         }
                     }
-                } elseif ($inputall['keylist'] == self::DELETE) {
+                } elseif ($inputall['applyoption'] == self::DELETE) {
                     // if(empty(Yii::$app->BackFunctions->checkaccess('delete', Yii::$app->controller->id))){
                     //     throw new \yii\web\HttpException('403',"You don't have permission to access on this role.");
                     // }
-                    if (isset($inputall['delete']) && $inputall['delete']) {
-                        foreach ($inputall['delete'] as $id) {
-                            $this->findModel($id)->delete();
+
+                    if (isset($inputall['keylist']) && $inputall['keylist']) {
+                        foreach ($inputall['keylist'] as $id) {
+                            Modules::where('id', $id)->delete();
                         }
                     }
                 }
@@ -147,27 +143,27 @@ class ModulesController extends Controller
         }
     }
 
-    protected function findModel($id) {
+    protected function findModel($id)
+    {
         if (($model = Modules::find($id)) !== null) {
             return $model;
         }
 
         throw new Exception('The requested page does not exist.');
     }
-    
 
     public function childmenu(Request $request)
     {
         $out = [];
         if (isset($_POST['depdrop_parents'])) {
-            
+
             $type = empty($_POST['depdrop_parents'][0]) ? null : $_POST['depdrop_parents'][0];
             // $parent_menu_id = empty($_POST['depdrop_parents'][1]) ? null : $_POST['depdrop_parents'][1];
             $type_id = isset($_REQUEST['type_id']) ? $_REQUEST['type_id'] : '';
             $parent_menu_id = isset($_REQUEST['parent_menu_id']) ? $_REQUEST['parent_menu_id'] : '';
             $list = [];
             if ($type == 'Submenu') {
-                $list = Modules::where(['parent_submenu_id' => null, 'type'=>'Menu'])->where('title', '!=', '')->get()->pluck(['id' => 'title'])->toArray();
+                $list = Modules::where(['parent_submenu_id' => null, 'type' => 'Menu'])->where('title', '!=', '')->get()->pluck('title', 'id')->toArray();
                 // $list = Modules::find();
             } elseif ($type == 'Subsubmenu' && ($parent_menu_id == 0 || empty($parent_menu_id))) {
                 $list = Modules::find()->where(['menu_id' => $menu_id, 'parent_menu_id' => 0, 'parent_submenu_id' => 0])->andWhere(['!=', 'title', ''])->asArray()->all();
