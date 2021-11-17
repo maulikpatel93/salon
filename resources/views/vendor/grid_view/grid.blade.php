@@ -116,7 +116,7 @@ if(isset($toolbar['searchbtn']) && $toolbar['searchbtn']){
                             </tr>
                             @if ($useFilters)
                             <tr class="filter-header" id="gridtablefilter">
-                                <form action="" method="get" id="grid_view_filters_form" data-trigger-pjax="0" >
+                                <form action="{!! $filterUrl !!}" method="get" id="grid_view_filters_form" data-trigger-pjax="1" >
                                     <td></td>
                                     @foreach($columnObjects as $column_obj)
                                         <td>
@@ -130,7 +130,7 @@ if(isset($toolbar['searchbtn']) && $toolbar['searchbtn']){
                                             @endif
                                         </td>
                                     @endforeach
-                                    <button type="submit" class="btn btn-outline-primary grid-filter-button d-none"  id="grid-filter-button" title="filter data">Filter&nbsp;<i class="fas fa-filter"></i></button>
+                                    <button type="submit" class="btn btn-outline-primary grid-filter-button d-none"  id="grid-filter-button" form="grid_view_filters_form" title="filter data">Filter&nbsp;<i class="fas fa-filter"></i></button>
                                 </form>
                             </tr>
                             @endif

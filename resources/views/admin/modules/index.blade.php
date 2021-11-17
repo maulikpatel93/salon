@@ -7,7 +7,7 @@
     $applydropdown = '<select class="form-select w-auto me-3" name="applyoption" id="applyoption">
         <option value="">--Select--</option>
         <option value="Active">Active</option>
-        <option value="Inactive">InActive</option>
+        <option value="Inactive">Inactive</option>
         <option value="Delete">Delete</option>
         </select>';
 
@@ -43,6 +43,7 @@
         'id' => 'gridtable',
         'dataProvider' => $dataProvider,
         'useFilters' => true,
+        'filterUrl' => url()->current(),
         'paginatorOptions' => [ // Here you can set some options of paginator Illuminate\Pagination\LengthAwarePaginator, used in a package.
             'pageName' => 'p'
         ],
@@ -78,7 +79,7 @@
                     'label' => 'Active', // Column label.
                     'value' => function ($model) { // You can set 'value' as a callback function to get a row data value dynamically.
                             $btnbg = ($model->is_active == 1) ? 'success' : 'danger';
-                            $active = ($model->is_active == 1) ? 'Active' : 'InActive';
+                            $active = ($model->is_active == 1) ? 'Active' : 'Inactive';
                             return Html::link('javascript:void(0)',
                                             $active,
                                             [
@@ -99,7 +100,7 @@
                         'class' => Itstructure\GridView\Filters\DropdownFilter::class, // REQUIRED. For this case it is necessary to set 'class'.
                         'name' => 'is_active', // REQUIRED if 'attribute' is not defined for column.
                         'data' => [ // REQUIRED.
-                            0 => 'No active',
+                            0 => 'Inactive',
                             1 => 'Active',
                         ]
                     ],

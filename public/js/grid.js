@@ -245,11 +245,11 @@ var _grids = _grids || {};
                                 "submit",
                                 this.opts.filterForm,
                                 function(event) {
-                                    // $.pjax.submit(
-                                    //     event,
-                                    //     _this3.opts.id,
-                                    //     _this3.opts.pjax.pjaxOptions
-                                    // );
+                                    $.pjax.submit(
+                                        event,
+                                        _this3.opts.id,
+                                        _this3.opts.pjax.pjaxOptions
+                                    );
                                 }
                             );
                         }
