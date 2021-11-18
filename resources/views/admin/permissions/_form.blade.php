@@ -3,7 +3,7 @@
     $unique_title = str_replace(' ', '_', strtolower($title_single)); //without space
     $formName = $title_single.'form';
     $formRoute = (!$model->id) ? route('admin.permissions.store') : route('admin.permissions.update', ['id' => encode($model->id)]);
-
+    
     $defaultPermission = [
         [
             'title' => 'List',
@@ -40,10 +40,16 @@
             'name' => 'isactive',
             'controller' => '',
             'action' => 'isactive',
+        ],
+        [
+            'title' => 'Export',
+            'name' => 'export',
+            'controller' => '',
+            'action' => 'export',
         ]
 ];
-// echo '<pre>'; print_r($defaultPermission); echo '<pre>';dd();
 
+$model->type = 'Backend';
 @endphp
 {{ Form::open([
     'url' => $formRoute,
@@ -57,12 +63,38 @@
     
     <div class="mb-3">
         {{ Form::label('module_id'); }}
-        {{ Form::select('module_id', $modules, $model->functionality, [
+        {{ Form::select('module_id', $modules, $model->module_id, [
         "class" => "form-select select2",
-        'id'=> $formName.'-functionality',
+        'id'=> $formName.'-module_id',
         'placeholder'=> '',
         ]) }}
     </div>
+    <div class="mb-3">
+        {{ Form::label('type'); }}
+        {{ Form::select('type', ['Backend' => 'Backend', 'Frontend' => 'Frontend', 'App' => 'App', 'Common' => 'Common'], $model->type, [
+        "class" => "form-select",
+        'id'=> $formName.'-type',
+        'placeholder'=> '',
+        ]) }}
+    </div>
+    @if($model->id)
+        <div class="mb-3">
+            {{ Form::label('controller'); }}
+            {{ Form::text('controller', $model->controller, [
+            "class" => "form-control",
+            'id'=> $formName.'-controller',
+            'placeholder'=> '',
+            ]) }}
+        </div>
+        <div class="mb-3">
+            {{ Form::label('action'); }}
+            {{ Form::text('action', $model->action, [
+            "class" => "form-control",
+            'id'=> $formName.'-action',
+            'placeholder'=> '',
+            ]) }}
+        </div>
+    @else
     <table class="table table-sm table-bordered" style="display: block;" id="main-container">
         <thead>
             <tr>
@@ -120,6 +152,7 @@
         </tfoot>
         </table>
     </div>
+    @endif
     <div class="float-end">
         {{ Form::button('Save', ['type'=>'submit','class' => 'btn btn-primary',
             'id' => $formName.'-submit']); }}

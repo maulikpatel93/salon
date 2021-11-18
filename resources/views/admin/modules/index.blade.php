@@ -13,8 +13,6 @@
 
     $applySubmit = Form::button('Apply', ['class' => 'btn btn-primary', 'id' => 'applysubmit', 'onclick' => 'applyjs(this);']);
     $applyafter = $applydropdown.' '.$applySubmit;
-
-
 @endphp
 @section('title')
 {{ $title }}
@@ -48,7 +46,7 @@
             'pageName' => 'p'
         ],
         'pjax' => true,
-        'rowsPerPage' => 10, // The number of rows in one page. By default 10.
+        'rowsPerPage' => config('params.rowsPerPage'), // The number of rows in one page. By default 10.
         'title' => 'List', // It can be empty ''
         'strictFilters' => false, // If true, then a searching by filters will be strict, using an equal '=' SQL operator instead of 'like'.
         'rowsFormAction' => route('admin.modules.applystatus'), // Route url to send slected checkbox items for deleting rows, for example.
@@ -152,7 +150,7 @@
                                 <a href="'.route("admin.modules.index").'" class="btn btn-secondary" title="Refresh Module" data-trigger-pjax="1" ><i class="fas fa-refresh"></i></a>
                             </div>
                             ',
-                'resetbtn' => ['class' => 'btn btn-warning ms-2'],
+                'resetbtn' => false,
                 'applybtn' => $applyafter,
             ],
         ];

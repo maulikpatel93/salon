@@ -65,7 +65,8 @@
                 select2InitIds: [],
                 ckeditorIds: [],
                 regexID: /^(.+?)([-\d-]{1,})(.+)$/i,
-                regexName: /(^.+?)([\[\d{1,}\]]{1,})(\[.+\]$)/i,
+                // regexName: /(^.+?)([\[\d{1,}\]]{1,})(\[.+\]$)/i,
+                regexName: /(^.+?)([\[\d{1,}\]]{1,})/i,
                 init: function() {},
                 complete: function() {},
                 beforeRender: function() {},
@@ -188,16 +189,15 @@
 
         var _updateAttrName = function($elem, index) {
             var name = $elem.attr("name");
+            hostname = name;
             if (name !== undefined) {
                 var matches = name.match(settings.regexName);
-
-                if (matches && matches.length === 4) {
+                if (matches && matches.length === 3) {
                     matches[2] = matches[2]
                         .replace(/\]\[/g, "-")
                         .replace(/\]|\[/g, "");
                     var identifiers = matches[2].split("-");
                     identifiers[0] = index;
-
                     if (identifiers.length > 1) {
                         var widgetsOptions = [];
                         $elem
@@ -216,12 +216,13 @@
                         }
                     }
 
-                    name =
-                        matches[1] +
-                        "[" +
-                        identifiers.join("][") +
-                        "]" +
-                        matches[3];
+                    name = matches[1] + "[" + identifiers.join("][") + "]";
+                    // name =
+                    // matches[1] +
+                    // "[" +
+                    // identifiers.join("][") +
+                    // "]" +
+                    // matches[3];
                     $elem.attr("name", name);
                 }
             }

@@ -26,7 +26,7 @@ class PermissionsController extends Controller
     public function index(Request $request)
     {
         // global $user;
-        $dataProvider = new EloquentDataProvider(Permissions::query());
+        $dataProvider = new EloquentDataProvider(Permissions::query()->orderBy('id', 'desc'));
         return view('admin.permissions.index', [
             'dataProvider' => $dataProvider,
         ]);
@@ -34,7 +34,7 @@ class PermissionsController extends Controller
 
     public function create()
     {
-        $model = new permissions();
+        $model = new Permissions();
         $modules = $this->modulefindModel();
         return view('admin.permissions.create', ['model' => $model, 'modules' => $modules]);
     }
@@ -42,11 +42,27 @@ class PermissionsController extends Controller
     public function store(PermissionsRequest $request)
     {
         $inputVal = $request->all();
-        $inputVal['controller'] = $inputVal['controller'] ?? '';
-        $inputVal['action'] = $inputVal['action'] ?? '';
 
-        $model = new permissions();
-        if ($request->ajax() && $model->create($inputVal)) {
+        if ($request->ajax()) {
+            $title = $inputVal['title'];
+            $name = $inputVal['name'];
+            $controller = $inputVal['controller'];
+            $action = $inputVal['action'];
+            if ($name) {
+                for ($i = 0; $i < count($name); $i++) {
+                    $model = Permissions::where(['name' => $name[$i], 'module_id' => $inputVal['module_id']])->count();
+                    if (empty($model)) {
+                        $model = new Permissions();
+                        $model->module_id = $inputVal['module_id'];
+                        $model->type = $inputVal['type'];
+                        $model->title = $title[$i];
+                        $model->name = $name[$i];
+                        $model->controller = $controller[$i];
+                        $model->action = $action[$i];
+                        $model->save();
+                    }
+                }
+            }
             $responseData['status'] = 200;
             $responseData['message'] = 'Success';
             $responseData['url'] = false;

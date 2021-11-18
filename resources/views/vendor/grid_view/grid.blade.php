@@ -74,8 +74,10 @@ if(isset($toolbar['searchbtn']) && $toolbar['searchbtn']){
                     @endisset
                     @if ($useFilters)
                     <div class="btn-group" role="group">
-                        <button id="grid_view_reset_button" type="button" @php echo $resetbtnOption @endphp>{{
-                            $resetButtonLabel }}</button>
+                        @if(isset($toolbar['resetbtn']) && $toolbar['resetbtn'])
+                            <button id="grid_view_reset_button" type="button" @php echo $resetbtnOption @endphp>{{
+                                $resetButtonLabel }}</button>
+                        @endif
                         {{-- <button id="grid_view_search_button" type="button" @php echo $searchbtnOption @endphp>{{
                             $searchButtonLabel }} <i class="fas fa-filter"></i></button> --}}
                     </div>

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Permissions extends Model
+class Roles extends Model
 {
     use HasFactory;
 
@@ -14,24 +14,18 @@ class Permissions extends Model
      *
      * @var string
      */
-    protected $table = 'permissions';
+    protected $table = 'roles';
 
     protected $appends = ['isNewRecord'];
-
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
      * @var string[]
      */
     protected $fillable = [
-        'title',
-        'module_id',
-        'type',
-        'title',
         'name',
-        'controller',
-        'action',
+        'panel',
+        'is_active',
     ];
 
     /**
@@ -48,11 +42,11 @@ class Permissions extends Model
      * @var array
      */
     protected $casts = [
-        // 'is_active_at' => 'datetime',
+        'is_active_at' => 'datetime',
     ];
 
     public function getIsNewRecordAttribute()
     {
-        //   return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
+        return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
     }
 }

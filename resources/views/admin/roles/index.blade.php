@@ -1,9 +1,9 @@
 @extends('layouts.main')
 @php
-    $title = 'Permissions';
-    $title_single = 'Permission';
+    $title = 'Roles';
+    $title_single = 'Role';
     $unique_title = str_replace(' ', '_', strtolower($title_single));; //without space
-    $createbtn = '<a href="'.route('admin.permissions.create').'" class="btn btn-primary showModalButton" title="Add '.$title_single.'" data-bs-toggle="modal" data-bs-target="#gridviewModal">Add</a>';
+    $createbtn = '<a href="'.route('admin.roles.create').'" class="btn btn-primary showModalButton" title="Add '.$title_single.'" data-bs-toggle="modal" data-bs-target="#gridviewModal">Add</a>';
     $applydropdown = '<select class="form-select w-auto me-3" name="applyoption" id="applyoption">
         <option value="">--Select--</option>
         <option value="Active">Active</option>
@@ -49,7 +49,7 @@
         'rowsPerPage' => config('params.rowsPerPage'), // The number of rows in one page. By default 10.
         'title' => 'List', // It can be empty ''
         'strictFilters' => false, // If true, then a searching by filters will be strict, using an equal '=' SQL operator instead of 'like'.
-        'rowsFormAction' => route('admin.permissions.applystatus'), // Route url to send slected checkbox items for deleting rows, for example.
+        'rowsFormAction' => route('admin.roles.applystatus'), // Route url to send slected checkbox items for deleting rows, for example.
         'useSendButtonAnyway' => false, // If true, even if there are no checkbox column, the main send button will be displayed.
         'columnFields' => [
                 [
@@ -57,20 +57,51 @@
                     'field' => 'delete',
                     'attribute' => 'id'
                 ],
-                [
-                    'label' => 'Title', // Column label.
-                    'attribute' => 'title', // Attribute, by which the row column data will be taken from a model.
-                ],
                 'name',
-                'controller',
-                'action',
                 [
-                    'label' => 'Type',
-                    'attribute' => 'type',
-                    'value' => function ($row) {
-                            return $row->type;
-                        },
-                    'sort' => 'type' // To sort rows. Have to set if an 'attribute' is not defined for column.
+                    'label' => 'Panel', // Column label.
+                    'attribute' => 'panel', // Attribute, by which the row column data will be taken from a model.
+                    'filter' => [ // For dropdown it is necessary to set 'data' array. Array keys are for html <option> tag values, array values are for titles.
+                        'class' => Itstructure\GridView\Filters\DropdownFilter::class, // REQUIRED. For this case it is necessary to set 'class'.
+                        'name' => 'panel', // REQUIRED if 'attribute' is not defined for column.
+                        'data' => [ // REQUIRED.
+                            'Backend' => 'Backend',
+                            'Frontend' => 'Frontend',
+                            'Common' => 'Common',
+                        ]
+                    ],
+                ],
+                [
+                    'label' => 'Active', // Column label.
+                    'value' => function ($model) { // You can set 'value' as a callback function to get a row data value dynamically.
+                            $btnbg = ($model->is_active == 1) ? 'success' : 'danger';
+                            $active = ($model->is_active == 1) ? 'Active' : 'Inactive';
+                            return Html::link('javascript:void(0)',
+                                            $active,
+                                            [
+                                                'class' => 'btn btn-' . $btnbg . ' btn-sm',
+                                                'id' => 'is_active_' . $model->id,
+                                                'title' => $active,
+                                                'onclick' => '$.post({
+                                                    url: "'.route('admin.roles.isactive',['id'=>encode($model->id)]).'",
+                                                    success: function (response) {
+                                                    $.pjax.reload({container: "#gridtable-pjax"});
+                                                },
+                                            }); return false;'
+                                    ]
+                            );
+                        return '<span class="icon fas '.($row->is_active == 1 ? 'fa-check' : 'fa-times').'"></span>';
+                    },
+                    'filter' => [ // For dropdown it is necessary to set 'data' array. Array keys are for html <option> tag values, array values are for titles.
+                        'class' => Itstructure\GridView\Filters\DropdownFilter::class, // REQUIRED. For this case it is necessary to set 'class'.
+                        'name' => 'is_active', // REQUIRED if 'attribute' is not defined for column.
+                        'data' => [ // REQUIRED.
+                            0 => 'Inactive',
+                            1 => 'Active',
+                        ]
+                    ],
+                    'format' => 'html', // To render column content without lossless of html tags, set 'html' formatter.
+                    'sort' => 'is_active' // To sort rows. Have to set if an attribute is not defined for column.
                 ],
                 [
                     'label' => 'Actions', // Optional
@@ -79,7 +110,17 @@
                         [
                             'class' => Itstructure\GridView\Actions\View::class, // Required
                             'url' => function ($model) { // Optional
-                                return route('admin.permissions.view', ['id' => encode($model->id)]);
+                                return route('admin.roles.access', ['id' => encode($model->id)]);
+                            },
+                            'htmlAttributes' => [ // Optional
+                                'class' => 'text-secondary ms-1 me-1',
+                                'title' => 'Access '.$title_single,
+                            ]
+                        ],
+                        [
+                            'class' => Itstructure\GridView\Actions\View::class, // Required
+                            'url' => function ($model) { // Optional
+                                return route('admin.roles.view', ['id' => encode($model->id)]);
                             },
                             'htmlAttributes' => [ // Optional
                                 'class' => 'showModalButton text-warning ms-1 me-1',
@@ -89,7 +130,7 @@
                         [
                             'class' => Itstructure\GridView\Actions\Edit::class, // Required
                             'url' => function ($model) { // Optional
-                                return route('admin.permissions.edit', ['id' => encode($model->id)]);
+                                return route('admin.roles.edit', ['id' => encode($model->id)]);
                             },
                             'htmlAttributes' => [ // Optional
                                 'class' => 'showModalButton text-primary ms-1 me-1',
@@ -99,7 +140,7 @@
                         [
                             'class' => Itstructure\GridView\Actions\Delete::class, // Required
                             'url' => function ($model) { // Optional
-                                return route('admin.permissions.delete', ['id' => encode($model->id)]);
+                                return route('admin.roles.delete', ['id' => encode($model->id)]);
                             },
                             'htmlAttributes' => [ // Optional
                                 'title' => 'Delete '.$title_single,
@@ -114,7 +155,7 @@
             'toolbar' =>  [
                 'content' => '<div class="btn-group" role="group">
                                 '.$createbtn.'
-                                <a href="'.route("admin.permissions.index").'" class="btn btn-secondary" title="Refresh Module" data-trigger-pjax="1" ><i class="fas fa-refresh"></i></a>
+                                <a href="'.route("admin.roles.index").'" class="btn btn-secondary" title="Refresh Role" data-trigger-pjax="1" ><i class="fas fa-refresh"></i></a>
                             </div>
                             ',
                 'applybtn' => $applyafter,
@@ -127,9 +168,9 @@
 @section('modal')
 {!! Modal::start([
     'options' => ['id' => 'gridviewModal'],
-    'title' => 'Create Module',
+    'title' => 'Create Role',
     'header' => true,
-    'size' => 'modal-lg',
+    'size' => 'modal-md',
     'clientOptions' => [
         'backdrop' => true,
         'keyboard' => true
@@ -192,7 +233,6 @@
                 });
             }
         }
-        
 </script>
 @endsection
 
