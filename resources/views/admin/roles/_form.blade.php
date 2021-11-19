@@ -3,7 +3,6 @@
     $unique_title = str_replace(' ', '_', strtolower($title_single)); //without space
     $formName = $title_single.'form';
     $formRoute = (!$model->id) ? route('admin.roles.store') : route('admin.roles.update', ['id' => encode($model->id)]);
-    $childmenu = route('admin.roles.childmenu', ['type_id' => $model->type, 'parent_menu_id' => $model->parent_menu_id]);
 @endphp
 {{ Form::open([
     'url' => $formRoute,
@@ -16,7 +15,7 @@
     <div id="formerror" class="formerror"></div>
     <div class="mb-3">
         {{ Form::label('name'); }}
-        {{ Form::text('name', $model->title, [
+        {{ Form::text('name', $model->name, [
         "class" => "form-control",
         'id'=> $formName.'-name',
         'placeholder'=> '',
@@ -24,7 +23,7 @@
     </div>
     <div class="mb-3">
         {{ Form::label('panel'); }}
-        {{ Form::select('panel', ['Backend' => 'Backend', 'Frontend' => 'Frontend', 'Common' => 'Common'], $model->functionality, [
+        {{ Form::select('panel', ['Backend' => 'Backend', 'Frontend' => 'Frontend', 'Common' => 'Common'], $model->panel, [
         "class" => "form-select",
         'id'=> $formName.'-panel',
         'placeholder'=> '',
@@ -38,7 +37,7 @@
     </div>
     {{ Form::close() }}
 
-    {!! JsValidator::formRequest('App\Http\Requests\Admin\ModuleRequest', '#gridview-form'); !!}
+    {!! JsValidator::formRequest('App\Http\Requests\Admin\RoleRequest', '#gridview-form'); !!}
     <script>
         $.ajaxSetup({
             headers: {

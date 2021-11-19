@@ -1,4 +1,6 @@
 @extends('layouts.main')
+{{-- {{ dd(request()->route()) }} --}}
+
 @php
     $title = 'Roles';
     $title_single = 'Role';

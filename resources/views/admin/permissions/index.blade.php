@@ -64,14 +64,7 @@
                 'name',
                 'controller',
                 'action',
-                [
-                    'label' => 'Type',
-                    'attribute' => 'type',
-                    'value' => function ($row) {
-                            return $row->type;
-                        },
-                    'sort' => 'type' // To sort rows. Have to set if an 'attribute' is not defined for column.
-                ],
+                'panel',
                 [
                     'label' => 'Actions', // Optional
                     'class' => Itstructure\GridView\Columns\ActionColumn::class, // Required

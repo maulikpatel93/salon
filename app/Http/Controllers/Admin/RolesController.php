@@ -11,6 +11,7 @@ use App\Models\Roles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Itstructure\GridView\DataProviders\EloquentDataProvider;
+use Route;
 
 class RolesController extends Controller
 {
