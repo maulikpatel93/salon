@@ -70,10 +70,10 @@ $model->type = 'Backend';
         ]) }}
     </div>
     <div class="mb-3">
-        {{ Form::label('type'); }}
-        {{ Form::select('type', ['Backend' => 'Backend', 'Frontend' => 'Frontend', 'App' => 'App', 'Common' => 'Common'], $model->type, [
+        {{ Form::label('panel'); }}
+        {{ Form::select('panel', ['Backend' => 'Backend', 'Frontend' => 'Frontend', 'App' => 'App', 'Common' => 'Common'], $model->panel, [
         "class" => "form-select",
-        'id'=> $formName.'-type',
+        'id'=> $formName.'-panel',
         'placeholder'=> '',
         ]) }}
     </div>
@@ -161,7 +161,7 @@ $model->type = 'Backend';
     </div>
     {{ Form::close() }}
 
-    {!! JsValidator::formRequest('App\Http\Requests\PermissionsRequest', '#gridview-form'); !!}
+    {!! JsValidator::formRequest('App\Http\Requests\Admin\PermissionsRequest', '#gridview-form'); !!}
     
     <script type="text/javascript">
         $.ajaxSetup({

@@ -71,5 +71,5 @@
 </div>
 @endsection
 @section('pagescript')
-{!! JsValidator::formRequest('App\Http\Requests\AdminLoginRequest', '#my-form'); !!}
+{!! JsValidator::formRequest('App\Http\Requests\Admin\LoginRequest', '#my-form'); !!}
 @endsection

@@ -15,6 +15,14 @@
     'enableAjaxSubmit' => 1]) }}
     <div id="formerror" class="formerror"></div>
     <div class="mb-3">
+        {{ Form::label('panel'); }}
+        {{ Form::select('panel', ['Backend' => 'Backend', 'Frontend' => 'Frontend', 'Common' => 'Common'], $model->panel, [
+        "class" => "form-select",
+        'id'=> $formName.'-panel',
+        'placeholder'=> '',
+        ]) }}
+    </div>
+    <div class="mb-3">
         {{ Form::label('title'); }}
         {{ Form::text('title', $model->title, [
         "class" => "form-control",
@@ -79,7 +87,7 @@
     </div>
     {{ Form::close() }}
 
-    {!! JsValidator::formRequest('App\Http\Requests\ModuleRequest', '#gridview-form'); !!}
+    {!! JsValidator::formRequest('App\Http\Requests\Admin\ModuleRequest', '#gridview-form'); !!}
     <script>
         $.ajaxSetup({
             headers: {

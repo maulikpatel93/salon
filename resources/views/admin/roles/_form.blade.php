@@ -38,7 +38,7 @@
     </div>
     {{ Form::close() }}
 
-    {!! JsValidator::formRequest('App\Http\Requests\ModuleRequest', '#gridview-form'); !!}
+    {!! JsValidator::formRequest('App\Http\Requests\Admin\ModuleRequest', '#gridview-form'); !!}
     <script>
         $.ajaxSetup({
             headers: {

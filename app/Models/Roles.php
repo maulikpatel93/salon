@@ -26,6 +26,7 @@ class Roles extends Model
         'name',
         'panel',
         'is_active',
+        'is_active_at',
     ];
 
     /**

@@ -2,143 +2,196 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\User;
-use Spatie\Permission\Models\Role;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\StoreUsersRequest;
-use App\Http\Requests\Admin\UpdateUsersRequest;
+use App\Http\Requests\Admin\UserAccessRequest;
+use App\Http\Requests\Admin\UserRequest;
+use App\Models\Permissions;
+use App\Models\UserAccess;
+use App\Models\Users;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Itstructure\GridView\DataProviders\EloquentDataProvider;
 
 class UsersController extends Controller
 {
-    /**
-     * Display a listing of User.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    const ACTIVE = 'Active';
+    const INACTIVE = 'Inactive';
+    const ACTIVE_INT = '1';
+    const INACTIVE_INT = '0';
+    const DELETE = 'Delete';
+
+    public function __construct()
     {
-        if (! Gate::allows('users_manage')) {
-            return abort(401);
-        }
-
-        $users = User::all();
-
-        return view('admin.users.index', compact('users'));
+        $this->middleware('auth:admin');
+        parent::__construct();
     }
 
-    /**
-     * Show the form for creating new User.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function index(Request $request)
+    {
+        // global $user;
+        $dataProvider = new EloquentDataProvider(Users::query()->orderBy('id', 'desc'));
+        return view('admin.users.index', [
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
     public function create()
     {
-        if (! Gate::allows('users_manage')) {
-            return abort(401);
-        }
-        $roles = Role::get()->pluck('name', 'name');
-
-        return view('admin.users.create', compact('roles'));
+        $model = new Users();
+        return view('admin.users.create', ['model' => $model]);
     }
 
-    /**
-     * Store a newly created User in storage.
-     *
-     * @param  \App\Http\Requests\StoreUsersRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreUsersRequest $request)
+    public function store(UserRequest $request)
     {
-        if (! Gate::allows('users_manage')) {
-            return abort(401);
+        $inputVal = $request->all();
+        $inputVal['controller'] = $inputVal['controller'] ?? '';
+        $inputVal['action'] = $inputVal['action'] ?? '';
+        $inputVal['is_active_at'] = currentDateTime();
+        $model = new Users();
+        if ($request->ajax() && $model->create($inputVal)) {
+            $responseData['status'] = 200;
+            $responseData['message'] = 'Success';
+            $responseData['url'] = false;
+            return response()->json($responseData);
         }
-        $user = User::create($request->all());
-        $roles = $request->input('roles') ? $request->input('roles') : [];
-        $user->assignRole($roles);
-
         return redirect()->route('admin.users.index');
     }
 
-
-    /**
-     * Show the form for editing User.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(User $user)
+    public function edit($id)
     {
-        if (! Gate::allows('users_manage')) {
-            return abort(401);
-        }
-        $roles = Role::get()->pluck('name', 'name');
-
-        return view('admin.users.edit', compact('user', 'roles'));
+        $model = $this->findModel(decode($id));
+        return view('admin.users.update', ['model' => $model]);
     }
 
-    /**
-     * Update User in storage.
-     *
-     * @param  \App\Http\Requests\UpdateUsersRequest  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateUsersRequest $request, User $user)
+    public function update(UserRequest $request, $id)
     {
-        if (! Gate::allows('users_manage')) {
-            return abort(401);
+        // $validated = $request->validated();
+        $inputVal = $request->all();
+        $inputVal['controller'] = $inputVal['controller'] ?? '';
+        $inputVal['action'] = $inputVal['action'] ?? '';
+        $model = $this->findModel(decode($id));
+        if ($request->ajax() && $model->update($inputVal)) {
+            $responseData['status'] = 200;
+            $responseData['message'] = 'Success';
+            $responseData['url'] = false;
+            return response()->json($responseData);
         }
-
-        $user->update($request->all());
-        $roles = $request->input('roles') ? $request->input('roles') : [];
-        $user->syncRoles($roles);
-
         return redirect()->route('admin.users.index');
     }
 
-    public function show(User $user)
+    public function view(Request $request, $id)
     {
-        if (! Gate::allows('users_manage')) {
-            return abort(401);
-        }
-
-        $user->load('roles');
-
-        return view('admin.users.show', compact('user'));
+        return view('admin.users.view');
     }
 
-    /**
-     * Remove User from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(User $user)
+    public function delete(Request $request, $id)
     {
-        if (! Gate::allows('users_manage')) {
-            return abort(401);
-        }
-
-        $user->delete();
-
+        Users::where('id', decode($id))->delete();
         return redirect()->route('admin.users.index');
     }
 
-    /**
-     * Delete all selected User at once.
-     *
-     * @param Request $request
-     */
-    public function massDestroy(Request $request)
+    public function isactive(Request $request, $id)
     {
-        if (! Gate::allows('users_manage')) {
-            return abort(401);
+        if ($request->ajax()) {
+            $model = $this->findModel(decode($id));
+            $model->is_active = ($model->is_active == self::ACTIVE_INT) ? self::INACTIVE_INT : self::ACTIVE_INT;
+            $model->is_active_at = currentDateTime();
+            return $model->save();
         }
-        User::whereIn('id', request('ids'))->delete();
-
-        return response()->noContent();
     }
 
+    public function applystatus(Request $request)
+    {
+        if ($request->ajax()) {
+            $inputall = $request->all();
+            if (isset($inputall['applyoption'])) {
+                if ($inputall['applyoption'] == self::ACTIVE) {
+                    // if(empty(Yii::$app->BackFunctions->checkaccess('statusupdate', Yii::$app->controller->id))){
+                    //     throw new \yii\web\HttpException('403',"You don't have permission to access on this role.");
+                    // }
+                    if (isset($inputall['keylist']) && $inputall['keylist']) {
+                        foreach ($inputall['keylist'] as $id) {
+                            $model = $this->findModel($id);
+                            $model->is_active = '1';
+                            $model->is_active_at = currentDateTime();
+                            $model->save();
+                        }
+                    }
+                } elseif ($inputall['applyoption'] == self::INACTIVE) {
+                    // if(empty(Yii::$app->BackFunctions->checkaccess('statusupdate', Yii::$app->controller->id))){
+                    //     throw new \yii\web\HttpException('403',"You don't have permission to access on this role.");
+                    // }
+                    if (isset($inputall['keylist']) && $inputall['keylist']) {
+                        foreach ($inputall['keylist'] as $id) {
+                            $model = $this->findModel($id);
+                            $model->is_active = '0';
+                            $model->is_active_at = currentDateTime();
+                            $model->save();
+                        }
+                    }
+                } elseif ($inputall['applyoption'] == self::DELETE) {
+                    // if(empty(Yii::$app->BackFunctions->checkaccess('delete', Yii::$app->controller->id))){
+                    //     throw new \yii\web\HttpException('403',"You don't have permission to access on this role.");
+                    // }
+
+                    if (isset($inputall['keylist']) && $inputall['keylist']) {
+                        foreach ($inputall['keylist'] as $id) {
+                            Users::where('id', $id)->delete();
+                        }
+                    }
+                }
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    public function access(Request $request, $id)
+    {
+        $rolemodel = $this->findModel(decode($id));
+        config()->set('database.connections.mysql.strict', false);
+        DB::reconnect(); //important as the existing connection if any would be in strict mode
+        $permissionmodel = DB::select("SELECT CASE WHEN ROW_NUMBER() OVER(PARTITION BY module_id ORDER BY id) = 1 THEN (select title as module_name from modules WHERE id = module_id) ELSE NULL END AS 'module_name_unique' , id , module_id , name , title , controller , action FROM permissions ORDER BY module_id, controller, id;");
+        config()->set('database.connections.mysql.strict', true);
+        DB::reconnect();
+        $model = new UserAccess();
+        $model->role_id = $id;
+        return view('admin.users.access', [
+            'model' => $model,
+            'rolemodel' => $rolemodel,
+            'permissionmodel' => $permissionmodel,
+        ]);
+    }
+
+    public function accessupdate(UserAccessRequest $request, $id)
+    {
+        $id = decode($id);
+        $inputVal = $request->all();
+        $permission_id = isset($inputVal['permission_id']) ? $inputVal['permission_id'] : [];
+        $access = isset($inputVal['access']) ? $inputVal['access'] : [];
+        if ($permission_id) {
+            foreach ($permission_id as $key => $value) {
+                $checkPermissionId = Permissions::where(['id' => $value])->count();
+                if ($checkPermissionId) {
+                    $model = UserAccess::where(['role_id' => $id, 'permission_id' => $value])->first();
+                    if (empty($model->count())) {
+                        $model = new UserAccess();
+                    }
+                    $model->role_id = $id;
+                    $model->permission_id = $value;
+                    $model->access = isset($access[$key]) ? $access[$key] : '0';
+                    $model->save();
+                }
+            }
+        }
+        return redirect()->route('admin.users.index');
+    }
+    protected function findModel($id)
+    {
+        if (($model = Users::find($id)) !== null) {
+            return $model;
+        }
+        throw new Exception('The requested page does not exist.');
+    }
 }

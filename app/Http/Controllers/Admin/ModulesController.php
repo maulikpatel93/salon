@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ModuleRequest;
+use App\Http\Requests\Admin\ModuleRequest;
 use App\Models\Modules;
 use Illuminate\Http\Request;
 use Itstructure\GridView\DataProviders\EloquentDataProvider;
@@ -42,7 +42,7 @@ class ModulesController extends Controller
         $inputVal = $request->all();
         $inputVal['controller'] = $inputVal['controller'] ?? '';
         $inputVal['action'] = $inputVal['action'] ?? '';
-
+        $inputVal['is_active_at'] = currentDateTime();
         $model = new Modules();
         if ($request->ajax() && $model->create($inputVal)) {
             $responseData['status'] = 200;
@@ -77,7 +77,8 @@ class ModulesController extends Controller
 
     public function view(Request $request, $id)
     {
-        return view('admin.modules.view');
+        $model = $this->findModel(decode($id));
+        return view('admin.modules.view', ['model' => $model]);
     }
 
     public function delete(Request $request, $id)

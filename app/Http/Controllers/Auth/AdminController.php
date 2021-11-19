@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\LoginRequest;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\AdminLoginRequest;
-use Validator;
 
 class AdminController extends Controller
 {
@@ -21,7 +20,7 @@ class AdminController extends Controller
     | redirecting them to your home screen. The controller uses a trait
     | to conveniently provide its functionality to your applications.
     |
-    */
+     */
 
     use AuthenticatesUsers;
 
@@ -42,7 +41,7 @@ class AdminController extends Controller
         $this->middleware('guest:admin')->except('logout');
     }
 
-    public function login(AdminLoginRequest $request)
+    public function login(LoginRequest $request)
     {
         // $validated = $request->validated();
         $inputVal = $request->all();
@@ -50,19 +49,19 @@ class AdminController extends Controller
         $credentials = [
             'email' => $inputVal['email'],
             'password' => $inputVal['password'],
-            'role_id' => 1
+            'role_id' => 1,
         ];
-        $remember_me = (isset($inputVal['remember']) && $inputVal['remember'] == 'on')  ? true : false;
+        $remember_me = (isset($inputVal['remember']) && $inputVal['remember'] == 'on') ? true : false;
         $responseData = [];
-        if(Auth::guard('admin')->attempt($credentials, $remember_me)){
+        if (Auth::guard('admin')->attempt($credentials, $remember_me)) {
             $responseData['status'] = 200;
             $responseData['message'] = 'Success';
             $responseData['url'] = route('admin.dashboard');
             return response()->json($responseData);
-        }else{
+        } else {
             // return redirect()->route('admin.login')->with('error','Email & Password are incorrect.');
             // return redirect()->back()->with('error','Email & Password are incorrect.');
-            if($request->ajax()){
+            if ($request->ajax()) {
                 $responseData['status'] = 0;
                 $responseData['message'] = 'Email & Password are incorrect.';
                 $responseData['url'] = route('admin.login');

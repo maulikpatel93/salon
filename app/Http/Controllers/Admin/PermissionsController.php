@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\PermissionsRequest;
+use App\Http\Requests\Admin\PermissionsRequest;
 use App\Models\Modules;
 use App\Models\Permissions;
 use Illuminate\Http\Request;
@@ -54,7 +54,7 @@ class PermissionsController extends Controller
                     if (empty($model)) {
                         $model = new Permissions();
                         $model->module_id = $inputVal['module_id'];
-                        $model->type = $inputVal['type'];
+                        $model->panel = $inputVal['panel'];
                         $model->title = $title[$i];
                         $model->name = $name[$i];
                         $model->controller = $controller[$i];
@@ -96,7 +96,8 @@ class PermissionsController extends Controller
 
     public function view(Request $request, $id)
     {
-        return view('admin.permissions.view');
+        $model = $this->findModel(decode($id));
+        return view('admin.permissions.view', ['model' => $model]);
     }
 
     public function delete(Request $request, $id)

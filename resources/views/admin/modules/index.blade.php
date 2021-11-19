@@ -74,6 +74,19 @@
                     'attribute' => 'functionality', // Attribute, by which the row column data will be taken from a model.
                 ],
                 [
+                    'label' => 'Panel', // Column label.
+                    'attribute' => 'panel', // Attribute, by which the row column data will be taken from a model.
+                    'filter' => [ // For dropdown it is necessary to set 'data' array. Array keys are for html <option> tag values, array values are for titles.
+                        'class' => Itstructure\GridView\Filters\DropdownFilter::class, // REQUIRED. For this case it is necessary to set 'class'.
+                        'name' => 'panel', // REQUIRED if 'attribute' is not defined for column.
+                        'data' => [ // REQUIRED.
+                            'Backend' => 'Backend',
+                            'Frontend' => 'Frontend',
+                            'Common' => 'Common',
+                        ]
+                    ],
+                ],
+                [
                     'label' => 'Active', // Column label.
                     'value' => function ($model) { // You can set 'value' as a callback function to get a row data value dynamically.
                             $btnbg = ($model->is_active == 1) ? 'success' : 'danger';

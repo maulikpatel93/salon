@@ -88,7 +88,7 @@ class CreateBasicTable extends Migration
         //php artisan make:migration create_permissions_table
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['Backend', 'Frontend', 'App', 'Common'])->default('Backend');
+            $table->enum('panel', ['Backend', 'Frontend', 'App', 'Common'])->default('Backend');
             $table->string('title', 200);
             $table->string('name', 100);
             $table->string('controller', 100);

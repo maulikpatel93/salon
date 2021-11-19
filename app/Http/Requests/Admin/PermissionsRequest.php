@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\JsonResponse;
 
-class AdminLoginRequest extends FormRequest
+class PermissionsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,10 +23,14 @@ class AdminLoginRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'email' => 'required|email',
-            'password' => 'required',
+        $rules = [
+            'module_id' => 'required',
+            'panel' => 'required',
+            'title.*' => 'required',
+            'name.*' => 'required',
         ];
+
+        return $rules;
     }
 
     public function messages()
@@ -35,11 +38,5 @@ class AdminLoginRequest extends FormRequest
         return [
             // 'email' => 'Please Select Role',
         ];
-    }
-
-    public function response(array $errors)
-    {
-
-        return new JsonResponse(['error' => $errors], 400);
     }
 }

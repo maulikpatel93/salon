@@ -62,9 +62,9 @@
             if ($permissionmodel) {
                 $i = 0;
                 foreach ($permissionmodel as $key => $value) {
-                    $RoleAccess = RoleAccess::where(['role_id' => $rolemodel->id, 'permission_id' => $value->id])->get();
+                    $RoleAccess = RoleAccess::where(['role_id' => $rolemodel->id, 'permission_id' => $value->id])->first();
                     if ($RoleAccess) {
-                        // $model->access = $RoleAccess->access;
+                        $model->access = $RoleAccess->access;
                     }
                     if ($value->module_name_unique) {
                         ?>
@@ -81,7 +81,7 @@
                             'placeholder'=> '',
                             ]) }}
                         </div>
-                        {{ Form::checkbox('access[' . $i . ']', '1', false, ['id' => 'roleaccess-access-' . $i,'class'=>"custom-control-input checkbox"]) }}
+                        {{ Form::checkbox('access[' . $i . ']', '1', $model->access, ['id' => 'roleaccess-access-' . $i,'class'=>"custom-control-input checkbox"]) }}
                         {{ Form::label('roleaccess-access-' . $i, $value->title) }}
                     </div>
                     <?php
@@ -104,7 +104,7 @@
 @endsection
 
 @section('pagescript')
-{!! JsValidator::formRequest('App\Http\Requests\RoleAccessRequest', '#my-form'); !!}
+{!! JsValidator::formRequest('App\Http\Requests\Admin\RoleAccessRequest', '#my-form'); !!}
 <script>
   $("#permissionid").click(function () {
       $(".checkbox").prop("checked", $(this).prop("checked"));

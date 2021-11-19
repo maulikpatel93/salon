@@ -23,6 +23,7 @@ class Modules extends Model
      * @var string[]
      */
     protected $fillable = [
+        'panel',
         'title',
         'controller',
         'action',
@@ -32,6 +33,7 @@ class Modules extends Model
         'parent_menu_id',
         'parent_submenu_id',
         'is_active',
+        'is_active_at',
     ];
 
     /**
@@ -52,7 +54,7 @@ class Modules extends Model
     ];
 
     public function getIsNewRecordAttribute()
-     {
-          return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
-     }
+    {
+        return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
+    }
 }

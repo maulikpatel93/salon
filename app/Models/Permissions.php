@@ -27,7 +27,7 @@ class Permissions extends Model
     protected $fillable = [
         'title',
         'module_id',
-        'type',
+        'panel',
         'title',
         'name',
         'controller',

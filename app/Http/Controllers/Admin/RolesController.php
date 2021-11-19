@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\RoleAccessRequest;
-use App\Http\Requests\RoleRequest;
+use App\Http\Requests\Admin\RoleAccessRequest;
+use App\Http\Requests\Admin\RoleRequest;
 use App\Models\Permissions;
 use App\Models\RoleAccess;
 use App\Models\Roles;
@@ -46,7 +46,7 @@ class RolesController extends Controller
         $inputVal = $request->all();
         $inputVal['controller'] = $inputVal['controller'] ?? '';
         $inputVal['action'] = $inputVal['action'] ?? '';
-
+        $inputVal['is_active_at'] = currentDateTime();
         $model = new Roles();
         if ($request->ajax() && $model->create($inputVal)) {
             $responseData['status'] = 200;
@@ -81,7 +81,8 @@ class RolesController extends Controller
 
     public function view(Request $request, $id)
     {
-        return view('admin.roles.view');
+        $model = $this->findModel(decode($id));
+        return view('admin.roles.view', ['model' => $model]);
     }
 
     public function delete(Request $request, $id)
@@ -152,31 +153,11 @@ class RolesController extends Controller
         $rolemodel = $this->findModel(decode($id));
         config()->set('database.connections.mysql.strict', false);
         DB::reconnect(); //important as the existing connection if any would be in strict mode
-        $permissionmodel = DB::select("SELECT CASE WHEN ROW_NUMBER() OVER(PARTITION BY module_id ORDER BY action) = 1 THEN (select title as module_name from modules WHERE id = module_id) ELSE NULL END AS 'module_name_unique' , id , module_id , name , title , controller , action FROM permissions ORDER BY module_id,controller, action;");
+        $permissionmodel = DB::select("SELECT CASE WHEN ROW_NUMBER() OVER(PARTITION BY module_id ORDER BY id) = 1 THEN (select title as module_name from modules WHERE id = module_id) ELSE NULL END AS 'module_name_unique' , id , module_id , name , title , controller , action FROM permissions ORDER BY module_id, controller, id;");
         config()->set('database.connections.mysql.strict', true);
         DB::reconnect();
         $model = new RoleAccess();
         $model->role_id = $id;
-        // if ($model->load(Yii::$app->request->post())) {
-        //     if ($model->permission_id) {
-        //         foreach ($model->permission_id as $key => $value) {
-        //             $checkPermissionId = Permission::find()->where(['id' => $value])->count();
-        //             if ($checkPermissionId) {
-        //                 $modelAll = RoleAccess::find()->where(['role_id' => $id, 'permission_id' => $value])->one();
-        //                 if (empty($modelAll)) {
-        //                     $modelAll = new RoleAccess();
-        //                     $modelAll->role_id = $id;
-        //                 }
-        //                 $modelAll->permission_id = $value;
-        //                 $modelAll->access = $model->access[$key];
-        //                 $modelAll->created_at = date("Y-m-d H:i:s");
-        //                 $modelAll->save();
-        //             }
-        //         }
-        //     }
-        //     Yii::$app->session->setFlash('success', Yii::$app->BackFunctions->message('update'));
-        //     return $this->redirect(['access', 'id' => $model->role_id]);
-        // }
         return view('admin.roles.access', [
             'model' => $model,
             'rolemodel' => $rolemodel,
@@ -186,6 +167,7 @@ class RolesController extends Controller
 
     public function accessupdate(RoleAccessRequest $request, $id)
     {
+        $id = decode($id);
         $inputVal = $request->all();
         $permission_id = isset($inputVal['permission_id']) ? $inputVal['permission_id'] : [];
         $access = isset($inputVal['access']) ? $inputVal['access'] : [];
@@ -193,13 +175,13 @@ class RolesController extends Controller
             foreach ($permission_id as $key => $value) {
                 $checkPermissionId = Permissions::where(['id' => $value])->count();
                 if ($checkPermissionId) {
-                    $model = RoleAccess::where(['role_id' => $id, 'permission_id' => $value])->get();
-                    if (empty($model->count())) {
+                    $model = RoleAccess::where(['role_id' => $id, 'permission_id' => $value])->first();
+                    if (empty($model)) {
                         $model = new RoleAccess();
                     }
-                    $model->role_id = decode($id);
+                    $model->role_id = $id;
                     $model->permission_id = $value;
-                    $model->access = isset($access[$key]) ? $access[$key] : 0;
+                    $model->access = isset($access[$key]) ? $access[$key] : '0';
                     $model->save();
                 }
             }
