@@ -19,12 +19,6 @@ class RedirectIfAuthenticated
      */
     public function handle(Request $request, Closure $next, ...$guards)
     {
-        $routeArray = app('request')->route()->getAction();
-
-        $controllerAction = class_basename($routeArray['controller']);
-
-        list($controller, $action) = explode('@', $controllerAction);
-
         $guards = empty($guards) ? [null] : $guards;
 
         foreach ($guards as $guard) {

@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\Modules;
-use App\Models\Permission;
+use App\Models\Permissions;
 use App\Models\RoleAccess;
 use Illuminate\Support\Str;
 use Route;
@@ -17,7 +17,7 @@ function generateUuid()
 
 if (!function_exists('homeRoute')) {
     /**
-     * Return the route to the "home" page depending on authentication/authorization status.
+     * Return the route to the "home" page depending on authentication/authorization is_active.
      *
      * @return string
      */
@@ -212,14 +212,14 @@ if (!function_exists('checkaccess')) {
         global $user;
         $adminuser = $user;
         if ($action && $controller) {
-            $modulesdata = Modules::find()->where(['status' => 'Active', 'controller' => $controller, 'action' => $action])->one();
+            $modulesdata = Modules::where(['is_active' => '1', 'controller' => $controller, 'action' => $action])->first();
             if (empty($modulesdata)) {
-                $modulesdata = Modules::find()->where(['status' => 'Active', 'controller' => $controller])->one();
+                $modulesdata = Modules::where(['is_active' => '1', 'controller' => $controller])->first();
             }
             if ($modulesdata) {
-                $permission = Permission::find()->where(['module_id' => $modulesdata->id, 'controller' => $controller])->andWhere(['or', ['action' => $action], ['name' => $action]])->one();
+                $permission = Permissions::where(['module_id' => $modulesdata->id, 'controller' => $controller])->where('action', $action)->orWhere('name', $action)->first();
                 if ($permission) {
-                    $module_access = RoleAccess::find()->where(['role_id' => $adminuser->role_id, 'permission_id' => $permission->id, 'access' => '1'])->one();
+                    $module_access = RoleAccess::where(['role_id' => $adminuser->role_id, 'permission_id' => $permission->id, 'access' => '1'])->first();
                     if ($module_access) {
                         return true;
                     }
