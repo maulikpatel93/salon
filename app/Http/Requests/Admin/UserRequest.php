@@ -23,9 +23,24 @@ class UserRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'name' => 'required',
-            'panel' => 'required',
-        ];
+        if (decode($this->id)) {
+            $id = $this->id;
+            return [
+                'first_name' => 'required',
+                'last_name' => 'required',
+                'role_id' => 'required',
+            ];
+        } else {
+            return [
+                'first_name' => 'required',
+                'last_name' => 'required',
+                'username' => 'required|unique:users',
+                'email' => 'required|email|unique:users',
+                'password' => 'required|min:6',
+                'password_confirmation' => 'required|required_with:password|same:password|min:6',
+                'role_id' => 'required',
+            ];
+        }
+
     }
 }

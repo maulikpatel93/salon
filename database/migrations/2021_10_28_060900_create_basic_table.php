@@ -33,6 +33,10 @@ class CreateBasicTable extends Migration
             $table->enum('email_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('api_token', 80)->after('password')
+                ->unique()
+                ->nullable()
+                ->default(null);
             $table->string('phone_number', 20);
             $table->enum('phone_number_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify
             $table->timestamp('phone_number_verified_at')->nullable();

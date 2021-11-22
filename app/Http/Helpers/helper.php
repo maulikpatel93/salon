@@ -3,8 +3,8 @@
 use App\Models\Modules;
 use App\Models\Permissions;
 use App\Models\RoleAccess;
+use Illuminate\Support\Route;
 use Illuminate\Support\Str;
-use Route;
 /**
  * Henerate UUID.
  *

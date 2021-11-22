@@ -107,7 +107,7 @@
             'toolbar' =>  [
                 'content' => '<div class="btn-group" role="group">
                                 '.$createbtn.'
-                                <a href="'.route("admin.permissions.index").'" class="btn btn-secondary" title="Refresh Module" data-trigger-pjax="1" ><i class="fas fa-refresh"></i></a>
+                                <a href="'.route("admin.permissions.index").'" class="btn btn-secondary" title="Refresh Module" data-trigger-pjax="1" ><i class="fas fa-redo"></i></a>
                             </div>
                             ',
                 'applybtn' => $applyafter,

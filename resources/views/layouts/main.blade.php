@@ -110,16 +110,15 @@
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
                     <?php
-                        $sideMenu = array();
                         // $modules = Modules::where(['menu_id' => 0, 'parent_menu_id' => 0, 'parent_submenu_id' => 0])->where('title', '!=', '')->get();
                         // if($modules){
                         //     foreach ($modules as $key => $value){
 
                                 //$sideMenu[] = '<li class="nav-header">'.$value['title'].'</li>';
 
-                                $menus = Modules::where(['type' => 'Menu', 'is_active'=>'1'])->where('title', '!=', '')->orderBy('menu_position', 'asc')->get()->toArray();
-                                
-                                $side_menu = array();
+                                $menus = Modules::where(['type' => 'Menu', 'is_active'=>'1', 'panel' => 'Backend'])->where('title', '!=', '')->orderBy('menu_position', 'asc')->get()->toArray();
+                               
+                                $sideMenu = '';
                                 if($menus){
                                     foreach ($menus as $key_menu => $value_menu){
                                         $active_sidemenu = '';
@@ -134,8 +133,8 @@
                                         }
                                         $childMenu = "";
                                         $icon = "";
-                                        $submenu = Modules::where(['type' => 'Submenu', 'parent_menu_id' => $value_menu['id'] ,'is_active'=>'1'])->where('title', '!=', '')->orderBy('submenu_position', 'asc')->get()->toArray();
-                                        
+                                        $submenu = Modules::where(['type' => 'Submenu', 'parent_menu_id' => $value_menu['id'] ,'is_active'=>'1', 'panel' => 'Backend'])->where('title', '!=', '')->orderBy('submenu_position', 'asc')->get()->toArray();
+                                        $totalchildMenu = [];
                                         if ($submenu) {
                                             $childMenu .= '<ul class="nav nav-treeview">';
                                             foreach ($submenu as $key_submenu => $value_submenu) {
@@ -154,7 +153,7 @@
                                                 }
                                                 $iconchild = "";
                                                 $childInMenu = "";
-                                                $subsubmenu = Modules::where(['type' => 'Subsubmenu','parent_menu_id' => $value_menu['id'],'parent_submenu_id' => $value_submenu['id'] ,'is_active'=>'1'])->where('title', '!=', '')->orderBy('submenu_position', 'asc')->get()->toArray();
+                                                $subsubmenu = Modules::where(['type' => 'Subsubmenu','parent_menu_id' => $value_menu['id'],'parent_submenu_id' => $value_submenu['id'] ,'is_active'=>'1', 'panel' => 'Backend'])->where('title', '!=', '')->orderBy('submenu_position', 'asc')->get()->toArray();
                                                 if($subsubmenu){  
                                                   $childInMenu .= '<ul class="nav nav-treeview">';
                                                   foreach ($subsubmenu as $key_subsubmenu => $value_subsubmenu) {
@@ -173,19 +172,17 @@
                                                           $nav_open_sidemenu = 'menu-is-opening menu-open';
                                                       }
                                                       if(!empty(checkaccess($value_subsubmenu['action'], $value_subsubmenu['controller']))){
-                                                        $childInMenu .= '<li class="nav-item">'
-                                                                . link_to(url().'/'.$url_childInmenu, '<i class="nav-icon ' . $value_subsubmenu['icon'] . '"></i><p>' . $value_subsubmenu['title'] . '</p>', ['class' => 'nav-link ' . $active_childInmenu, 'data-ajax'=>'?path='.$url_childInmenu])
-                                                                . '</li>';
+                                                        $childInMenutitle = '<i class="nav-icon ' . $value_subsubmenu['icon'] . '"></i><p>' . $value_subsubmenu['title'] . '</p>';
+                                                        $childInMenu .= '<li class="nav-item"><a href="'.url('/admin').'/'.$url_childInmenu.'" class="nav-link '.$active_childInmenu.'">'.$childInMenutitle.'</a></li>';
                                                       }
                                                   }
                                                   $childInMenu .= "</ul>";
                                                   $iconchild .= '<i class="fas fa-angle-left right"></i>';
                                                 }
                                                 if(!empty(checkaccess($value_submenu['action'], $value_submenu['controller']))){
-                                                    $childMenu .= '<li class="nav-item">'
-                                                            . link_to(url().'/'.$url_childmenu, '<i class="nav-icon ' . $value_submenu['icon'] . '"></i><p>' . $value_submenu['title'] . $iconchild . '</p>', ['class' => 'nav-link ' . $active_childmenu, 'data-ajax'=>'?path='.$url_childmenu])
-                                                            . $childInMenu
-                                                            . '</li>';
+                                                    $childMenutitle = '<i class="nav-icon ' . $value_submenu['icon'] . '"></i><p>' . $value_submenu['title'] . $iconchild . '</p>';
+                                                    $childMenu .= '<li class="nav-item"><a href="'.url('/admin').'/'.$url_childmenu.'" class="nav-link '.$active_childmenu.'">'.$childMenutitle.'</a>'. $childInMenu. '</li>';
+                                                    $totalchildMenu[] = true; 
                                                 }
                                             }
                                             $childMenu .= "</ul>";
@@ -196,18 +193,16 @@
                                                 $nav_open_sidemenu = 'menu-is-opening menu-open';
                                             }
                                         }
-                                        //echo checkaccess($value_menu['action'], $value_menu['controller']);
-                                        // if(!empty(checkaccess($value_menu['action'], $value_menu['controller']))){
-                                        //     $sideMenu[] = '<li class="nav-item ' . $nav_open_sidemenu . '">'
-                                        //     . link_to(url().'/'.$url, '<i class="nav-icon ' . $value_menu['icon'] . '"></i><p>' . $value_menu['title'] . $icon . '</p>', ['class' => 'nav-link ' . $active_sidemenu, 'data-ajax'=>'?path='.$url])
-                                        //     . $childMenu
-                                        //     . '</li>';
-                                        // }else{
-                                        //     $sideMenu[] = '<li class="nav-item ' . $nav_open_sidemenu . '">'
-                                        //     . link_to(url().'/'.$url, '<i class="nav-icon ' . $value_menu['icon'] . '"></i><p>' . $value_menu['title'] . $icon . '</p>', ['class' => 'nav-link ' . $active_sidemenu, 'data-ajax'=>'?path='.$url])
-                                        //     . $childMenu
-                                        //     . '</li>';
-                                        // }
+                                        // echo checkaccess($value_menu['action'], $value_menu['controller']);
+                                        if(!empty(checkaccess($value_menu['action'], $value_menu['controller']))){
+                                            $sideMenutitle = '<i class="nav-icon ' . $value_menu['icon'] . '"></i><p>' . $value_menu['title'] . $icon . '</p>';
+                                            $sideMenu .= '<li class="nav-item ' . $nav_open_sidemenu . '"><a href="'.url('/admin').'/'.$url.'" class="nav-link '.$active_sidemenu.'">'.$sideMenutitle.'</a>'. $childMenu. '</li>';
+                                        }else{
+                                            if($totalchildMenu || $value_menu['controller'] == 'dashboard'){
+                                                $sideMenutitle = '<i class="nav-icon ' . $value_menu['icon'] . '"></i><p>' . $value_menu['title'] . $icon . '</p>';
+                                                $sideMenu .= '<li class="nav-item ' . $nav_open_sidemenu . '"><a href="'.url('/admin').'/'.$url.'" class="nav-link '.$active_sidemenu.'">'.$sideMenutitle.'</a>'. $childMenu. '</li>';    
+                                            }
+                                        }
                                     } 
                                 }
 
@@ -220,50 +215,7 @@
                         ?>
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
-                        {!! implode(' ', $sideMenu) !!}
-                        <li class="nav-item">
-                            <a href="{{ route('admin.dashboard') }}" class="nav-link">
-                                <i class="nav-icon fas fa-th"></i>
-                                <p>
-                                    Dashboard
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="nav-icon fas fa-user"></i>
-                                <p>
-                                    User Management
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{ route('admin.modules.index') }}" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Modules</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('admin.permissions.index') }}" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Permission</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('admin.roles.index') }}" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Roles</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Users</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                        {!! $sideMenu !!}
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->

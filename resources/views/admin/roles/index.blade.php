@@ -159,7 +159,7 @@
             'toolbar' =>  [
                 'content' => '<div class="btn-group" role="group">
                                 '.$createbtn.'
-                                <a href="'.route("admin.roles.index").'" class="btn btn-secondary" title="Refresh Role" data-trigger-pjax="1" ><i class="fas fa-refresh"></i></a>
+                                <a href="'.route("admin.roles.index").'" class="btn btn-secondary" title="Refresh Role" data-trigger-pjax="1" ><i class="fas fa-redo"></i></a>
                             </div>
                             ',
                 'applybtn' => $applyafter,

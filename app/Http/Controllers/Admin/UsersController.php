@@ -10,6 +10,8 @@ use App\Models\UserAccess;
 use App\Models\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Itstructure\GridView\DataProviders\EloquentDataProvider;
 
 class UsersController extends Controller
@@ -44,9 +46,16 @@ class UsersController extends Controller
     public function store(UserRequest $request)
     {
         $inputVal = $request->all();
-        $inputVal['controller'] = $inputVal['controller'] ?? '';
-        $inputVal['action'] = $inputVal['action'] ?? '';
+        $inputVal['username'] = '';
+        $inputVal['email_verified'] = '1';
+        $inputVal['email_verified_at'] = currentDateTime();
+        $inputVal['phone_number_verified'] = '0';
+        $inputVal['password'] = Hash::make($inputVal['password']);
         $inputVal['is_active_at'] = currentDateTime();
+        $inputVal['profile_photo'] = '';
+
+        $token = Str::random(60);
+        $inputVal['api_token'] = hash('sha256', $token);
         $model = new Users();
         if ($request->ajax() && $model->create($inputVal)) {
             $responseData['status'] = 200;
@@ -193,5 +202,16 @@ class UsersController extends Controller
             return $model;
         }
         throw new Exception('The requested page does not exist.');
+    }
+
+    public function update1(Request $request)
+    {
+        $token = Str::random(60);
+
+        $request->user()->forceFill([
+            'api_token' => hash('sha256', $token),
+        ])->save();
+
+        return ['token' => $token];
     }
 }

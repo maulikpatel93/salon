@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ModulesController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\RolesController;
+use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Auth\AdminController;
 use App\Http\Controllers\Auth\LoginController;
 //Web Panel
@@ -45,7 +46,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', function () {
             return redirect(route('admin.login'));
         });
-        Route::view('/login', 'auth.adminlogin')->name('login');
+        // Route::view('/login', 'auth.adminlogin')->name('login');
+        Route::get('/login', [AdminController::class, 'index'])->name('login');
         Route::post('/login', [AdminController::class, 'login'])->name('checklogin');
     });
     Route::middleware('auth:admin', 'PreventBackHistory')->group(function () {
@@ -96,6 +98,30 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/access/{id}', [RolesController::class, 'access'])->name('access');
             Route::post('/accessupdate/{id}', [RolesController::class, 'accessupdate'])->name('accessupdate');
         });
+
+        //Roles
+        Route::prefix('users')->name('users.')->group(function () {
+            Route::get('/', [UsersController::class, 'index'])->name('index');
+            Route::post('/create', [UsersController::class, 'create'])->name('create');
+            Route::post('/store', [UsersController::class, 'store'])->name('store');
+            Route::post('/edit/{id}', [UsersController::class, 'edit'])->name('edit');
+            Route::post('/update/{id}', [UsersController::class, 'update'])->name('update');
+            Route::post('/view/{id}', [UsersController::class, 'view'])->name('view');
+            Route::get('/delete/{id}', [UsersController::class, 'delete'])->name('delete');
+            Route::post('/isactive/{id}', [UsersController::class, 'isactive'])->name('isactive');
+            Route::post('/applystatus', [UsersController::class, 'applystatus'])->name('applystatus');
+            Route::get('/access/{id}', [UsersController::class, 'access'])->name('access');
+            Route::post('/accessupdate/{id}', [UsersController::class, 'accessupdate'])->name('accessupdate');
+        });
+    });
+});
+
+Route::prefix('api')->name('api.')->group(function () {
+    Route::middleware(['guest:api', 'PreventBackHistory'])->group(function () {
+
+    });
+    Route::middleware(['auth:api', 'PreventBackHistory'])->group(function () {
+
     });
 });
 // Route::get('home', [HomeController::class, 'index'])->name('home');

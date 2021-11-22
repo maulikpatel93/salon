@@ -41,6 +41,11 @@ class AdminController extends Controller
         $this->middleware('guest:admin')->except('logout');
     }
 
+    public function index(Request $request)
+    {
+        return view('auth.adminlogin');
+    }
+
     public function login(LoginRequest $request)
     {
         // $validated = $request->validated();
