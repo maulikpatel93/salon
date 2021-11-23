@@ -28,10 +28,12 @@ Route::get('/', function () {
 });
 
 Auth::routes();
-
+Route::fallback(function () {
+    // Route::view('/errors.404', 'home.notfound');
+});
 //Landing Page
 Route::middleware(['guest:web', 'PreventBackHistory'])->group(function () {
-    Route::view('/login', 'auth.login')->name('login');
+    // Route::view('/login', 'auth.login')->name('login');
 });
 Route::middleware('auth:web', 'PreventBackHistory')->group(function () {
     Route::view('/home', 'home')->name('home');
@@ -113,15 +115,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/access/{id}', [UsersController::class, 'access'])->name('access');
             Route::post('/accessupdate/{id}', [UsersController::class, 'accessupdate'])->name('accessupdate');
         });
-    });
-});
-
-Route::prefix('api')->name('api.')->group(function () {
-    Route::middleware(['guest:api', 'PreventBackHistory'])->group(function () {
-
-    });
-    Route::middleware(['auth:api', 'PreventBackHistory'])->group(function () {
-
     });
 });
 // Route::get('home', [HomeController::class, 'index'])->name('home');

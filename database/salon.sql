@@ -438,7 +438,7 @@ CREATE TABLE `users` (
   `email_verified` enum('1','0') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `api_token` varchar(80) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `auth_key` varchar(80) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `phone_number` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `phone_number_verified` enum('1','0') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
   `phone_number_verified_at` timestamp NULL DEFAULT NULL,
@@ -454,7 +454,7 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `role_id`, `first_name`, `last_name`, `username`, `email`, `email_verified`, `email_verified_at`, `password`, `api_token`, `phone_number`, `phone_number_verified`, `phone_number_verified_at`, `profile_photo`, `remember_token`, `is_active`, `is_active_at`, `created_at`, `updated_at`) VALUES
+INSERT INTO `users` (`id`, `role_id`, `first_name`, `last_name`, `username`, `email`, `email_verified`, `email_verified_at`, `password`, `auth_key`, `phone_number`, `phone_number_verified`, `phone_number_verified_at`, `profile_photo`, `remember_token`, `is_active`, `is_active_at`, `created_at`, `updated_at`) VALUES
 (1, 1, 'Lyla', 'Murazik', 'kyundt', 'programmer93.dynamicdreamz@gmail.com', '1', '1984-02-29 21:41:52', '$2y$10$7pWq7Y9s4nXoW1yTypEO8OwTjJSMlb1Qam/CQ6FMN9zzGQprEAdGm', '93b2b4aff84e168afc31e5f5e0dc8a7d23c801f1d6212f9a7986d5fff4c01f60', '1-531-896-3112', '1', '1996-05-03 08:30:23', '', 'DM0HnB8tfydbwwGho37B6Tt8H6UQuoOyAGRhpZOlX0Jfl4cOgG23cUaqB4f8', '1', '2021-11-22 06:33:12', '1981-08-23 23:48:57', '2021-11-22 03:28:31'),
 (3, 3, 'Lyla', 'Murazik1', 'kyundt', 'programmer.dynamicdreamz@gmail.com', '1', '1984-02-29 21:41:52', '$2y$10$7pWq7Y9s4nXoW1yTypEO8OwTjJSMlb1Qam/CQ6FMN9zzGQprEAdGm', NULL, '1-531-896-3112', '1', '1996-05-03 08:30:23', '', NULL, '1', '1994-09-25 23:03:02', '1981-08-23 23:48:57', '2007-11-15 19:36:23'),
 (4, 2, 'Lyla', 'Murazik2', 'kyundt', 'programmer_.dynamicdreamz@gmail.com', '1', '1984-02-29 21:41:52', '$2y$10$7pWq7Y9s4nXoW1yTypEO8OwTjJSMlb1Qam/CQ6FMN9zzGQprEAdGm', NULL, '1-531-896-3112', '1', '1996-05-03 08:30:23', '', NULL, '1', '1994-09-25 23:03:02', '1981-08-23 23:48:57', '2007-11-15 19:36:23'),
@@ -566,7 +566,7 @@ ALTER TABLE `roles_access`
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `users_email_unique` (`email`),
-  ADD UNIQUE KEY `users_api_token_unique` (`api_token`),
+  ADD UNIQUE KEY `users_auth_key_unique` (`auth_key`),
   ADD KEY `users_role_id_foreign` (`role_id`);
 
 --

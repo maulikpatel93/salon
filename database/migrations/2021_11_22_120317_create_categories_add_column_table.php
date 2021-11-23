@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUsersAddApiColumnTable extends Migration
+class CreateCategoriesAddColumnTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,9 +14,8 @@ class CreateUsersAddApiColumnTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('auth_key', 80)->after('password')
-                ->unique()
-                ->nullable();
+            $table->renameColumn('api_token', 'auth_key');
+            $table->string('auth_key', 100)->nullable()->change();
         });
     }
 

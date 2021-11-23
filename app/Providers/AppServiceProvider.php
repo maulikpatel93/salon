@@ -24,15 +24,17 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         app('view')->composer('*', function ($view) {
-            if (app('request')->route()->getAction() != null) {
+            if (app('request')->route() && app('request')->route()->getAction() != null) {
                 $getActionName = app('request')->route()->getAction();
+                if (isset($getActionName['middleware']) && count($getActionName['middleware']) >= 2 && is_array($getActionName['middleware'])) {
+                    if (in_array('auth:admin', $getActionName['middleware']) || in_array('guest:admin', $getActionName['middleware'])) {
+                        $getControllerName = class_basename($getActionName['controller']);
+                        list($getControllerName, $getActionName) = explode('@', $getControllerName);
 
-                $getControllerName = class_basename($getActionName['controller']);
-
-                list($getControllerName, $getActionName) = explode('@', $getControllerName);
-
-                $getControllerName = strtolower(str_replace('Controller', '', $getControllerName));
-                $view->with(compact('getControllerName', 'getActionName'));
+                        $getControllerName = strtolower(str_replace('Controller', '', $getControllerName));
+                        $view->with(compact('getControllerName', 'getActionName'));
+                    }
+                }
             }
         });
     }

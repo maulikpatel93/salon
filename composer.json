@@ -16,6 +16,7 @@
         "itstructure/laravel-grid-view": "^1.0",
         "jquery-form/form": "^4.3",
         "laravel/framework": "^8.65",
+        "laravel/passport": "^10.2",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.3",

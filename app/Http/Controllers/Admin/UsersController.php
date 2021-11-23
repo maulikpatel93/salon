@@ -54,8 +54,8 @@ class UsersController extends Controller
         $inputVal['is_active_at'] = currentDateTime();
         $inputVal['profile_photo'] = '';
 
-        $token = Str::random(60);
-        $inputVal['api_token'] = hash('sha256', $token);
+        $token = Str::random(config('params.auth_key_character'));
+        $inputVal['auth_key'] = hash('sha256', $token);
         $model = new Users();
         if ($request->ajax() && $model->create($inputVal)) {
             $responseData['status'] = 200;
@@ -209,7 +209,7 @@ class UsersController extends Controller
         $token = Str::random(60);
 
         $request->user()->forceFill([
-            'api_token' => hash('sha256', $token),
+            'auth_key' => hash('sha256', $token),
         ])->save();
 
         return ['token' => $token];
