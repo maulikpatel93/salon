@@ -140,18 +140,22 @@ if(isset($toolbar['searchbtn']) && $toolbar['searchbtn']){
 
                         <form action="{{ $rowsFormAction }}" method="post" id="grid_view_rows_form">
                             <tbody>
-                                @foreach($paginator->items() as $key => $row)
-                                <tr class="gridtable">
-                                    <td class="text-center">{{ ($paginator->currentPage() - 1) * $paginator->perPage() + $key + 1 }}</td>
-                                    @foreach($columnObjects as $column_obj)
-                                    @if($column_obj instanceof \Itstructure\GridView\Columns\CheckboxColumn)
-                                    <td class="kv-row-select text-center">{!! $column_obj->render($row) !!}</td>
-                                    @else
-                                    <td class="">{!! $column_obj->render($row) !!}</td>
-                                    @endif
+                                @if($paginator->items())
+                                    @foreach($paginator->items() as $key => $row)
+                                    <tr class="gridtable">
+                                        <td class="text-center">{{ ($paginator->currentPage() - 1) * $paginator->perPage() + $key + 1 }}</td>
+                                        @foreach($columnObjects as $column_obj)
+                                        @if($column_obj instanceof \Itstructure\GridView\Columns\CheckboxColumn)
+                                        <td class="kv-row-select text-center">{!! $column_obj->render($row) !!}</td>
+                                        @else
+                                        <td class="">{!! $column_obj->render($row) !!}</td>
+                                        @endif
+                                        @endforeach
+                                    </tr>
                                     @endforeach
-                                </tr>
-                                @endforeach
+                                @else
+                                    <tr class=""><td class="text-center" colspan="100">No record found.</td></tr>
+                                @endif
                             </tbody>
                             {{-- <tfoot>
                                 <tr>

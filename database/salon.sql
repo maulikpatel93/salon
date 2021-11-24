@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 22, 2021 at 10:10 AM
+-- Generation Time: Nov 23, 2021 at 11:17 AM
 -- Server version: 10.4.20-MariaDB
 -- PHP Version: 8.0.9
 
@@ -132,7 +132,13 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (6, '2021_11_19_065042_create_permission_add_column_table', 5),
 (7, '2021_11_22_071639_create_users_add_column_table', 6),
 (8, '2021_11_22_073140_create_users_add_api_column_table', 7),
-(9, '2021_11_22_073429_create_users_add_api_column_table', 8);
+(9, '2021_11_22_073429_create_users_add_api_column_table', 8),
+(10, '2016_06_01_000001_create_oauth_auth_codes_table', 9),
+(11, '2016_06_01_000002_create_oauth_access_tokens_table', 9),
+(12, '2016_06_01_000003_create_oauth_refresh_tokens_table', 9),
+(13, '2016_06_01_000004_create_oauth_clients_table', 9),
+(14, '2016_06_01_000005_create_oauth_personal_access_clients_table', 9),
+(15, '2021_11_22_120317_create_categories_add_column_table', 10);
 
 -- --------------------------------------------------------
 
@@ -175,6 +181,146 @@ INSERT INTO `modules` (`id`, `panel`, `title`, `controller`, `action`, `icon`, `
 (8, 'Backend', 'Settings', 'settings', 'index', 'fas fa-cog', 'crud', 'Menu', NULL, NULL, NULL, NULL, '0', '1', '2021-11-19 05:42:58', '2021-11-18 03:41:22', '2021-11-22 00:09:55'),
 (9, 'Backend', 'Custom Pages', 'custompages', 'index', 'far fa-circle', 'crud', 'Submenu', 6, NULL, NULL, NULL, '0', '1', NULL, '2021-11-18 03:44:49', '2021-11-18 03:44:49'),
 (10, 'Backend', 'Users', 'users', 'index', 'far fa-circle', 'crud', 'Submenu', 2, NULL, NULL, NULL, '0', '1', '2021-11-19 06:45:13', '2021-11-18 22:56:20', '2021-11-19 01:15:13');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `oauth_access_tokens`
+--
+
+CREATE TABLE `oauth_access_tokens` (
+  `id` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `client_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `scopes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `revoked` tinyint(1) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `expires_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `oauth_access_tokens`
+--
+
+INSERT INTO `oauth_access_tokens` (`id`, `user_id`, `client_id`, `name`, `scopes`, `revoked`, `created_at`, `updated_at`, `expires_at`) VALUES
+('03770c068399a1580bf272a8d55adf089c3b457d4531cc1fe9da799dcde4689ee33594ad205ef01e', 11, 1, 'MyApp', '[]', 0, '2021-11-22 07:29:52', '2021-11-22 07:29:52', '2022-11-22 12:59:52'),
+('06f38cec233f8dfe5b74749f147662665e3ffa045a0795052ac571d46e60f50670a6fef1f49f8f1b', 11, 1, 'MyApp', '[]', 0, '2021-11-22 06:49:28', '2021-11-22 06:49:28', '2022-11-22 12:19:28'),
+('11c5aa04d3878bac34d5e6fec683f762c53dd73b75faa183a4b09dfcc203d3b3442711145001a459', 11, 1, 'MyApp', '[]', 0, '2021-11-22 07:01:32', '2021-11-22 07:01:32', '2022-11-22 12:31:32'),
+('139d7de3b9409d5dc9c4e9976f57c19914309a782c7a14984e6d1adc147fc2d8147ad33b96ee72d3', 11, 1, 'MyApp', '[]', 0, '2021-11-22 06:42:07', '2021-11-22 06:42:07', '2022-11-22 12:12:07'),
+('19a09b57b6f7861345ac252752bae678be083b5b25dbca7a2a11b56ddfe914381a874a59e1377554', 11, 1, 'MyApp', '[]', 0, '2021-11-22 23:43:18', '2021-11-22 23:43:18', '2022-11-23 05:13:18'),
+('1f46100fd526b1f2fd2f380fda2f951f0b249210bd20ac94e1fce39fff178ae5eb6821444603fe56', 11, 1, 'MyApp', '[]', 0, '2021-11-23 00:38:18', '2021-11-23 00:38:18', '2022-11-23 06:08:18'),
+('21184b527bb0f69dcd1ae81a2a2dac36b6a2c9b09f8f22adc1330561821c3e4bc82ffe05609312e5', 11, 1, 'MyApp', '[]', 0, '2021-11-22 07:09:41', '2021-11-22 07:09:41', '2022-11-22 12:39:41'),
+('25b81dab2aa677ba44e0b85ee91ad81669a3fc41ddce597d377852999d286760616e7585d04d5125', 11, 1, 'MyApp', '[]', 0, '2021-11-22 06:42:01', '2021-11-22 06:42:01', '2022-11-22 12:12:01'),
+('28f2c4d9d10b624c244ab7d0f7bb4f96b42e43534c911fcda93b9a9677237eef8136225fa06a3e6c', 10, 1, 'MyApp', '[]', 0, '2021-11-22 06:30:47', '2021-11-22 06:30:47', '2022-11-22 12:00:47'),
+('2add72dbf2e40d276c2687c7447ea2b486161c931d628a819d710161cc16bae84d8851dbba49919b', 11, 1, 'MyApp', '[]', 1, '2021-11-23 01:04:39', '2021-11-23 01:04:39', '2022-11-23 06:34:39'),
+('306c7d2cf7d934da8bdf4bbc294daf3c8e9ff4d16c90faa3fe0fc19653d4ea2264cf0c42713209fd', 11, 1, 'MyApp', '[]', 0, '2021-11-22 07:36:18', '2021-11-22 07:36:18', '2022-11-22 13:06:18'),
+('3204066ed5e6c4ea1c9cc9dac6d08269639e5d6e08d487fd0b8d47b07ca0886a41b8629e1fe34b9a', 7, 1, 'MyApp', '[]', 0, '2021-11-22 06:17:00', '2021-11-22 06:17:00', '2022-11-22 11:47:00'),
+('38578790735f1ab53b323978681201acf67b0c3f175b9585fd90bbc324d5ba66dcb856ecdd5c0cd7', 11, 1, 'MyApp', '[]', 0, '2021-11-22 06:44:06', '2021-11-22 06:44:06', '2022-11-22 12:14:06'),
+('3d3156766df0b252832898972754fd4b36d1c21b96c72bc5a15ea20aadf445aae2436ab85f985202', 11, 1, 'MyApp', '[]', 0, '2021-11-23 00:38:27', '2021-11-23 00:38:27', '2022-11-23 06:08:27'),
+('3fa48b73c2883648cf1b06a73a68e9fe9057fd460e9de0034737c16c4b4ff6d38c5036c6412133bf', 11, 1, 'MyApp', '[]', 0, '2021-11-22 06:42:19', '2021-11-22 06:42:19', '2022-11-22 12:12:19'),
+('4790ef1df324c1939ddc8348e5fda9b915e76cd8d8b5f51e90ae5f01c8bb3ab5c3ee556f24efb4f9', 11, 1, 'MyApp', '[]', 0, '2021-11-22 06:49:35', '2021-11-22 06:49:35', '2022-11-22 12:19:35'),
+('5bb2e06a68fb5e8b1895eaf879b3e4cc5b7cb8757c31b4ffd9dfbd6467f09cc3a93a924c0e96fbad', 11, 1, 'MyApp', '[]', 0, '2021-11-22 07:06:11', '2021-11-22 07:06:11', '2022-11-22 12:36:11'),
+('7ba9844c97eec0457961da38af2ed2c6cfdb8b3a9b51c4134f53fc4be0a7efcc529301e4aeb95dc6', 11, 1, 'MyApp', '[]', 0, '2021-11-22 06:42:19', '2021-11-22 06:42:19', '2022-11-22 12:12:19'),
+('84d05d16d2e28cc5055648e1cc077b344fd989668bf9f068f1e240151741747d0391b83422822d2d', 11, 1, 'MyApp', '[]', 0, '2021-11-22 23:46:44', '2021-11-22 23:46:44', '2022-11-23 05:16:44'),
+('89814bfad6103b5af78eb86333470f2fb784c184c895c7f52de8f8cd0a59dd877575cbcd669cb010', 11, 1, 'MyApp', '[]', 0, '2021-11-22 07:36:27', '2021-11-22 07:36:27', '2022-11-22 13:06:27'),
+('8a663240aa096ddb589eb9885af9303eba84fb44e0a1e2f3fec86013582c830e0d0914e37aec0b1b', 11, 1, 'MyApp', '[]', 0, '2021-11-22 07:36:15', '2021-11-22 07:36:15', '2022-11-22 13:06:15'),
+('8d78dca7898e94b620e363931e75b13778aa2e357e59d281f7ca19fcaece88ead8e365caeba8fa06', 11, 1, 'MyApp', '[]', 1, '2021-11-23 04:44:46', '2021-11-23 04:44:46', '2022-11-23 10:14:46'),
+('983e43e5037c28f91422db9bf997dae3cf1ff9b444dc47fef94daad2b653d46b6bf6b23a22e88a3a', 11, 1, 'MyApp', '[]', 0, '2021-11-22 06:43:54', '2021-11-22 06:43:54', '2022-11-22 12:13:54'),
+('a1732098784f52c529d7a19fee0d9316693ed13c14efade37ba69614b7ddea4a991f2e70d0ef6c15', 11, 1, 'MyApp', '[]', 0, '2021-11-23 00:53:52', '2021-11-23 00:53:52', '2022-11-23 06:23:52'),
+('a3f731745208c6622d27cdd26030833807795b213f9b1da80c79b73be1257fe57c4b3b653e76d997', 11, 1, 'MyApp', '[]', 0, '2021-11-23 00:38:19', '2021-11-23 00:38:19', '2022-11-23 06:08:19'),
+('ae0805eb4b6a91789e50664f523740ea782e70c00cc7385a8a774f104cf736f1a3b4c8450716a25c', 11, 1, 'MyApp', '[]', 0, '2021-11-22 07:36:32', '2021-11-22 07:36:32', '2022-11-22 13:06:32'),
+('af8c09fe85ad441eb4154205fde31da14e6a703981bacabc00190b60ecac64bbd94cdd99d6dd1960', 11, 1, 'MyApp', '[]', 0, '2021-11-22 07:36:26', '2021-11-22 07:36:26', '2022-11-22 13:06:26'),
+('b05907579d8ab99345483f62d133b589a0e2f17369df5308cfa760b081b32bd647af9586d95f0d1e', 8, 1, 'MyApp', '[]', 0, '2021-11-22 06:18:29', '2021-11-22 06:18:29', '2022-11-22 11:48:29'),
+('b07c7700ffd29378eb4bbd12cfe44bd6a30db4bcea79bf6aed2fb304c110a0f444e6a1dc68f61b55', 11, 1, 'MyApp', '[]', 0, '2021-11-22 06:42:09', '2021-11-22 06:42:09', '2022-11-22 12:12:09'),
+('b1d8436525ad6c44db4a787726ddb22416d7b3c2cc20b1bf7f13588acf4a12740b94053c7ae1caf5', 11, 1, 'MyApp', '[]', 0, '2021-11-22 06:31:35', '2021-11-22 06:31:35', '2022-11-22 12:01:35'),
+('b8d17726b147b8fae7b7bc18fab2f7c2d1e7072c999e2095984eeea7f12485bd44317307c2b6794c', 11, 1, 'MyApp', '[]', 0, '2021-11-22 06:42:23', '2021-11-22 06:42:23', '2022-11-22 12:12:23'),
+('c3ba232975274d686d7014913e7464d86d8fbf18ab30c5ecf0c9167755e5248bdfcd3956c74e3ab1', 11, 1, 'MyApp', '[]', 0, '2021-11-22 06:42:23', '2021-11-22 06:42:23', '2022-11-22 12:12:23'),
+('c90cbf2f2f4cafe44b899d2260c6bc83f577d30e1fc7259d6d3ec0f6d3c3cd238e74a2b657ed436d', 9, 1, 'MyApp', '[]', 0, '2021-11-22 06:29:49', '2021-11-22 06:29:49', '2022-11-22 11:59:49'),
+('d03e9969c641c9c7a0d1514c116850004d73384fb79a1c0254531252a81fb72fe08c1f78e908f516', 11, 1, 'MyApp', '[]', 0, '2021-11-22 23:43:13', '2021-11-22 23:43:13', '2022-11-23 05:13:13'),
+('d2a64ecf60d9fd8d22d90b4ccae50ab2231b2dcb262c1c6d50db437f94ea8cfe817a45ef33358ad3', 11, 1, 'MyApp', '[]', 0, '2021-11-22 07:05:35', '2021-11-22 07:05:35', '2022-11-22 12:35:35'),
+('d4b11b70afb898cc0f3ded39a1e3c4f815395529e172b7a3afcc864de06775c0de641232e0097db0', 11, 1, 'MyApp', '[]', 0, '2021-11-23 00:50:50', '2021-11-23 00:50:50', '2022-11-23 06:20:50'),
+('d64567832d7be5214946f8e9da238d0af3cb11fab7b5a999a9cde771f31fc24f19c83cb736ad962c', 11, 1, 'MyApp', '[]', 0, '2021-11-22 06:43:53', '2021-11-22 06:43:53', '2022-11-22 12:13:53'),
+('da4efb62334942cb476a4809991b8f31c3529ddf5e4a5a638d0a99b3bfa3f411e33e70a6d59c76b1', 11, 1, 'MyApp', '[]', 0, '2021-11-22 06:42:08', '2021-11-22 06:42:08', '2022-11-22 12:12:08'),
+('edc381159393862500ae2672e89adbb46bed01894a4628461b02f92433ee46c103db1c3dc95a9b8c', 11, 1, 'MyApp', '[]', 0, '2021-11-22 23:42:34', '2021-11-22 23:42:34', '2022-11-23 05:12:34'),
+('f273b336f8113f2d6f52d9bd5aca8fc44a363e7907dff10fdae34136fffbe2d5f14ea13d4d39b297', 6, 1, 'MyApp', '[]', 0, '2021-11-22 06:15:45', '2021-11-22 06:15:45', '2022-11-22 11:45:45');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `oauth_auth_codes`
+--
+
+CREATE TABLE `oauth_auth_codes` (
+  `id` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `client_id` bigint(20) UNSIGNED NOT NULL,
+  `scopes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `revoked` tinyint(1) NOT NULL,
+  `expires_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `oauth_clients`
+--
+
+CREATE TABLE `oauth_clients` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `secret` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `provider` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `redirect` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `personal_access_client` tinyint(1) NOT NULL,
+  `password_client` tinyint(1) NOT NULL,
+  `revoked` tinyint(1) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `oauth_clients`
+--
+
+INSERT INTO `oauth_clients` (`id`, `user_id`, `name`, `secret`, `provider`, `redirect`, `personal_access_client`, `password_client`, `revoked`, `created_at`, `updated_at`) VALUES
+(1, NULL, 'Salon Personal Access Client', 'Bm1I4u1mMho0lCkLwMur4WCViUSwEDs9Id43p1KM', NULL, 'http://localhost', 1, 0, 0, '2021-11-22 04:41:30', '2021-11-22 04:41:30'),
+(2, NULL, 'Salon Password Grant Client', 'G9pozEP6Kcv6MZFLo7ofYgtYz16TyiY5hCOplmk4', 'users', 'http://localhost', 0, 1, 0, '2021-11-22 04:41:30', '2021-11-22 04:41:30');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `oauth_personal_access_clients`
+--
+
+CREATE TABLE `oauth_personal_access_clients` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `client_id` bigint(20) UNSIGNED NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `oauth_personal_access_clients`
+--
+
+INSERT INTO `oauth_personal_access_clients` (`id`, `client_id`, `created_at`, `updated_at`) VALUES
+(1, 1, '2021-11-22 04:41:30', '2021-11-22 04:41:30');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `oauth_refresh_tokens`
+--
+
+CREATE TABLE `oauth_refresh_tokens` (
+  `id` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `access_token_id` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `revoked` tinyint(1) NOT NULL,
+  `expires_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -455,10 +601,11 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `role_id`, `first_name`, `last_name`, `username`, `email`, `email_verified`, `email_verified_at`, `password`, `auth_key`, `phone_number`, `phone_number_verified`, `phone_number_verified_at`, `profile_photo`, `remember_token`, `is_active`, `is_active_at`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Lyla', 'Murazik', 'kyundt', 'programmer93.dynamicdreamz@gmail.com', '1', '1984-02-29 21:41:52', '$2y$10$7pWq7Y9s4nXoW1yTypEO8OwTjJSMlb1Qam/CQ6FMN9zzGQprEAdGm', '93b2b4aff84e168afc31e5f5e0dc8a7d23c801f1d6212f9a7986d5fff4c01f60', '1-531-896-3112', '1', '1996-05-03 08:30:23', '', 'DM0HnB8tfydbwwGho37B6Tt8H6UQuoOyAGRhpZOlX0Jfl4cOgG23cUaqB4f8', '1', '2021-11-22 06:33:12', '1981-08-23 23:48:57', '2021-11-22 03:28:31'),
+(1, 1, 'Lyla', 'Murazik', 'kyundt', 'programmer93.dynamicdreamz@gmail.com', '1', '1984-02-29 21:41:52', '$2y$10$7pWq7Y9s4nXoW1yTypEO8OwTjJSMlb1Qam/CQ6FMN9zzGQprEAdGm', '93b2b4aff84e168afc31e5f5e0dc8a7d23c801f1d6212f9a7986d5fff4c01f60', '1-531-896-3112', '1', '1996-05-03 08:30:23', '', 'ypkfkK7tLRs0GOIAtKtHdJb7r49bncKbyUMiCdu1rJV5y9L2Akt2DIIzAm4p', '1', '2021-11-22 06:33:12', '1981-08-23 23:48:57', '2021-11-22 03:28:31'),
 (3, 3, 'Lyla', 'Murazik1', 'kyundt', 'programmer.dynamicdreamz@gmail.com', '1', '1984-02-29 21:41:52', '$2y$10$7pWq7Y9s4nXoW1yTypEO8OwTjJSMlb1Qam/CQ6FMN9zzGQprEAdGm', NULL, '1-531-896-3112', '1', '1996-05-03 08:30:23', '', NULL, '1', '1994-09-25 23:03:02', '1981-08-23 23:48:57', '2007-11-15 19:36:23'),
 (4, 2, 'Lyla', 'Murazik2', 'kyundt', 'programmer_.dynamicdreamz@gmail.com', '1', '1984-02-29 21:41:52', '$2y$10$7pWq7Y9s4nXoW1yTypEO8OwTjJSMlb1Qam/CQ6FMN9zzGQprEAdGm', NULL, '1-531-896-3112', '1', '1996-05-03 08:30:23', '', NULL, '1', '1994-09-25 23:03:02', '1981-08-23 23:48:57', '2007-11-15 19:36:23'),
-(5, 4, 'Maulik', 'Patel', '', 'maulik@gmail.com', '1', '2021-11-22 01:47:55', '$2y$10$4oEABjSILhJ/jsFUFzWAGuM5Ojv7UFRD.vf/t4oWde5lnVrqKJiMO', NULL, '123456422', '0', NULL, NULL, NULL, '1', '2021-11-22 07:17:55', '2021-11-22 01:47:55', '2021-11-22 01:57:38');
+(5, 4, 'Maulik', 'Patel', '', 'maulik@gmail.com', '1', '2021-11-22 01:47:55', '$2y$10$4oEABjSILhJ/jsFUFzWAGuM5Ojv7UFRD.vf/t4oWde5lnVrqKJiMO', NULL, '123456422', '0', NULL, NULL, NULL, '1', '2021-11-22 07:17:55', '2021-11-22 01:47:55', '2021-11-22 01:57:38'),
+(11, 4, 'Maulik', 'Patel', '', 'maulikpatel240@gmail.com', '1', '2021-11-22 06:31:35', '$2y$10$iFEXKR2e.zKVNqOvPpraxOTAZ/vL4GLJWTOl2Ypycql2D8fsYl3BS', '80c1522e039ce7a6dcd1f8e4f2a754443f6c083d7bd07c375f5eb0283a9c6cb0', '', '0', NULL, NULL, NULL, '1', '2021-11-22 12:01:35', '2021-11-22 06:31:35', '2021-11-22 06:31:35');
 
 -- --------------------------------------------------------
 
@@ -526,6 +673,40 @@ ALTER TABLE `modules`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `oauth_access_tokens`
+--
+ALTER TABLE `oauth_access_tokens`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `oauth_access_tokens_user_id_index` (`user_id`);
+
+--
+-- Indexes for table `oauth_auth_codes`
+--
+ALTER TABLE `oauth_auth_codes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `oauth_auth_codes_user_id_index` (`user_id`);
+
+--
+-- Indexes for table `oauth_clients`
+--
+ALTER TABLE `oauth_clients`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `oauth_clients_user_id_index` (`user_id`);
+
+--
+-- Indexes for table `oauth_personal_access_clients`
+--
+ALTER TABLE `oauth_personal_access_clients`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `oauth_refresh_tokens`
+--
+ALTER TABLE `oauth_refresh_tokens`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `oauth_refresh_tokens_access_token_id_index` (`access_token_id`);
+
+--
 -- Indexes for table `password_reset`
 --
 ALTER TABLE `password_reset`
@@ -566,7 +747,7 @@ ALTER TABLE `roles_access`
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `users_email_unique` (`email`),
-  ADD UNIQUE KEY `users_auth_key_unique` (`auth_key`),
+  ADD UNIQUE KEY `users_api_token_unique` (`auth_key`),
   ADD KEY `users_role_id_foreign` (`role_id`);
 
 --
@@ -615,13 +796,25 @@ ALTER TABLE `failed_jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `modules`
 --
 ALTER TABLE `modules`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `oauth_clients`
+--
+ALTER TABLE `oauth_clients`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `oauth_personal_access_clients`
+--
+ALTER TABLE `oauth_personal_access_clients`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `permissions`
@@ -651,7 +844,7 @@ ALTER TABLE `roles_access`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `users_access`

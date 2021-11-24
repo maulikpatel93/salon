@@ -24,6 +24,35 @@ class CreateBasicTable extends Migration
         });
 
         //php artisan make:migration create_users_table
+        Schema::create('admins', function (Blueprint $table) {
+            $table->id();
+            $table->string('auth_key', 80)->after('id')
+                ->unique()
+                ->nullable()
+                ->default(null);
+            $table->string('first_name', 100);
+            $table->string('last_name', 100);
+            $table->string('username', 100);
+            $table->string('email', 100)->unique();
+            $table->enum('email_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->string('phone_number', 20);
+            $table->enum('phone_number_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify
+            $table->timestamp('phone_number_verified_at')->nullable();
+            $table->string('profile_photo', 100);
+            $table->rememberToken();
+            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->dateTime('is_active_at')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::table('admins', function (Blueprint $table) {
+            $table->unsignedBigInteger('role_id')->after('id')->nullable()->comment('Type Of Role');
+            $table->foreign('role_id')->references('id')->on('roles')->onUpdate('cascade')->onDelete('cascade');
+        });
+
+        //php artisan make:migration create_users_table
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('auth_key', 80)->after('id')

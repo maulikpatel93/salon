@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ModulesController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\RolesController;
+use App\Http\Controllers\Admin\SalonsController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Auth\AdminController;
 use App\Http\Controllers\Auth\LoginController;
@@ -29,7 +30,7 @@ Route::get('/', function () {
 
 Auth::routes();
 Route::fallback(function () {
-    // Route::view('/errors.404', 'home.notfound');
+    abort(404, 'API resource not found');
 });
 //Landing Page
 Route::middleware(['guest:web', 'PreventBackHistory'])->group(function () {
@@ -101,7 +102,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/accessupdate/{id}', [RolesController::class, 'accessupdate'])->name('accessupdate');
         });
 
-        //Roles
+        //Users
         Route::prefix('users')->name('users.')->group(function () {
             Route::get('/', [UsersController::class, 'index'])->name('index');
             Route::post('/create', [UsersController::class, 'create'])->name('create');
@@ -114,6 +115,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/applystatus', [UsersController::class, 'applystatus'])->name('applystatus');
             Route::get('/access/{id}', [UsersController::class, 'access'])->name('access');
             Route::post('/accessupdate/{id}', [UsersController::class, 'accessupdate'])->name('accessupdate');
+        });
+
+        //Salons
+        Route::prefix('salons')->name('salons.')->group(function () {
+            Route::get('/', [SalonsController::class, 'index'])->name('index');
+            Route::post('/create', [SalonsController::class, 'create'])->name('create');
+            Route::post('/store', [SalonsController::class, 'store'])->name('store');
+            Route::post('/edit/{id}', [SalonsController::class, 'edit'])->name('edit');
+            Route::post('/update/{id}', [SalonsController::class, 'update'])->name('update');
+            Route::post('/view/{id}', [SalonsController::class, 'view'])->name('view');
+            Route::get('/delete/{id}', [SalonsController::class, 'delete'])->name('delete');
+            Route::post('/isactive/{id}', [SalonsController::class, 'isactive'])->name('isactive');
+            Route::post('/applystatus', [SalonsController::class, 'applystatus'])->name('applystatus');
         });
     });
 });
