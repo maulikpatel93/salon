@@ -60,6 +60,20 @@
                     'attribute' => 'id'
                 ],
                 'first_name',
+                'last_name',
+                'email',
+                [
+                    'label' => 'Role',
+                    'value' => function ($model) {
+                        return $model->role->name;
+                    }
+                ],
+                [
+                    'label' => 'Business Salon',
+                    'value' => function ($model) {
+                        return ($model->salon) ? $model->salon->business_name : '';
+                    }
+                ],
                 [
                     'label' => 'Active', // Column label.
                     'value' => function ($model) { // You can set 'value' as a callback function to get a row data value dynamically.
@@ -95,6 +109,9 @@
                 [
                     'label' => 'Actions', // Optional
                     'class' => Itstructure\GridView\Columns\ActionColumn::class, // Required
+                    'htmlAttributes' => [
+                        'width' => '110px' // Width of table column.
+                    ],
                     'actionTypes' => [ // Required
                         [
                             'class' => Itstructure\GridView\Actions\Custom::class, // Required

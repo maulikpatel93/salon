@@ -1,22 +1,20 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Api;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Model;
 
-class Admin extends Authenticatable
+class Salons extends Model
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'users';
+    protected $table = 'salons';
 
     protected $appends = ['isNewRecord'];
     /**
@@ -25,10 +23,22 @@ class Admin extends Authenticatable
      * @var string[]
      */
     protected $fillable = [
-        'name',
-        'email',
+        'business_name',
+        'owner_name',
+        'business_email',
+        'business_email_verified',
+        'business_email_verified_at',
         'password',
-        'role_id', // adding this
+        'business_phone_number',
+        'business_phone_number_verified',
+        'business_phone_number_verified_at',
+        'business_address',
+        'salon_type',
+        'number_of_staff',
+        'logo',
+        'timezone',
+        'is_active',
+        'is_active_at',
     ];
 
     /**
@@ -37,8 +47,6 @@ class Admin extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password',
-        'remember_token',
     ];
 
     /**
@@ -47,16 +55,13 @@ class Admin extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'business_email_verified_at' => 'datetime',
+        'business_phone_number_verified_at' => 'datetime',
+        'is_active_at' => 'datetime',
     ];
 
     public function getIsNewRecordAttribute()
     {
         return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
-    }
-
-    public function role()
-    {
-        return $this->hasOne(Roles::class, 'id', 'role_id');
     }
 }

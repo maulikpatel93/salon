@@ -21,6 +21,7 @@ class Users extends Model
      */
     protected $fillable = [
         'role_id',
+        'salon_id',
         'first_name',
         'last_name',
         'username',
@@ -59,5 +60,15 @@ class Users extends Model
     public function getIsNewRecordAttribute()
     {
         return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
+    }
+
+    public function role()
+    {
+        return $this->hasOne(Roles::class, 'id', 'role_id');
+    }
+
+    public function salon()
+    {
+        return $this->hasOne(Salons::class, 'id', 'salon_id');
     }
 }

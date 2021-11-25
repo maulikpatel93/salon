@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSalonsAddColumnTable extends Migration
+class CreateSupplieruniqueTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class CreateSalonsAddColumnTable extends Migration
      */
     public function up()
     {
-        Schema::table('salons', function (Blueprint $table) {
-            //
+        Schema::table('suppliers', function (Blueprint $table) {
+            $table->string('name', 100)->unique()->change();
         });
     }
 
@@ -25,7 +25,7 @@ class CreateSalonsAddColumnTable extends Migration
      */
     public function down()
     {
-        Schema::table('salons', function (Blueprint $table) {
+        Schema::table('suppliers', function (Blueprint $table) {
             //
         });
     }

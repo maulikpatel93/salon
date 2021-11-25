@@ -100,20 +100,11 @@
                 ],
                 [
                     'label' => 'Actions', // Optional
-                    'class' => Itstructure\GridView\Columns\ActionColumn::class, // Required
-                    'actionTypes' => [ // Required
-                        [
-                            'class' => Itstructure\GridView\Actions\Custom::class, // Required
-                            'url' => function ($model) { // Optional
-                                return route('admin.salons.access', ['id' => encode($model->id)]);
-                            },
-                            'htmlAttributes' => [ // Optional
-                                'class' => 'text-dark ms-1 me-1',
-                                'title' => 'Access '.$title_single,
-                                'label' => '<span class="fas fa-user-lock"></span>'
-                            ],
-                            'label' => '<span class="fas fa-user-lock"></span>',
-                        ],
+                    'class' => Itstructure\GridView\Columns\ActionColumn::class, // Required,
+                    'htmlAttributes' => [
+                        'width' => '110px' // Width of table column.
+                    ],
+                    'actionTypes' => [ 
                         [
                             'class' => Itstructure\GridView\Actions\View::class, // Required
                             'url' => function ($model) { // Optional

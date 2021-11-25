@@ -115,6 +115,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/applystatus', [UsersController::class, 'applystatus'])->name('applystatus');
             Route::get('/access/{id}', [UsersController::class, 'access'])->name('access');
             Route::post('/accessupdate/{id}', [UsersController::class, 'accessupdate'])->name('accessupdate');
+            //Dependent-Dropdown
+            Route::post('/salons', [UsersController::class, 'salons'])->name('salons');
         });
 
         //Salons

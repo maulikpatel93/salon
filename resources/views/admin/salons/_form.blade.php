@@ -43,35 +43,17 @@
         'placeholder'=> '',
         ]) }}
     </div>
-    @if(!$model->id)
-        <div class="mb-3">
-            {{ Form::label('business_email'); }}
-            {{ Form::text('business_email', $model->email, [
-            "class" => "form-control",
-            'id'=> $formName.'-business_email',
-            'placeholder'=> '',
-            ]) }}
-        </div>
-        <div class="mb-3">
-            {{ Form::label('password'); }}
-            {{ Form::text('password', $model->password, [
-            "class" => "form-control",
-            'id'=> $formName.'-password',
-            'placeholder'=> '',
-            ]) }}
-        </div>
-        <div class="mb-3">
-            {{ Form::label('confirm password'); }}
-            {{ Form::text('password_confirmation', '', [
-            "class" => "form-control",
-            'id'=> $formName.'-password_confirmation',
-            'placeholder'=> '',
-            ]) }}
-        </div>
-    @endif
+    <div class="mb-3">
+        {{ Form::label('business_email'); }}
+        {{ Form::text('business_email', $model->business_email, [
+        "class" => "form-control",
+        'id'=> $formName.'-business_email',
+        'placeholder'=> '',
+        ]) }}
+    </div>
     <div class="mb-3">
         {{ Form::label('business_phone_number'); }}
-        {{ Form::text('business_phone_number', $model->owner_name, [
+        {{ Form::text('business_phone_number', $model->business_phone_number, [
         "class" => "form-control",
         'id'=> $formName.'-business_phone_number',
         'placeholder'=> '',
@@ -79,7 +61,7 @@
     </div>
     <div class="mb-3">
         {{ Form::label('business_address'); }}
-        {{ Form::text('business_address', $model->owner_name, [
+        {{ Form::text('business_address', $model->business_address, [
         "class" => "form-control",
         'id'=> $formName.'-business_address',
         'placeholder'=> '',
@@ -121,5 +103,10 @@
             allowClear:true,
             dropdownParent: $("#gridviewModal"),
             width: "100%",
+        });
+        $(document).ready(function(){
+            $('#salonform-business_phone_number').inputmask({mask: "999-999-9999"});
+            // $(":input").inputmask();
+            // Inputmask().mask(document.querySelectorAll("input"));
         });
     </script>

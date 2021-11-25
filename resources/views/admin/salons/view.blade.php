@@ -18,8 +18,13 @@
     ],
     'showHead' => false,
     'rowFields' => [
-        'panel',
-        'name',
+        'business_name',
+        'owner_name',
+        'business_email',
+        'business_phone_number',
+        'business_address',
+        'salon_type',
+        'number_of_staff',
         [
             'label' => 'Active', // Row label.
             'value' => function ($model) { // You can set 'value' as a callback function to get a row data value dynamically.

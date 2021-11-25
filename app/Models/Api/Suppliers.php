@@ -1,22 +1,21 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Api;
 
+// use App\Models\Api\Salons;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Model;
 
-class Admin extends Authenticatable
+class Suppliers extends Model
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'users';
+    protected $table = 'suppliers';
 
     protected $appends = ['isNewRecord'];
     /**
@@ -25,10 +24,26 @@ class Admin extends Authenticatable
      * @var string[]
      */
     protected $fillable = [
+        'salon_id',
         'name',
+        'first_name',
+        'last_name',
         'email',
-        'password',
-        'role_id', // adding this
+        'email_verified',
+        'email_verified_at',
+        'phone_number',
+        'phone_number_verified',
+        'phone_number_verified_at',
+        'logo',
+        'website',
+        'address',
+        'street',
+        'suburb',
+        'state',
+        'postcode',
+        'description',
+        'is_active',
+        'is_active_at',
     ];
 
     /**
@@ -37,8 +52,6 @@ class Admin extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password',
-        'remember_token',
     ];
 
     /**
@@ -47,7 +60,7 @@ class Admin extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'is_active_at' => 'datetime',
     ];
 
     public function getIsNewRecordAttribute()
@@ -55,8 +68,8 @@ class Admin extends Authenticatable
         return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
     }
 
-    public function role()
+    public function salon()
     {
-        return $this->hasOne(Roles::class, 'id', 'role_id');
+        return $this->hasOne(Salons::class, 'salon_id', 'id');
     }
 }

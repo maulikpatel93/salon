@@ -50,4 +50,9 @@ class Roles extends Model
     {
         return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
     }
+
+    public function users()
+    {
+        return $this->hasMany(Users::class, 'role_id', 'id');
+    }
 }

@@ -20,14 +20,12 @@ class CreateSalonsTable extends Migration
             $table->string('business_email', 100)->unique();
             $table->enum('business_email_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify
             $table->timestamp('business_email_verified_at')->nullable();
-            $table->string('password');
             $table->string('business_phone_number', 20)->unique();
             $table->enum('business_phone_number_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify
             $table->timestamp('business_phone_number_verified_at')->nullable();
-            $table->string('business_telephone_number', 20);
+            $table->string('business_telephone_number', 20)->nullable();
             $table->text('business_address');
             $table->enum('salon_type', ['Unisex', 'Ladies', 'Gents'])->default('Unisex'); // 1:Active, 0:Inactive
-            $table->integer('number_of_staff', false, true)->nullable();
             $table->string('logo', 100)->nullable();
             $table->string('timezone', 100);
             $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive

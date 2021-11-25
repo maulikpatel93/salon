@@ -1,22 +1,20 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Api;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Model;
 
-class Admin extends Authenticatable
+class Products extends Model
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'users';
+    protected $table = 'products';
 
     protected $appends = ['isNewRecord'];
     /**
@@ -25,10 +23,21 @@ class Admin extends Authenticatable
      * @var string[]
      */
     protected $fillable = [
+        'salon_id',
+        'supplier_id',
+        'tax_id',
+        'image',
         'name',
-        'email',
-        'password',
-        'role_id', // adding this
+        'sku',
+        'last_name',
+        'description',
+        'cost_price',
+        'retail_price',
+        'manage_stock',
+        'stock_quantity',
+        'low_stock_threshold',
+        'is_active',
+        'is_active_at',
     ];
 
     /**
@@ -37,8 +46,6 @@ class Admin extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password',
-        'remember_token',
     ];
 
     /**
@@ -47,7 +54,7 @@ class Admin extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'is_active_at' => 'datetime',
     ];
 
     public function getIsNewRecordAttribute()
@@ -55,8 +62,8 @@ class Admin extends Authenticatable
         return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
     }
 
-    public function role()
+    public function salon()
     {
-        return $this->hasOne(Roles::class, 'id', 'role_id');
+        return $this->hasOne(Salons::class, 'salon_id', 'id');
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\SalonRequest;
 use App\Models\Salons;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Itstructure\GridView\DataProviders\EloquentDataProvider;
 
 class SalonsController extends Controller
@@ -48,9 +49,11 @@ class SalonsController extends Controller
         $inputVal['is_active_at'] = currentDateTime();
 
         $file = $request->file('logo');
-        $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-        $filePath = $file->storeAs('salons', $fileName, 'public');
-        $inputVal['logo'] = $fileName;
+        if ($file) {
+            $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $filePath = $file->storeAs('salons', $fileName, 'public');
+            $inputVal['logo'] = $fileName;
+        }
         $model = new Salons();
         if ($request->ajax() && $model->create($inputVal)) {
             $responseData['status'] = 200;
@@ -73,7 +76,20 @@ class SalonsController extends Controller
         $inputVal = $request->all();
         $inputVal['controller'] = $inputVal['controller'] ?? '';
         $inputVal['action'] = $inputVal['action'] ?? '';
+        $inputVal['business_email_verified'] = '1';
+        $inputVal['business_email_verified_at'] = currentDateTime();
+        $inputVal['business_phone_number_verified'] = '0';
+        $inputVal['is_active_at'] = currentDateTime();
+
         $model = $this->findModel(decode($id));
+        $file = $request->file('logo');
+        $inputVal['logo'] = $model->logo;
+        if ($file) {
+            Storage::delete('/public/salons/' . $model->logo);
+            $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $filePath = $file->storeAs('salons', $fileName, 'public');
+            $inputVal['logo'] = $fileName;
+        }
         if ($request->ajax() && $model->update($inputVal)) {
             $responseData['status'] = 200;
             $responseData['message'] = 'Success';

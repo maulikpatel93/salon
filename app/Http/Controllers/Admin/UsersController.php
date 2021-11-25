@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserAccessRequest;
 use App\Http\Requests\Admin\UserRequest;
 use App\Models\Permissions;
+use App\Models\Salons;
 use App\Models\UserAccess;
 use App\Models\Users;
 use Illuminate\Http\Request;
@@ -46,14 +47,12 @@ class UsersController extends Controller
     public function store(UserRequest $request)
     {
         $inputVal = $request->all();
-        $inputVal['username'] = '';
+        $inputVal['salon_id'] = (isset($inputVal['salon_id'])) ? $inputVal['salon_id'] : '';
         $inputVal['email_verified'] = '1';
         $inputVal['email_verified_at'] = currentDateTime();
         $inputVal['phone_number_verified'] = '0';
         $inputVal['password'] = Hash::make($inputVal['password']);
         $inputVal['is_active_at'] = currentDateTime();
-        $inputVal['profile_photo'] = '';
-
         $token = Str::random(config('params.auth_key_character'));
         $inputVal['auth_key'] = hash('sha256', $token);
         $model = new Users();
@@ -204,14 +203,29 @@ class UsersController extends Controller
         throw new Exception('The requested page does not exist.');
     }
 
-    public function update1(Request $request)
+    public function salons(Request $request)
     {
-        $token = Str::random(60);
+        $out = [];
+        if (isset($_POST['depdrop_parents'])) {
 
-        $request->user()->forceFill([
-            'auth_key' => hash('sha256', $token),
-        ])->save();
-
-        return ['token' => $token];
+            $type = empty($_POST['depdrop_parents'][0]) ? null : $_POST['depdrop_parents'][0];
+            // $parent_menu_id = empty($_POST['depdrop_parents'][1]) ? null : $_POST['depdrop_parents'][1];
+            if ($type == 4) {
+                $role_id = isset($_REQUEST['role_id']) ? $_REQUEST['role_id'] : '';
+                $salon_id = isset($_REQUEST['salon_id']) ? $_REQUEST['salon_id'] : '';
+                $list = [];
+                $list = Salons::where('is_active', '1')->where('business_name', '!=', '')->get()->pluck('business_name', 'id')->toArray();
+                $selected = null;
+                if ($type != null && count($list) > 0) {
+                    $selected = $salon_id;
+                    foreach ($list as $key => $value) {
+                        $out[] = ['id' => $key, 'name' => $value];
+                    }
+                    // Shows how you can preselect a value
+                    return response()->json(['output' => $out, 'selected' => $selected]);
+                }
+            }
+        }
+        return response()->json(['output' => '', 'selected' => '']);
     }
 }

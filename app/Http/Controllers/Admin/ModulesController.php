@@ -167,7 +167,7 @@ class ModulesController extends Controller
                 $list = Modules::where(['parent_submenu_id' => null, 'type' => 'Menu'])->where('title', '!=', '')->get()->pluck('title', 'id')->toArray();
                 // $list = Modules::find();
             } elseif ($type == 'Subsubmenu' && ($parent_menu_id == 0 || empty($parent_menu_id))) {
-                $list = Modules::find()->where(['menu_id' => $menu_id, 'parent_menu_id' => 0, 'parent_submenu_id' => 0])->andWhere(['!=', 'title', ''])->asArray()->all();
+                $list = Modules::where(['parent_menu_id' => 0, 'parent_submenu_id' => 0])->where('title', '!=', '')->get()->pluck('title', 'id')->toArray();
             }
             $selected = null;
             if ($type != null && count($list) > 0) {

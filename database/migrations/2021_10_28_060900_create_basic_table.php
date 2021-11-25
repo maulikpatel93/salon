@@ -61,8 +61,8 @@ class CreateBasicTable extends Migration
                 ->default(null);
             $table->string('first_name', 100);
             $table->string('last_name', 100);
-            $table->string('username', 100);
-            $table->string('email', 100)->unique();
+            $table->string('username', 100)->unique();
+            $table->string('email', 100);
             $table->enum('email_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

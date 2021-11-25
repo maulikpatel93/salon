@@ -4,7 +4,8 @@
     $unique_title = str_replace(' ', '_', strtolower($title_single)); //without space
     $formName = $title_single.'form';
     $formRoute = (!$model->id) ? route('admin.users.store') : route('admin.users.update', ['id' => encode($model->id)]);
-    $roles = Roles::where('is_active', '1')->get()->pluck('name', 'id')->toArray();
+    $roles = Roles::where('is_active', '1')->where('id', '!=', '5')->get()->pluck('name', 'id')->toArray();
+    $salonsUrl = route('admin.users.salons', ['role_id' => $model->role_id, 'salon_id' => $model->salon_id]);
 @endphp
 {{ Form::open([
     'url' => $formRoute,
@@ -15,6 +16,24 @@
     'loader' => $unique_title,
     'enableAjaxSubmit' => 1]) }}
     <div id="formerror" class="formerror"></div>
+
+    <div class="mb-3">
+        {{ Form::label('role'); }}
+        {{ Form::select('role_id', $roles, $model->role_id, [
+        "class" => "form-select",
+        'id'=> $formName.'-role_id',
+        'placeholder'=> '--Select--',
+        ]) }}
+    </div>
+    <div class="mb-3">
+        {{ Form::label('salon'); }}
+        {{ Form::select('salon_id', ['' => '--Select'], $model->salon_id, [
+        "class" => "form-select select2",
+        'id'=> $formName.'-salon_id',
+        'placeholder'=> '',
+         'data-url' => $salonsUrl 
+        ]) }}
+    </div>
     <div class="mb-3">
         {{ Form::label('first_name'); }}
         {{ Form::text('first_name', $model->first_name, [
@@ -31,23 +50,23 @@
         'placeholder'=> '',
         ]) }}
     </div>
+    <div class="mb-3">
+        {{ Form::label('username'); }}
+        {{ Form::text('username', $model->username, [
+        "class" => "form-control",
+        'id'=> $formName.'-username',
+        'placeholder'=> '',
+        ]) }}
+    </div>
+    <div class="mb-3">
+        {{ Form::label('email'); }}
+        {{ Form::text('email', $model->email, [
+        "class" => "form-control",
+        'id'=> $formName.'-email',
+        'placeholder'=> '',
+        ]) }}
+    </div>
     @if(!$model->id)
-        <div class="mb-3">
-            {{ Form::label('username'); }}
-            {{ Form::text('username', $model->username, [
-            "class" => "form-control",
-            'id'=> $formName.'-username',
-            'placeholder'=> '',
-            ]) }}
-        </div>
-        <div class="mb-3">
-            {{ Form::label('email'); }}
-            {{ Form::text('email', $model->email, [
-            "class" => "form-control",
-            'id'=> $formName.'-email',
-            'placeholder'=> '',
-            ]) }}
-        </div>
         <div class="mb-3">
             {{ Form::label('password'); }}
             {{ Form::text('password', $model->password, [
@@ -58,9 +77,9 @@
         </div>
         <div class="mb-3">
             {{ Form::label('confirm password'); }}
-            {{ Form::text('password_confirmation', '', [
+            {{ Form::text('confirm_password', '', [
             "class" => "form-control",
-            'id'=> $formName.'-password_confirmation',
+            'id'=> $formName.'-confirm_password',
             'placeholder'=> '',
             ]) }}
         </div>
@@ -70,14 +89,6 @@
         {{ Form::text('phone_number', $model->phone_number, [
         "class" => "form-control",
         'id'=> $formName.'-phone_number',
-        'placeholder'=> '',
-        ]) }}
-    </div>
-    <div class="mb-3">
-        {{ Form::label('role'); }}
-        {{ Form::select('role_id', $roles, $model->role_id, [
-        "class" => "form-select",
-        'id'=> $formName.'-role_id',
         'placeholder'=> '',
         ]) }}
     </div>
@@ -95,5 +106,23 @@
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
+        });
+        $(document).ready(function(){
+            $('#userform-phone_number').inputmask({mask: "999-999-9999"});
+            // $(":input").inputmask();
+            // Inputmask().mask(document.querySelectorAll("input"));
+        });
+        $(".select2").select2({
+            placeholder:'--Select--',
+            allowClear:true,
+            dropdownParent: $("#gridviewModal"),
+            width: "100%",
+        });
+        $('#userform-role_id').depdrop('init');
+        $('#userform-salon_id').depdrop({
+            depends: ['userform-role_id'],
+            url: '{!! $salonsUrl !!}',
+            initDepends: ['userform-role_id'], // initial ajax loading will be fired first for parent-1, then child-1, and child-2
+            initialize: true,
         });
     </script>

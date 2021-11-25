@@ -257,6 +257,7 @@
     <script src="{{ asset('plugins/dependent-dropdown/js/dependent-dropdown.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('plugins/jquery-pjax/jquery.pjax.js') }}" type="text/javascript"></script>
     <script src="{{ asset('plugins/sweetalert2/js/sweetalert2.all.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('plugins/inputmask/jquery.inputmask.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('plugins/handlebars/handlebars.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('plugins/select2/js/select2.full.min.js') }}" type="text/javascript"></script>
     @yield('pluginsJs')
@@ -274,6 +275,10 @@
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
+    });
+    $(document).ready(function(){
+        $(":input").inputmask();
+        // Inputmask().mask(document.querySelectorAll("input"));
     });
     </script>
     @stack('grid_js')  

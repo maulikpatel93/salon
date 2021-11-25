@@ -118,39 +118,39 @@ class CreateStaffTable extends Migration
             $table->foreign('staff_id')->references('id')->on('staff')->onUpdate('cascade')->onDelete('cascade');
         });
 
-        Schema::create('clients', function (Blueprint $table) {
-            $table->id();
-            $table->string('first_name', 100);
-            $table->string('last_name', 100);
-            $table->string('email', 100)->unique();
-            $table->enum('email_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->string('phone_number', 20);
-            $table->enum('phone_number_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify
-            $table->timestamp('phone_number_verified_at')->nullable();
-            $table->string('telephone', 20)->nullable();
-            $table->string('photo', 100)->nullable();
-            $table->enum('gender', ['Male', 'Female', 'Other'])->nullable(); // 1:Active, 0:Inactive
-            $table->date('date_of_birth')->nullable();
-            $table->text('address')->nullable();
-            $table->string('street', 255)->nullable();
-            $table->string('suburb', 255)->nullable();
-            $table->string('state', 100)->nullable();
-            $table->string('postcode', 10)->nullable();
-            $table->text('description')->nullable();
-            $table->enum('send_sms_notification', ['0', '1'])->default(1)->comment('Send sms notification to client'); // 1:Active, 0:Inactive
-            $table->enum('send_email_notification', ['0', '1'])->default(1)->comment('Send email notification to client'); // 1:Active, 0:Inactive
-            $table->enum('recieve_marketing_email', ['0', '1'])->default(0)->comment('Client agrees to receive marketing emails'); // 1:Active, 0:Inactive
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
-            $table->dateTime('is_active_at')->nullable();
-            $table->timestamps();
-        });
+        // Schema::create('clients', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->string('first_name', 100);
+        //     $table->string('last_name', 100);
+        //     $table->string('email', 100)->unique();
+        //     $table->enum('email_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify
+        //     $table->timestamp('email_verified_at')->nullable();
+        //     $table->string('password');
+        //     $table->string('phone_number', 20);
+        //     $table->enum('phone_number_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify
+        //     $table->timestamp('phone_number_verified_at')->nullable();
+        //     $table->string('telephone', 20)->nullable();
+        //     $table->string('photo', 100)->nullable();
+        //     $table->enum('gender', ['Male', 'Female', 'Other'])->nullable(); // 1:Active, 0:Inactive
+        //     $table->date('date_of_birth')->nullable();
+        //     $table->text('address')->nullable();
+        //     $table->string('street', 255)->nullable();
+        //     $table->string('suburb', 255)->nullable();
+        //     $table->string('state', 100)->nullable();
+        //     $table->string('postcode', 10)->nullable();
+        //     $table->text('description')->nullable();
+        //     $table->enum('send_sms_notification', ['0', '1'])->default(1)->comment('Send sms notification to client'); // 1:Active, 0:Inactive
+        //     $table->enum('send_email_notification', ['0', '1'])->default(1)->comment('Send email notification to client'); // 1:Active, 0:Inactive
+        //     $table->enum('recieve_marketing_email', ['0', '1'])->default(0)->comment('Client agrees to receive marketing emails'); // 1:Active, 0:Inactive
+        //     $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+        //     $table->dateTime('is_active_at')->nullable();
+        //     $table->timestamps();
+        // });
 
-        Schema::table('clients', function (Blueprint $table) {
-            $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
-            $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
-        });
+        // Schema::table('clients', function (Blueprint $table) {
+        //     $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
+        //     $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
+        // });
     }
 
     /**

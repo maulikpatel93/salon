@@ -46,4 +46,14 @@ class User extends Authenticatable
     {
         return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
     }
+
+    public function role()
+    {
+        return $this->hasOne(Roles::class, 'role_id', 'id');
+    }
+
+    public function salon()
+    {
+        return $this->hasOne(Salons::class, 'id', 'salon_id');
+    }
 }

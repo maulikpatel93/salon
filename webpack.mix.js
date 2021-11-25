@@ -59,6 +59,8 @@ mix.js("resources/js/app.js", "public/js")
         "node_modules/sweetalert2/dist/",
         "public/plugins/sweetalert2"
     )
+    //input mask
+    .copyDirectory("node_modules/inputmask/dist/", "public/plugins/inputmask")
     .copyDirectory("node_modules/select2/dist/", "public/plugins/select2")
     .copyDirectory("node_modules/handlebars/dist/", "public/plugins/handlebars")
     .copy("resources/js/grid.js", "public/js")
