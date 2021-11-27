@@ -1,7 +1,9 @@
 <?php
 use App\Http\Controllers\Api\v1\AuthApiController;
+use App\Http\Controllers\Api\v1\CategoriesApiController;
 use App\Http\Controllers\Api\v1\GuestApiController;
 use App\Http\Controllers\Api\v1\ProductsApiController;
+use App\Http\Controllers\Api\v1\ServicesApiController;
 use App\Http\Controllers\Api\v1\SuppliersApiController;
 use Illuminate\Support\Facades\Route;
 
@@ -47,6 +49,22 @@ Route::prefix('v1')->group(function () {
             Route::post('/store', [ProductsApiController::class, 'store'])->name('store');
             Route::post('/update/{id}', [ProductsApiController::class, 'update'])->name('update');
             Route::post('/delete/{id}', [ProductsApiController::class, 'delete'])->name('delete');
+        });
+
+        //Categories
+        Route::prefix('categories')->name('categories.')->group(function () {
+            Route::post('/view', [CategoriesApiController::class, 'view'])->name('view');
+            Route::post('/store', [CategoriesApiController::class, 'store'])->name('store');
+            Route::post('/update/{id}', [CategoriesApiController::class, 'update'])->name('update');
+            Route::post('/delete/{id}', [CategoriesApiController::class, 'delete'])->name('delete');
+        });
+
+        //Services
+        Route::prefix('services')->name('services.')->group(function () {
+            Route::post('/view', [ServicesApiController::class, 'view'])->name('view');
+            Route::post('/store', [ServicesApiController::class, 'store'])->name('store');
+            Route::post('/update/{id}', [ServicesApiController::class, 'update'])->name('update');
+            Route::post('/delete/{id}', [ServicesApiController::class, 'delete'])->name('delete');
         });
     });
 });

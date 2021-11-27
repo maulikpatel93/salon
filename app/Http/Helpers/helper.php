@@ -255,3 +255,10 @@ if (!function_exists('getAction')) {
         return $action;
     }
 }
+
+if (!function_exists('ImageFullUrl')) {
+    function ImageFullUrl($image_name, $path)
+    {
+        return url('storage/' . $path . '/' . $image_name);
+    }
+}

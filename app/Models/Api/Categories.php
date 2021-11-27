@@ -2,11 +2,10 @@
 
 namespace App\Models\Api;
 
-// use App\Models\Api\Salons;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Suppliers extends Model
+class Categories extends Model
 {
     use HasFactory;
 
@@ -15,9 +14,8 @@ class Suppliers extends Model
      *
      * @var string
      */
-    protected $table = 'suppliers';
+    protected $table = 'categories';
 
-    protected $appends = ['isNewRecord'];
     /**
      * The attributes that are mass assignable.
      *
@@ -26,22 +24,6 @@ class Suppliers extends Model
     protected $fillable = [
         'salon_id',
         'name',
-        'first_name',
-        'last_name',
-        'email',
-        'email_verified',
-        'email_verified_at',
-        'phone_number',
-        'phone_number_verified',
-        'phone_number_verified_at',
-        'logo',
-        'website',
-        'address',
-        'street',
-        'suburb',
-        'state',
-        'postcode',
-        'description',
         'is_active',
         'is_active_at',
     ];
@@ -63,19 +45,13 @@ class Suppliers extends Model
         'is_active_at' => 'datetime',
     ];
 
-    public function getIsNewRecordAttribute()
-    {
-        return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
-    }
-
     public function salon()
     {
         return $this->belongsTo(Salons::class, 'salon_id', 'id');
     }
 
-    public function products()
+    public function categories()
     {
-        return $this->hasMany(Products::class, 'supplier_id', 'id');
+        return $this->hasMany(Categories::class, 'category_id', 'id');
     }
-
 }

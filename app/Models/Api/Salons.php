@@ -16,7 +16,6 @@ class Salons extends Model
      */
     protected $table = 'salons';
 
-    protected $appends = ['isNewRecord'];
     /**
      * The attributes that are mass assignable.
      *
@@ -60,8 +59,19 @@ class Salons extends Model
         'is_active_at' => 'datetime',
     ];
 
-    public function getIsNewRecordAttribute()
+    public function suppliers()
     {
-        return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
+        return $this->hasMany(Suppliers::class, 'supplier_id', 'id');
     }
+
+    public function products()
+    {
+        return $this->hasMany(Products::class, 'product_id', 'id');
+    }
+
+    public function categories()
+    {
+        return $this->hasMany(Categories::class, 'Category_id', 'id');
+    }
+
 }

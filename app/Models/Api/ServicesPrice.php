@@ -5,7 +5,7 @@ namespace App\Models\Api;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Products extends Model
+class ServicesPrice extends Model
 {
     use HasFactory;
 
@@ -14,7 +14,7 @@ class Products extends Model
      *
      * @var string
      */
-    protected $table = 'products';
+    protected $table = 'services_price';
 
     /**
      * The attributes that are mass assignable.
@@ -22,19 +22,11 @@ class Products extends Model
      * @var string[]
      */
     protected $fillable = [
-        'salon_id',
-        'supplier_id',
-        'tax_id',
-        'image',
+        'service_id',
         'name',
-        'sku',
-        'last_name',
-        'description',
-        'cost_price',
-        'retail_price',
-        'manage_stock',
-        'stock_quantity',
-        'low_stock_threshold',
+        'price',
+        'name',
+        'add_on_price',
         'is_active',
         'is_active_at',
     ];
@@ -56,18 +48,8 @@ class Products extends Model
         'is_active_at' => 'datetime',
     ];
 
-    public function salon()
+    public function service()
     {
-        return $this->belongsTo(Salons::class, 'salon_id', 'id');
-    }
-
-    public function supplier()
-    {
-        return $this->belongsTo(Suppliers::class, 'supplier_id', 'id');
-    }
-
-    public function tax()
-    {
-        return $this->belongsTo(Tax::class, 'tax_id', 'id');
+        return $this->belongsTo(Services::class, 'service_id', 'id');
     }
 }

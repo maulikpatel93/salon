@@ -35,7 +35,7 @@ class CreateSalonsTable extends Migration
 
         Schema::create('tax', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100);
+            $table->string('name', 100)->unique();
             $table->text('description');
             $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
@@ -44,10 +44,10 @@ class CreateSalonsTable extends Migration
 
         Schema::create('suppliers', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100);
+            $table->string('name', 150);
             $table->string('first_name', 100);
             $table->string('last_name', 100);
-            $table->string('email', 100)->unique();
+            $table->string('email', 100);
             $table->enum('email_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify
             $table->timestamp('email_verified_at')->nullable();
             $table->string('phone_number', 20);
@@ -74,11 +74,12 @@ class CreateSalonsTable extends Migration
 
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100);
+            $table->string('image')->after('name')->nullable();
+            $table->string('name', 150);
             $table->string('sku', 100);
             $table->text('description');
-            $table->float('cost_price', 10, 2);
-            $table->float('retail_price', 10, 2);
+            $table->decimal('cost_price', 10, 2);
+            $table->decimal('retail_price', 10, 2);
             $table->enum('manage_stock', ['0', '1'])->default(1); // 1:Active, 0:Inactive
             $table->integer('stock_quantity', false, true)->nullable();
             $table->integer('low_stock_threshold', false, true)->nullable();
@@ -100,7 +101,7 @@ class CreateSalonsTable extends Migration
 
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100);
+            $table->string('name', 150);
             $table->text('description');
             $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
@@ -121,7 +122,7 @@ class CreateSalonsTable extends Migration
             $table->string('color', 10)->comment('color code #fcfcfcfc');
             $table->enum('service_booked_online', ['0', '1'])->default(1); // 1:Active, 0:Inactive
             $table->enum('deposit_booked_online', ['0', '1'])->default(0); // 1:Active, 0:Inactive
-            $table->float('deposit_booked_price', 10, 2);
+            $table->decimal('deposit_booked_price', 10, 2);
             $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
@@ -141,8 +142,8 @@ class CreateSalonsTable extends Migration
         Schema::create('services_price', function (Blueprint $table) {
             $table->id();
             $table->string('name', 100);
-            $table->float('price', 10, 2);
-            $table->float('add_on_price', 10, 2);
+            $table->decimal('price', 10, 2)->nullable();
+            $table->decimal('add_on_price', 10, 2)->nullable();
             $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();

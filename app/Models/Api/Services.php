@@ -5,7 +5,7 @@ namespace App\Models\Api;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Products extends Model
+class Services extends Model
 {
     use HasFactory;
 
@@ -14,7 +14,7 @@ class Products extends Model
      *
      * @var string
      */
-    protected $table = 'products';
+    protected $table = 'services';
 
     /**
      * The attributes that are mass assignable.
@@ -23,18 +23,16 @@ class Products extends Model
      */
     protected $fillable = [
         'salon_id',
-        'supplier_id',
+        'category_id',
         'tax_id',
-        'image',
         'name',
-        'sku',
-        'last_name',
         'description',
-        'cost_price',
-        'retail_price',
-        'manage_stock',
-        'stock_quantity',
-        'low_stock_threshold',
+        'duration',
+        'padding_time',
+        'color',
+        'service_booked_online',
+        'deposit_booked_online',
+        'deposit_booked_price',
         'is_active',
         'is_active_at',
     ];
@@ -58,16 +56,21 @@ class Products extends Model
 
     public function salon()
     {
-        return $this->belongsTo(Salons::class, 'salon_id', 'id');
+        // return $this->hasOne(Salons::class, 'salon_id', 'id');
+        return $this->belongsTo(Salons::class);
     }
-
-    public function supplier()
+    public function category()
     {
-        return $this->belongsTo(Suppliers::class, 'supplier_id', 'id');
+        return $this->belongsTo(Categories::class, 'category_id', 'id');
     }
 
     public function tax()
     {
         return $this->belongsTo(Tax::class, 'tax_id', 'id');
+    }
+
+    public function serviceprice()
+    {
+        return $this->hasMany(ServicesPrice::class, 'service_id', 'id');
     }
 }

@@ -25,13 +25,15 @@ class SupplierRequest extends FormRequest
     public function rules()
     {
         $id = $this->id;
+        $salon_id = $this->salon_id;
+        $supplier_id = $this->supplier_id;
         $rules = [
             'salon_id' => 'required|integer',
-            'name' => 'required|max:150|unique:suppliers,name,' . $id,
+            'name' => 'required|max:150|unique:suppliers,name,' . $id . ',id,salon_id,' . $salon_id,
             'first_name' => 'required|max:150',
             'last_name' => 'required|max:150',
             'phone_number' => "required|regex:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/",
-            'email' => 'required|email|unique:suppliers,email,' . $id,
+            'email' => 'required|email|unique:suppliers,email,' . $id . ',id,salon_id,' . $salon_id,
             'logo' => 'image|mimes:jpeg,png,jpg|max:2048',
             'website' => 'required|url',
             'address' => 'required|max:100',

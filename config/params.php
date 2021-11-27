@@ -7,6 +7,11 @@ return [
     'apiPerPage' => 1,
     'auth_key_character' => 32,
     'phone_number_pattern' => "/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/",
+    'service_price' => [
+        'General' => 'General',
+        'Junior' => 'Junior',
+        'Senior' => 'Senior',
+    ],
     'timezones' => array(
         'Pacific/Midway' => "(GMT-11:00) Midway Island",
         'US/Samoa' => "(GMT-11:00) Samoa",

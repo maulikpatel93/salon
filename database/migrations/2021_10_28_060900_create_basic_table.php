@@ -63,13 +63,15 @@ class CreateBasicTable extends Migration
             $table->string('last_name', 100);
             $table->string('username', 100)->unique();
             $table->string('email', 100);
+            $table->string('email_otp', 10)->after('email')->nullable();
             $table->enum('email_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('phone_number', 20);
+            $table->string('phone_number_otp', 10)->after('phone_number')->nullable();
             $table->enum('phone_number_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify
             $table->timestamp('phone_number_verified_at')->nullable();
-            $table->string('profile_photo', 100);
+            $table->string('profile_photo', 100)->nullable();
             $table->rememberToken();
             $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
@@ -102,9 +104,10 @@ class CreateBasicTable extends Migration
         //php artisan make:migration create_modules_table
         Schema::create('modules', function (Blueprint $table) {
             $table->id();
+            $table->enum('panel', ['Backend', 'Frontend', 'Common'])->default('Backend')->after('id'); // 1:Active, 0:Inactive
             $table->string('title', 100);
-            $table->string('controller', 100);
-            $table->string('action', 100);
+            $table->string('controller', 100)->nullable();
+            $table->string('action', 100)->nullable();
             $table->string('icon', 55);
             $table->enum('functionality', ['crud', 'singleview', 'other', 'none'])->default('crud');
             $table->enum('type', ['Menu', 'Submenu', 'Subsubmenu'])->default('Menu');

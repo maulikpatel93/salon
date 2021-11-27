@@ -13,12 +13,25 @@ class SuppliersApiController extends Controller
     protected $successStatus = 200;
     protected $errorStatus = 403;
 
-    protected $selectFieldSupplier = [
+    protected $field = [
         'id',
+        'salon_id',
         'name',
         'first_name',
         'last_name',
         'logo',
+    ];
+
+    protected $salon_field = [
+        'id',
+        'business_name',
+        'owner_name',
+    ];
+
+    protected $product_field = [
+        'id',
+        'supplier_id',
+        'name',
     ];
 
     public function __construct()
@@ -31,36 +44,24 @@ class SuppliersApiController extends Controller
     {
         $requestAll = $request->all();
         $id = $request->id;
-        $limit = $request->limit ? $request->limit : config('params.apiPerPage');
-        $page = $request->page && $request->page > 0 ? $request->page : 1;
-        $skip = ($page - 1) * $limit;
-
-        $where = ['is_active' => '1'];
-        $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
-        $model = Suppliers::select($this->selectFieldSupplier)->where($where)->simplePaginate($limit);
-        $successData = $model->toArray();
-        if ($successData) {
-            return response()->json(['status' => $this->successStatus, 'message' => 'success', 'data' => $successData]);
-        }
-        return response()->json(['status' => $this->errorStatus, 'message' => 'success']);
+        return $this->returnResponse($request, $id);
     }
 
     public function store(SupplierRequest $request)
     {
         $requestAll = $request->all();
+        $requestAll['is_active_at'] = currentDateTime();
         $model = new Suppliers;
         $model->fill($requestAll);
         $file = $request->file('logo');
         if ($file) {
             $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-            $filePath = $file->storeAs('supplier', $fileName, 'public');
+            $filePath = $file->storeAs('suppliers', $fileName, 'public');
             $model->logo = $fileName;
         }
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : '';
         $model->save();
-        $successData = [];
-        $successData[] = $model->only($this->selectFieldSupplier);
-        return response()->json(['status' => $this->successStatus, 'message' => 'success', 'data' => $successData]);
+        return $this->returnResponse($request, $model->id);
     }
 
     public function update(SupplierRequest $request, $id)
@@ -70,16 +71,14 @@ class SuppliersApiController extends Controller
         $model->fill($requestAll);
         $file = $request->file('logo');
         if ($file) {
-            Storage::delete('/public/supplier/' . $model->logo);
+            Storage::delete('/public/suppliers/' . $model->logo);
             $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-            $filePath = $file->storeAs('supplier', $fileName, 'public');
+            $filePath = $file->storeAs('suppliers', $fileName, 'public');
             $model->logo = $fileName;
         }
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : $model->description;
         $model->save();
-        $successData = [];
-        $successData[] = $model->only($this->selectFieldSupplier);
-        return response()->json(['status' => $this->successStatus, 'message' => 'success', 'data' => $successData]);
+        return $this->returnResponse($request, $model->id);
     }
 
     public function delete(Request $request, $id)
@@ -95,5 +94,58 @@ class SuppliersApiController extends Controller
             return $model;
         }
         throw new UnsecureException('The requested page does not exist.');
+    }
+
+    public function returnResponse($request, $id, $data = [])
+    {
+        $requestAll = $request->all();
+        $field = ($request->field) ? array_merge(['id'], explode(',', $request->field)) : $this->field;
+
+        $salon_field = $this->salon_field;
+        if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
+            $salon_field = false;
+        } else if ($request->salon_field == '*') {
+            $salon_field = [$request->salon_field];
+        } else if ($request->salon_field) {
+            $salon_field = array_merge(['id'], explode(',', $request->salon_field));
+        }
+
+        $product_field = $this->product_field;
+        if (isset($requestAll['product_field']) && empty($requestAll['product_field'])) {
+            $product_field = false;
+        } else if ($request->product_field == '*') {
+            $product_field = [$request->product_field];
+        } else if ($request->product_field) {
+            $product_field = array_merge(['id', 'supplier_id'], explode(',', $request->product_field));
+        }
+        $withArray = [];
+        if ($salon_field) {
+            $withArray[] = 'salon:' . implode(',', $salon_field);
+        }
+        if ($product_field) {
+            $withArray[] = 'products:' . implode(',', $product_field);
+        }
+
+        $pagination = $request->pagination ? $request->pagination : false;
+        $limit = $request->limit ? $request->limit : config('params.apiPerPage');
+
+        $where = ['is_active' => '1'];
+        $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
+
+        if ($pagination == true) {
+            $model = Suppliers::with($withArray)->select($field)->where($where)->simplePaginate($limit);
+        } else {
+            $model = Suppliers::with($withArray)->select($field)->where($where)->get();
+        }
+        if ($model->count()) {
+            $successData = $model->toArray();
+            if ($successData) {
+                if ($pagination == true) {
+                    return response()->json(array_merge(['status' => $this->successStatus, 'message' => 'Success'], $successData));
+                }
+                return response()->json(['status' => $this->successStatus, 'message' => 'Success', 'data' => $successData]);
+            }
+        }
+        return response()->json(['status' => $this->errorStatus, 'message' => 'Failed']);
     }
 }
