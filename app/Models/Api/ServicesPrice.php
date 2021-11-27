@@ -25,7 +25,6 @@ class ServicesPrice extends Model
         'service_id',
         'name',
         'price',
-        'name',
         'add_on_price',
         'is_active',
         'is_active_at',

@@ -73,4 +73,14 @@ class Services extends Model
     {
         return $this->hasMany(ServicesPrice::class, 'service_id', 'id');
     }
+
+    public function addonservices()
+    {
+        return $this->hasMany(AddOnServices::class, 'service_id', 'id')->select('add_on_service_id');
+    }
+
+    public function staffservices()
+    {
+        return $this->hasMany(StaffServices::class, 'service_id', 'id')->select('staff_id');
+    }
 }

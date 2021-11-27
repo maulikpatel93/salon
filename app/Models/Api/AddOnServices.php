@@ -5,7 +5,7 @@ namespace App\Models\Api;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Categories extends Model
+class AddOnServices extends Model
 {
     use HasFactory;
 
@@ -14,7 +14,7 @@ class Categories extends Model
      *
      * @var string
      */
-    protected $table = 'categories';
+    protected $table = 'add_on_services';
 
     /**
      * The attributes that are mass assignable.
@@ -23,9 +23,9 @@ class Categories extends Model
      */
     protected $fillable = [
         'salon_id',
-        'name',
-        'is_active',
-        'is_active_at',
+        'service_id',
+        'add_on_category_id',
+        'add_on_service_id',
     ];
 
     /**
@@ -47,11 +47,21 @@ class Categories extends Model
 
     public function salon()
     {
-        return $this->belongsTo(Salons::class, 'salon_id', 'id');
+        // return $this->hasOne(Salons::class, 'salon_id', 'id');
+        return $this->belongsTo(Salons::class);
+    }
+    public function category()
+    {
+        return $this->belongsTo(Categories::class, 'category_id', 'id');
     }
 
-    public function services()
+    public function tax()
     {
-        return $this->hasMany(Services::class, 'category_id', 'id');
+        return $this->belongsTo(Tax::class, 'tax_id', 'id');
+    }
+
+    public function serviceprice()
+    {
+        return $this->hasMany(ServicesPrice::class, 'service_id', 'id');
     }
 }

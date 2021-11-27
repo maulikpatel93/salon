@@ -19,16 +19,10 @@ class CreateAddOnServicesTable extends Migration
         });
 
         Schema::table('add_on_services', function (Blueprint $table) {
-            $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
-            $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
-
-            $table->unsignedBigInteger('service_id')->after('salon_id')->nullable()->comment('Type Of Service');
+            $table->unsignedBigInteger('service_id')->after('id')->nullable()->comment('Type Of Service');
             $table->foreign('service_id')->references('id')->on('services')->onUpdate('cascade')->onDelete('cascade');
 
-            $table->unsignedBigInteger('add_on_category_id')->after('service_id')->nullable()->comment('Type Of Add on Category');
-            $table->foreign('add_on_category_id')->references('id')->on('categories')->onUpdate('cascade')->onDelete('cascade');
-
-            $table->unsignedBigInteger('add_on_service_id')->after('add_on_category_id')->nullable()->comment('Type Of Add on Service');
+            $table->unsignedBigInteger('add_on_service_id')->after('service_id')->nullable()->comment('Type Of Add on Service');
             $table->foreign('add_on_service_id')->references('id')->on('services')->onUpdate('cascade')->onDelete('cascade');
         });
     }

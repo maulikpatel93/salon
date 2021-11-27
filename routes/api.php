@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\v1\CategoriesApiController;
 use App\Http\Controllers\Api\v1\GuestApiController;
 use App\Http\Controllers\Api\v1\ProductsApiController;
 use App\Http\Controllers\Api\v1\ServicesApiController;
+use App\Http\Controllers\Api\v1\StaffApiController;
 use App\Http\Controllers\Api\v1\SuppliersApiController;
 use Illuminate\Support\Facades\Route;
 
@@ -65,6 +66,14 @@ Route::prefix('v1')->group(function () {
             Route::post('/store', [ServicesApiController::class, 'store'])->name('store');
             Route::post('/update/{id}', [ServicesApiController::class, 'update'])->name('update');
             Route::post('/delete/{id}', [ServicesApiController::class, 'delete'])->name('delete');
+        });
+
+        //Services
+        Route::prefix('staff')->name('staff.')->group(function () {
+            Route::post('/view', [StaffApiController::class, 'view'])->name('view');
+            Route::post('/store', [StaffApiController::class, 'store'])->name('store');
+            Route::post('/update/{id}', [StaffApiController::class, 'update'])->name('update');
+            Route::post('/delete/{id}', [StaffApiController::class, 'delete'])->name('delete');
         });
     });
 });

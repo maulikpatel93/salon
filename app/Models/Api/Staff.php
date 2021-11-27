@@ -5,7 +5,7 @@ namespace App\Models\Api;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Categories extends Model
+class Staff extends Model
 {
     use HasFactory;
 
@@ -14,7 +14,7 @@ class Categories extends Model
      *
      * @var string
      */
-    protected $table = 'categories';
+    protected $table = 'staff';
 
     /**
      * The attributes that are mass assignable.
@@ -23,7 +23,21 @@ class Categories extends Model
      */
     protected $fillable = [
         'salon_id',
-        'name',
+        'first_name',
+        'last_name',
+        'username',
+        'email',
+        'email_verified',
+        'email_verified_at',
+        'phone_number',
+        'phone_number_verified',
+        'phone_number_verified_at',
+        'address',
+        'street',
+        'suburb',
+        'state',
+        'postcode',
+        'calendar_booking',
         'is_active',
         'is_active_at',
     ];
@@ -47,11 +61,17 @@ class Categories extends Model
 
     public function salon()
     {
-        return $this->belongsTo(Salons::class, 'salon_id', 'id');
+        // return $this->hasOne(Salons::class, 'salon_id', 'id');
+        return $this->belongsTo(Salons::class);
     }
 
-    public function services()
+    public function staffservices()
     {
-        return $this->hasMany(Services::class, 'category_id', 'id');
+        return $this->hasMany(StaffServices::class, 'staff_id', 'id')->select('service_id');
+    }
+
+    public function staffworkinghours()
+    {
+        return $this->hasMany(StaffWorkingHours::class, 'staff_id', 'id');
     }
 }

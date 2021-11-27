@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api\v1;
 use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ServiceRequest;
+use App\Models\Api\AddOnServices;
 use App\Models\Api\Services;
 use App\Models\Api\ServicesPrice;
+use App\Models\Api\StaffServices;
 use Illuminate\Http\Request;
 
 class ServicesApiController extends Controller
@@ -83,6 +85,8 @@ class ServicesApiController extends Controller
     {
         $requestAll = $request->all();
         $service_price = ($request->service_price) ? json_decode($request->service_price, true) : [];
+        $add_on_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
+        $staff_services = ($request->staff_services) ? explode(",", $request->staff_services) : [];
 
         $requestAll['is_active_at'] = currentDateTime();
         $model = new Services;
@@ -103,6 +107,28 @@ class ServicesApiController extends Controller
                 $servicesPriceModel->save();
             }
         }
+        if ($add_on_services) {
+            foreach ($add_on_services as $key => $value) {
+                $AddOnServicesModel = AddOnServices::where(['service_id' => $model->id, 'add_on_service_id' => $value])->first();
+                if (empty($AddOnServicesModel)) {
+                    $AddOnServicesModel = new AddOnServices;
+                }
+                $AddOnServicesModel->service_id = $model->id;
+                $AddOnServicesModel->add_on_service_id = $value;
+                $AddOnServicesModel->save();
+            }
+        }
+        if ($staff_services) {
+            foreach ($staff_services as $key => $value) {
+                $StaffServicesModel = StaffServices::where(['service_id' => $model->id, 'staff_id' => $value])->first();
+                if (empty($StaffServicesModel)) {
+                    $StaffServicesModel = new StaffServices;
+                }
+                $StaffServicesModel->service_id = $model->id;
+                $StaffServicesModel->staff_id = $value;
+                $StaffServicesModel->save();
+            }
+        }
         return $this->returnResponse($request, $model->id);
     }
 
@@ -110,8 +136,22 @@ class ServicesApiController extends Controller
     {
         $requestAll = $request->all();
         $service_price = ($request->service_price) ? json_decode($request->service_price, true) : [];
+        $add_on_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
+        $staff_services = ($request->staff_services) ? explode(",", $request->staff_services) : [];
 
         $model = $this->findModel($id);
+        $model->addonservices->map(function ($value) use ($add_on_services, $id) {
+            if ($add_on_services && !in_array($value->add_on_service_id, $add_on_services)) {
+                AddOnServices::where(['service_id' => $id, 'add_on_service_id' => $value->add_on_service_id])->delete();
+            }
+            return;
+        })->toArray();
+        $model->staffservices->map(function ($value) use ($staff_services, $id) {
+            if ($staff_services && !in_array($value->staff_id, $staff_services)) {
+                StaffServices::where(['service_id' => $id, 'staff_id' => $value->staff_id])->delete();
+            }
+            return;
+        })->toArray();
         $model->fill($requestAll);
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : $model->description;
         $model->save();
@@ -127,6 +167,28 @@ class ServicesApiController extends Controller
                 $servicesPriceModel->add_on_price = ($value['add_on_price']) ? $value['add_on_price'] : '0';
                 $servicesPriceModel->is_active_at = currentDateTime();
                 $servicesPriceModel->save();
+            }
+        }
+        if ($add_on_services) {
+            foreach ($add_on_services as $key => $value) {
+                $AddOnServicesModel = AddOnServices::where(['service_id' => $model->id, 'add_on_service_id' => $value])->first();
+                if (empty($AddOnServicesModel)) {
+                    $AddOnServicesModel = new AddOnServices;
+                }
+                $AddOnServicesModel->service_id = $model->id;
+                $AddOnServicesModel->add_on_service_id = $value;
+                $AddOnServicesModel->save();
+            }
+        }
+        if ($staff_services) {
+            foreach ($staff_services as $key => $value) {
+                $StaffServicesModel = StaffServices::where(['service_id' => $model->id, 'staff_id' => $value])->first();
+                if (empty($StaffServicesModel)) {
+                    $StaffServicesModel = new StaffServices;
+                }
+                $StaffServicesModel->service_id = $model->id;
+                $StaffServicesModel->staff_id = $value;
+                $StaffServicesModel->save();
             }
         }
         return $this->returnResponse($request, $model->id);

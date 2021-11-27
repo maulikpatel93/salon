@@ -36,7 +36,7 @@ class SupplierRequest extends FormRequest
             'email' => 'required|email|unique:suppliers,email,' . $id . ',id,salon_id,' . $salon_id,
             'logo' => 'image|mimes:jpeg,png,jpg|max:2048',
             'website' => 'required|url',
-            'address' => 'required|max:100',
+            'address' => 'required',
             'street' => 'required|max:100',
             'suburb' => 'required|max:50',
             'state' => 'required|max:50',

@@ -31,7 +31,7 @@ class CreateStaffTable extends Migration
             $table->id();
             $table->string('first_name', 100);
             $table->string('last_name', 100);
-            $table->string('email', 100)->unique();
+            $table->string('email', 100);
             $table->enum('email_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify
             $table->timestamp('email_verified_at')->nullable();
             $table->string('phone_number', 20);
@@ -76,26 +76,14 @@ class CreateStaffTable extends Migration
 
         Schema::create('staff_services', function (Blueprint $table) {
             $table->id();
-            $table->string('days', 50);
-            $table->string('start_time', 50)->nullable();
-            $table->string('end_time', 50)->nullable();
-            $table->text('break_time');
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
-            $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
 
         Schema::table('staff_services', function (Blueprint $table) {
-            $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
-            $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
-
-            $table->unsignedBigInteger('staff_id')->after('salon_id')->nullable()->comment('Type Of Staff');
+            $table->unsignedBigInteger('staff_id')->after('id')->nullable()->comment('Type Of Staff');
             $table->foreign('staff_id')->references('id')->on('staff')->onUpdate('cascade')->onDelete('cascade');
 
-            $table->unsignedBigInteger('category_id')->after('staff_id')->nullable()->comment('Type Of Category');
-            $table->foreign('category_id')->references('id')->on('categories')->onUpdate('cascade')->onDelete('cascade');
-
-            $table->unsignedBigInteger('service_id')->after('category_id')->nullable()->comment('Type Of Service');
+            $table->unsignedBigInteger('service_id')->after('staff_id')->nullable()->comment('Type Of Category');
             $table->foreign('service_id')->references('id')->on('services')->onUpdate('cascade')->onDelete('cascade');
         });
 

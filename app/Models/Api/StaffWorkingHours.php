@@ -5,16 +5,15 @@ namespace App\Models\Api;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Categories extends Model
+class StaffWorkingHours extends Model
 {
     use HasFactory;
-
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'categories';
+    protected $table = 'staff_working_hours';
 
     /**
      * The attributes that are mass assignable.
@@ -23,7 +22,11 @@ class Categories extends Model
      */
     protected $fillable = [
         'salon_id',
-        'name',
+        'staff_id',
+        'days',
+        'start_time',
+        'end_time',
+        'break_time',
         'is_active',
         'is_active_at',
     ];
@@ -50,8 +53,8 @@ class Categories extends Model
         return $this->belongsTo(Salons::class, 'salon_id', 'id');
     }
 
-    public function services()
+    public function staff()
     {
-        return $this->hasMany(Services::class, 'category_id', 'id');
+        return $this->belongsTo(Staff::class, 'staff_id', 'id');
     }
 }

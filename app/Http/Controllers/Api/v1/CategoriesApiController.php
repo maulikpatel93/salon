@@ -13,16 +13,22 @@ class CategoriesApiController extends Controller
     protected $successStatus = 200;
     protected $errorStatus = 403;
 
-    protected $selectFieldCategory = [
+    protected $field = [
         'id',
         'salon_id',
         'name',
     ];
 
-    protected $selectFieldSalon = [
+    protected $salon_field = [
         'id',
         'business_name',
         'owner_name',
+    ];
+
+    protected $service_field = [
+        'id',
+        'category_id',
+        'name',
     ];
 
     public function __construct()
@@ -35,8 +41,7 @@ class CategoriesApiController extends Controller
     {
         $requestAll = $request->all();
         $id = $request->id;
-        $field = ($request->field) ? array_merge(['id'], explode(',', $request->field)) : [];
-        return $this->returnResponse($id, ['field' => $field, 'pagination' => $request->pagination, 'limit' => $request->limit]);
+        return $this->returnResponse($request, $id);
     }
 
     public function store(CategoryRequest $request)
@@ -47,7 +52,7 @@ class CategoriesApiController extends Controller
         $model->fill($requestAll);
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : '';
         $model->save();
-        return $this->returnResponse($model->id);
+        return $this->returnResponse($request, $model->id);
     }
 
     public function update(CategoryRequest $request, $id)
@@ -57,7 +62,7 @@ class CategoriesApiController extends Controller
         $model->fill($requestAll);
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : $model->description;
         $model->save();
-        return $this->returnResponse($model->id);
+        return $this->returnResponse($request, $model->id);
     }
 
     public function delete(Request $request, $id)
@@ -75,22 +80,46 @@ class CategoriesApiController extends Controller
         throw new UnsecureException('The requested page does not exist.');
     }
 
-    public function returnResponse($id, $pagination = [])
+    public function returnResponse($request, $id, $data = [])
     {
-        // $limit = $request->limit ? $request->limit : config('params.apiPerPage');
-        // $page = $request->page && $request->page > 0 ? $request->page : 1;
-        // $skip = ($page - 1) * $limit;
-        $selectField = (isset($data['field']) && $data['field']) ? $data['field'] : $this->selectFieldCategory;
-        $pagination = (isset($data['pagination']) && $data['pagination']) ? $data['pagination'] : false;
-        $limit = (isset($data['limit']) && $data['limit']) ? $data['limit'] : config('params.apiPerPage');
+        $requestAll = $request->all();
+        $field = ($request->field) ? array_merge(['id'], explode(',', $request->field)) : $this->field;
+
+        $salon_field = $this->salon_field;
+        if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
+            $salon_field = false;
+        } else if ($request->salon_field == '*') {
+            $salon_field = [$request->salon_field];
+        } else if ($request->salon_field) {
+            $salon_field = array_merge(['id'], explode(',', $request->salon_field));
+        }
+
+        $service_field = $this->service_field;
+        if (isset($requestAll['service_field']) && empty($requestAll['service_field'])) {
+            $service_field = false;
+        } else if ($request->services_field == '*') {
+            $service_field = [$request->service_field];
+        } else if ($request->services_field) {
+            $service_field = array_merge(['id', 'category_id'], explode(',', $request->service_field));
+        }
+        $withArray = [];
+        if ($salon_field) {
+            $withArray[] = 'salon:' . implode(',', $salon_field);
+        }
+        if ($service_field) {
+            $withArray[] = 'services:' . implode(',', $service_field);
+        }
+
+        $pagination = $request->pagination ? $request->pagination : false;
+        $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
         $where = ['is_active' => '1'];
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
         if ($pagination == true) {
-            $model = Categories::with('salon:' . implode(',', $this->selectFieldSalon))->select($selectField)->where($where)->simplePaginate($limit);
+            $model = Categories::with($withArray)->select($field)->where($where)->simplePaginate($limit);
         } else {
-            $model = Categories::with('salon:' . implode(',', $this->selectFieldSalon))->select($selectField)->where($where)->get();
+            $model = Categories::with($withArray)->select($field)->where($where)->get();
         }
         if ($model->count()) {
             $successData = $model->toArray();
@@ -103,4 +132,5 @@ class CategoriesApiController extends Controller
         }
         return response()->json(['status' => $this->errorStatus, 'message' => 'Failed']);
     }
+
 }

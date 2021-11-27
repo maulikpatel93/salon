@@ -13,7 +13,7 @@ class ProductsApiController extends Controller
     protected $successStatus = 200;
     protected $errorStatus = 403;
 
-    protected $selectFieldProduct = [
+    protected $field = [
         'id',
         'salon_id',
         'supplier_id',
@@ -28,17 +28,18 @@ class ProductsApiController extends Controller
         'low_stock_threshold',
     ];
 
-    protected $selectFieldSalon = [
+    protected $salon_field = [
         'id',
         'business_name',
         'owner_name',
     ];
 
-    protected $selectFieldSupplier = [
+    protected $supplier_field = [
         'id',
         'name',
         'first_name',
         'last_name',
+        'email',
     ];
 
     public function __construct()
@@ -51,8 +52,7 @@ class ProductsApiController extends Controller
     {
         $requestAll = $request->all();
         $id = $request->id;
-        $field = ($request->field) ? array_merge(['id'], explode(',', $request->field)) : [];
-        return $this->returnResponse($id, ['field' => $field, 'pagination' => $request->pagination, 'limit' => $request->limit]);
+        return $this->returnResponse($request, $id);
     }
 
     public function store(ProductRequest $request)
@@ -69,7 +69,7 @@ class ProductsApiController extends Controller
         }
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : '';
         $model->save();
-        return $this->returnResponse($model->id);
+        return $this->returnResponse($request, $model->id);
     }
 
     public function update(ProductRequest $request, $id)
@@ -86,7 +86,7 @@ class ProductsApiController extends Controller
         }
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : $model->description;
         $model->save();
-        return $this->returnResponse($model->id);
+        return $this->returnResponse($request, $model->id);
     }
 
     public function delete(Request $request, $id)
@@ -104,22 +104,46 @@ class ProductsApiController extends Controller
         throw new UnsecureException('The requested page does not exist.');
     }
 
-    public function returnResponse($id, $pagination = [])
+    public function returnResponse($request, $id, $data = [])
     {
-        // $limit = $request->limit ? $request->limit : config('params.apiPerPage');
-        // $page = $request->page && $request->page > 0 ? $request->page : 1;
-        // $skip = ($page - 1) * $limit;
-        $selectField = (isset($data['field']) && $data['field']) ? $data['field'] : $this->selectFieldProduct;
-        $pagination = (isset($data['pagination']) && $data['pagination']) ? $pagination['pagination'] : false;
-        $limit = (isset($data['limit']) && $data['limit']) ? $data['limit'] : config('params.apiPerPage');
+        $requestAll = $request->all();
+        $field = ($request->field) ? array_merge(['id'], explode(',', $request->field)) : $this->field;
+
+        $salon_field = $this->salon_field;
+        if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
+            $salon_field = false;
+        } else if ($request->salon_field == '*') {
+            $salon_field = [$request->salon_field];
+        } else if ($request->salon_field) {
+            $salon_field = array_merge(['id'], explode(',', $request->salon_field));
+        }
+
+        $supplier_field = $this->supplier_field;
+        if (isset($requestAll['supplier_field']) && empty($requestAll['supplier_field'])) {
+            $supplier_field = false;
+        } else if ($request->supplier_field == '*') {
+            $supplier_field = [$request->supplier_field];
+        } else if ($request->supplier_field) {
+            $supplier_field = array_merge(['id'], explode(',', $request->supplier_field));
+        }
+        $withArray = [];
+        if ($salon_field) {
+            $withArray[] = 'salon:' . implode(',', $salon_field);
+        }
+        if ($supplier_field) {
+            $withArray[] = 'supplier:' . implode(',', $supplier_field);
+        }
+
+        $pagination = $request->pagination ? $request->pagination : false;
+        $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
         $where = ['is_active' => '1'];
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
         if ($pagination == true) {
-            $model = Products::with('salon:' . implode(',', $this->selectFieldSalon), 'supplier:' . implode(',', $this->selectFieldSupplier))->select($selectField)->where($where)->simplePaginate($limit);
+            $model = Products::with($withArray)->select($field)->where($where)->simplePaginate($limit);
         } else {
-            $model = Products::with('salon:' . implode(',', $this->selectFieldSalon), 'supplier:' . implode(',', $this->selectFieldSupplier))->select($selectField)->where($where)->get();
+            $model = Products::with($withArray)->select($field)->where($where)->get();
         }
         if ($model->count()) {
             $successData = $model->toArray();
