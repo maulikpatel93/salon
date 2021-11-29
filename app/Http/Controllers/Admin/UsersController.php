@@ -32,7 +32,7 @@ class UsersController extends Controller
     public function index(Request $request)
     {
         // global $user;
-        $dataProvider = new EloquentDataProvider(Users::query()->orderBy('id', 'desc'));
+        $dataProvider = new EloquentDataProvider(Users::query()->where('role_id', '!=', 5)->orderBy('id', 'desc'));
         return view('admin.users.index', [
             'dataProvider' => $dataProvider,
         ]);
@@ -47,6 +47,8 @@ class UsersController extends Controller
     public function store(UserRequest $request)
     {
         $inputVal = $request->all();
+        $email_username = explode('@', $requestAll['email']);
+
         $inputVal['salon_id'] = (isset($inputVal['salon_id'])) ? $inputVal['salon_id'] : '';
         $inputVal['email_verified'] = '1';
         $inputVal['email_verified_at'] = currentDateTime();
@@ -55,6 +57,7 @@ class UsersController extends Controller
         $inputVal['is_active_at'] = currentDateTime();
         $token = Str::random(config('params.auth_key_character'));
         $inputVal['auth_key'] = hash('sha256', $token);
+        $inputVal['username'] = $email_username ? $email_username[0] : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
         $model = new Users();
         if ($request->ajax() && $model->create($inputVal)) {
             $responseData['status'] = 200;

@@ -1,8 +1,11 @@
 <?php
 use App\Http\Controllers\Api\v1\AuthApiController;
 use App\Http\Controllers\Api\v1\CategoriesApiController;
+use App\Http\Controllers\Api\v1\ClientApiController;
 use App\Http\Controllers\Api\v1\GuestApiController;
+use App\Http\Controllers\Api\v1\PricetierApiController;
 use App\Http\Controllers\Api\v1\ProductsApiController;
+use App\Http\Controllers\Api\v1\RosterApiController;
 use App\Http\Controllers\Api\v1\ServicesApiController;
 use App\Http\Controllers\Api\v1\StaffApiController;
 use App\Http\Controllers\Api\v1\SuppliersApiController;
@@ -32,7 +35,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/salonregistration', [GuestApiController::class, 'salonregistration']);
     Route::post('/getSalons', [GuestApiController::class, 'getSalons']);
     Route::post('/register', [GuestApiController::class, 'register']);
-    Route::middleware(['auth:api'])->group(function () {
+    Route::middleware(['auth:api'])->prefix('afterlogin')->group(function () {
         Route::post('/getUser', [AuthApiController::class, 'userdata']);
         Route::post('/logout', [GuestApiController::class, 'logout']);
 
@@ -68,12 +71,36 @@ Route::prefix('v1')->group(function () {
             Route::post('/delete/{id}', [ServicesApiController::class, 'delete'])->name('delete');
         });
 
-        //Services
+        //Price tier
+        Route::prefix('pricetier')->name('pricetier.')->group(function () {
+            Route::post('/view', [PricetierApiController::class, 'view'])->name('view');
+            Route::post('/store', [PricetierApiController::class, 'store'])->name('store');
+            Route::post('/update/{id}', [PricetierApiController::class, 'update'])->name('update');
+            Route::post('/delete/{id}', [PricetierApiController::class, 'delete'])->name('delete');
+        });
+
+        //Staff
         Route::prefix('staff')->name('staff.')->group(function () {
             Route::post('/view', [StaffApiController::class, 'view'])->name('view');
             Route::post('/store', [StaffApiController::class, 'store'])->name('store');
             Route::post('/update/{id}', [StaffApiController::class, 'update'])->name('update');
             Route::post('/delete/{id}', [StaffApiController::class, 'delete'])->name('delete');
+        });
+
+        //Roster
+        Route::prefix('roster')->name('roster.')->group(function () {
+            Route::post('/view', [RosterApiController::class, 'view'])->name('view');
+            Route::post('/store', [RosterApiController::class, 'store'])->name('store');
+            Route::post('/update/{id}', [RosterApiController::class, 'update'])->name('update');
+            Route::post('/delete/{id}', [RosterApiController::class, 'delete'])->name('delete');
+        });
+
+        //Client
+        Route::prefix('client')->name('client.')->group(function () {
+            Route::post('/view', [ClientApiController::class, 'view'])->name('view');
+            Route::post('/store', [ClientApiController::class, 'store'])->name('store');
+            Route::post('/update/{id}', [ClientApiController::class, 'update'])->name('update');
+            Route::post('/delete/{id}', [ClientApiController::class, 'delete'])->name('delete');
         });
     });
 });

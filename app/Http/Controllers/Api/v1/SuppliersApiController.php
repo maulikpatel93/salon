@@ -99,7 +99,7 @@ class SuppliersApiController extends Controller
     public function returnResponse($request, $id, $data = [])
     {
         $requestAll = $request->all();
-        $field = ($request->field) ? array_merge(['id'], explode(',', $request->field)) : $this->field;
+        $field = ($request->field) ? array_merge(['id', 'salon_id'], explode(',', $request->field)) : $this->field;
 
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {

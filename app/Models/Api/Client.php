@@ -5,7 +5,7 @@ namespace App\Models\Api;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Staff extends Model
+class Client extends Model
 {
     use HasFactory;
 
@@ -14,7 +14,7 @@ class Staff extends Model
      *
      * @var string
      */
-    protected $table = 'staff';
+    protected $table = 'users';
 
     /**
      * The attributes that are mass assignable.
@@ -22,23 +22,29 @@ class Staff extends Model
      * @var string[]
      */
     protected $fillable = [
+        'role_id',
         'salon_id',
-        'price_tier_id',
         'first_name',
         'last_name',
         'username',
         'email',
         'email_verified',
         'email_verified_at',
+        'password',
         'phone_number',
         'phone_number_verified',
         'phone_number_verified_at',
+        'gender',
+        'date_of_birth',
         'address',
         'street',
         'suburb',
         'state',
         'postcode',
-        'calendar_booking',
+        'description',
+        'send_sms_notification',
+        'send_email_notification',
+        'recieve_marketing_email',
         'is_active',
         'is_active_at',
     ];
@@ -62,21 +68,7 @@ class Staff extends Model
 
     public function salon()
     {
-        return $this->belongsTo(Salons::class, 'salon_id', 'id');
-    }
-
-    public function pricetier()
-    {
-        return $this->belongsTo(PriceTier::class, 'price_tier_id', 'id');
-    }
-
-    public function staffservices()
-    {
-        return $this->hasMany(StaffServices::class, 'staff_id', 'id')->select('service_id');
-    }
-
-    public function staffworkinghours()
-    {
-        return $this->hasMany(StaffWorkingHours::class, 'staff_id', 'id');
+        // return $this->hasOne(Salons::class, 'salon_id', 'id');
+        return $this->belongsTo(Salons::class);
     }
 }

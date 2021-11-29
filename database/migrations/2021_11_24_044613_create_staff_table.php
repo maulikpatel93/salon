@@ -89,7 +89,7 @@ class CreateStaffTable extends Migration
 
         Schema::create('roster', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('date')->nullable();
+            $table->date('date')->nullable();
             $table->string('start_time', 50)->nullable();
             $table->string('end_time', 50)->nullable();
             $table->enum('away', ['0', '1'])->default(1); // 1:Active, 0:Inactive

@@ -32,6 +32,7 @@ class Users extends Model
         'phone_number_verified',
         'phone_number_verified_at',
         'password',
+        'panel',
         'is_active',
         'is_active_at',
         'auth_key',

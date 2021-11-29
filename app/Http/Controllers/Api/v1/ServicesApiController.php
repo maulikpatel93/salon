@@ -42,7 +42,7 @@ class ServicesApiController extends Controller
     protected $category_field = ['id', 'name'];
 
     //Services_Price Column name default ['*']
-    protected $serviceprice_field = [
+    protected $service_field = [
         'id',
         'service_id',
         'name',
@@ -212,7 +212,7 @@ class ServicesApiController extends Controller
     public function returnResponse($request, $id, $data = [])
     {
         $requestAll = $request->all();
-        $field = ($request->field) ? array_merge(['id'], explode(',', $request->field)) : $this->field;
+        $field = ($request->field) ? array_merge(['id', 'salon_id', 'category_id'], explode(',', $request->field)) : $this->field;
 
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
@@ -232,13 +232,13 @@ class ServicesApiController extends Controller
             $category_field = array_merge(['id'], explode(',', $request->category_field));
         }
 
-        $serviceprice_field = $this->serviceprice_field;
-        if (isset($requestAll['serviceprice_field']) && empty($requestAll['serviceprice_field'])) {
-            $serviceprice_field = false;
-        } else if ($request->serviceprice_field == '*') {
-            $serviceprice_field = [$request->serviceprice_field];
-        } else if ($request->serviceprice_field) {
-            $serviceprice_field = array_merge(['id', 'service_id'], explode(',', $request->serviceprice_field));
+        $service_field = $this->service_field;
+        if (isset($requestAll['service_field']) && empty($requestAll['service_field'])) {
+            $service_field = false;
+        } else if ($request->service_field == '*') {
+            $service_field = [$request->service_field];
+        } else if ($request->service_field) {
+            $service_field = array_merge(['id', 'service_id'], explode(',', $request->service_field));
         }
         $withArray = [];
         if ($salon_field) {
@@ -247,8 +247,8 @@ class ServicesApiController extends Controller
         if ($category_field) {
             $withArray[] = 'category:' . implode(',', $category_field);
         }
-        if ($serviceprice_field) {
-            $withArray[] = 'serviceprice:' . implode(',', $serviceprice_field);
+        if ($service_field) {
+            $withArray[] = 'serviceprice:' . implode(',', $service_field);
         }
 
         $pagination = $request->pagination ? $request->pagination : false;

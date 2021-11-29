@@ -51,14 +51,6 @@
         ]) }}
     </div>
     <div class="mb-3">
-        {{ Form::label('username'); }}
-        {{ Form::text('username', $model->username, [
-        "class" => "form-control",
-        'id'=> $formName.'-username',
-        'placeholder'=> '',
-        ]) }}
-    </div>
-    <div class="mb-3">
         {{ Form::label('email'); }}
         {{ Form::text('email', $model->email, [
         "class" => "form-control",

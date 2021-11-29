@@ -55,6 +55,7 @@ class CreateBasicTable extends Migration
         //php artisan make:migration create_users_table
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->enum('panel', ['Backend', 'Frontend', 'Common'])->after('id')->default('Backend'); // 1:Active, 0:Inactive
             $table->string('auth_key', 80)->after('id')
                 ->unique()
                 ->nullable()
@@ -66,7 +67,7 @@ class CreateBasicTable extends Migration
             $table->string('email_otp', 10)->after('email')->nullable();
             $table->enum('email_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->string('phone_number', 20);
             $table->string('phone_number_otp', 10)->after('phone_number')->nullable();
             $table->enum('phone_number_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify

@@ -18,15 +18,27 @@ class StaffApiController extends Controller
     protected $field = [
         'id',
         'salon_id',
+        'price_tier_id',
         'first_name',
         'last_name',
         'photo',
+        'address',
+        'street',
+        'suburb',
+        'state',
+        'postcode',
+        'calendar_booking',
     ];
 
     protected $salon_field = [
         'id',
         'business_name',
         'owner_name',
+    ];
+
+    protected $price_tier_field = [
+        'id',
+        'name',
     ];
 
     protected $staff_service_field = [
@@ -189,7 +201,7 @@ class StaffApiController extends Controller
     public function returnResponse($request, $id, $data = [])
     {
         $requestAll = $request->all();
-        $field = ($request->field) ? array_merge(['id'], explode(',', $request->field)) : $this->field;
+        $field = ($request->field) ? array_merge(['id', 'salon_id', 'price_tier_id'], explode(',', $request->field)) : $this->field;
 
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
@@ -200,6 +212,15 @@ class StaffApiController extends Controller
             $salon_field = array_merge(['id'], explode(',', $request->salon_field));
         }
 
+        $price_tier_field = $this->price_tier_field;
+        if (isset($requestAll['price_tier_field']) && empty($requestAll['price_tier_field'])) {
+            $price_tier_field = false;
+        } else if ($request->price_tier_field == '*') {
+            $price_tier_field = [$request->price_tier_field];
+        } else if ($request->price_tier_field) {
+            $price_tier_field = array_merge(['id'], explode(',', $request->price_tier_field));
+        }
+
         $staff_service_field = $this->staff_service_field;
         if (isset($requestAll['staff_service_field']) && empty($requestAll['staff_service_field'])) {
             $staff_service_field = false;
@@ -208,6 +229,7 @@ class StaffApiController extends Controller
         } else if ($request->staff_service_field) {
             $staff_service_field = array_merge(['id'], explode(',', $request->staff_service_field));
         }
+
         $staff_working_hours_field = $this->staff_working_hours_field;
         if (isset($requestAll['staff_working_hours_field']) && empty($requestAll['staff_working_hours_field'])) {
             $staff_working_hours_field = false;
@@ -220,6 +242,9 @@ class StaffApiController extends Controller
         $withArray = [];
         if ($salon_field) {
             $withArray[] = 'salon:' . implode(',', $salon_field);
+        }
+        if ($price_tier_field) {
+            $withArray[] = 'pricetier:' . implode(',', $price_tier_field);
         }
         if ($staff_service_field) {
             $withArray[] = 'staffservices:' . implode(',', $staff_service_field);

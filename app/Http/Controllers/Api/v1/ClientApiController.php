@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\ProductRequest;
-use App\Models\Api\Products;
+use App\Http\Requests\Api\ClientRequest;
+use App\Models\Api\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
-class ProductsApiController extends Controller
+class ClientApiController extends Controller
 {
     protected $successStatus = 200;
     protected $errorStatus = 403;
@@ -16,30 +18,28 @@ class ProductsApiController extends Controller
     protected $field = [
         'id',
         'salon_id',
-        'supplier_id',
-        'name',
-        'image',
-        'sku',
+        'first_name',
+        'last_name',
+        'username',
+        'email',
+        'phone_number',
+        'gender',
+        'date_of_birth',
+        'address',
+        'street',
+        'suburb',
+        'state',
+        'postcode',
         'description',
-        'cost_price',
-        'retail_price',
-        'manage_stock',
-        'stock_quantity',
-        'low_stock_threshold',
+        'send_sms_notification',
+        'send_email_notification',
+        'recieve_marketing_email',
     ];
 
     protected $salon_field = [
         'id',
         'business_name',
         'owner_name',
-    ];
-
-    protected $supplier_field = [
-        'id',
-        'name',
-        'first_name',
-        'last_name',
-        'email',
     ];
 
     public function __construct()
@@ -55,34 +55,38 @@ class ProductsApiController extends Controller
         return $this->returnResponse($request, $id);
     }
 
-    public function store(ProductRequest $request)
+    public function store(ClientRequest $request)
     {
         $requestAll = $request->all();
         $requestAll['is_active_at'] = currentDateTime();
-        $model = new Products;
+        $email_username = explode('@', $requestAll['email']);
+        $requestAll['panel'] = 'Frontend';
+        $requestAll['username'] = $email_username ? $email_username[0] : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
+        $requestAll['password'] = Hash::make(Str::random(10));
+        $model = new Client;
         $model->fill($requestAll);
-        $file = $request->file('image');
+        $file = $request->file('profile_photo');
         if ($file) {
             $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-            $filePath = $file->storeAs('products', $fileName, 'public');
-            $model->image = $fileName;
+            $filePath = $file->storeAs('client', $fileName, 'public');
+            $model->logo = $fileName;
         }
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : '';
         $model->save();
         return $this->returnResponse($request, $model->id);
     }
 
-    public function update(ProductRequest $request, $id)
+    public function update(ClientRequest $request, $id)
     {
         $requestAll = $request->all();
         $model = $this->findModel($id);
         $model->fill($requestAll);
-        $file = $request->file('image');
+        $file = $request->file('profile_photo');
         if ($file) {
-            Storage::delete('/public/products/' . $model->image);
+            Storage::delete('/public/client/' . $model->logo);
             $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-            $filePath = $file->storeAs('products', $fileName, 'public');
-            $model->image = $fileName;
+            $filePath = $file->storeAs('client', $fileName, 'public');
+            $model->logo = $fileName;
         }
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : $model->description;
         $model->save();
@@ -92,13 +96,13 @@ class ProductsApiController extends Controller
     public function delete(Request $request, $id)
     {
         $requestAll = $request->all();
-        Products::where('id', $id)->delete();
+        Client::where('id', $id)->delete();
         return response()->json(['status' => $this->successStatus, 'message' => 'success']);
     }
 
     protected function findModel($id)
     {
-        if (($model = Products::find($id)) !== null) {
+        if (($model = Client::find($id)) !== null) {
             return $model;
         }
         throw new UnsecureException('The requested page does not exist.');
@@ -107,7 +111,7 @@ class ProductsApiController extends Controller
     public function returnResponse($request, $id, $data = [])
     {
         $requestAll = $request->all();
-        $field = ($request->field) ? array_merge(['id', 'salon_id', 'supplier_id'], explode(',', $request->field)) : $this->field;
+        $field = ($request->field) ? array_merge(['id', 'salon_id'], explode(',', $request->field)) : $this->field;
 
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
@@ -118,32 +122,20 @@ class ProductsApiController extends Controller
             $salon_field = array_merge(['id'], explode(',', $request->salon_field));
         }
 
-        $supplier_field = $this->supplier_field;
-        if (isset($requestAll['supplier_field']) && empty($requestAll['supplier_field'])) {
-            $supplier_field = false;
-        } else if ($request->supplier_field == '*') {
-            $supplier_field = [$request->supplier_field];
-        } else if ($request->supplier_field) {
-            $supplier_field = array_merge(['id'], explode(',', $request->supplier_field));
-        }
         $withArray = [];
         if ($salon_field) {
             $withArray[] = 'salon:' . implode(',', $salon_field);
         }
-        if ($supplier_field) {
-            $withArray[] = 'supplier:' . implode(',', $supplier_field);
-        }
-
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
-        $where = ['is_active' => '1'];
+        $where = ['is_active' => '1', 'role_id' => 5];
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
         if ($pagination == true) {
-            $model = Products::with($withArray)->select($field)->where($where)->simplePaginate($limit);
+            $model = Client::with($withArray)->select($field)->where($where)->simplePaginate($limit);
         } else {
-            $model = Products::with($withArray)->select($field)->where($where)->get();
+            $model = Client::with($withArray)->select($field)->where($where)->get();
         }
         if ($model->count()) {
             $successData = $model->toArray();

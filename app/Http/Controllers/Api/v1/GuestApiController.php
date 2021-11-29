@@ -154,6 +154,7 @@ class GuestApiController extends Controller
         $inputVal['phone_number_verified'] = '0';
         $inputVal['password'] = Hash::make($inputVal['password']);
         $inputVal['is_active_at'] = currentDateTime();
+        $inputVal['panel'] = 'Frontend';
         // $inputVal['username'] = str_replace(' ', '_', strtolower($inputVal['first_name'])).'_'.str_replace(' ', '_', strtolower($inputVal['last_name']));
         $token = Str::random(config('params.auth_key_character'));
         $inputVal['auth_key'] = hash('sha256', $token);
