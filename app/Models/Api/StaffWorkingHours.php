@@ -46,6 +46,7 @@ class StaffWorkingHours extends Model
      */
     protected $casts = [
         'is_active_at' => 'datetime',
+        'break_time' => 'array',
     ];
 
     public function salon()

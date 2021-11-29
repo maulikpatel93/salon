@@ -29,6 +29,21 @@ class StaffApiController extends Controller
         'owner_name',
     ];
 
+    protected $staff_service_field = [
+        'id',
+        'staff_id',
+        'service_id',
+    ];
+
+    protected $staff_working_hours_field = [
+        'id',
+        'staff_id',
+        'days',
+        'start_time',
+        'end_time',
+        'break_time',
+    ];
+
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -88,7 +103,7 @@ class StaffApiController extends Controller
                     $StaffWorkingHoursModel->days = $value['days'];
                     $StaffWorkingHoursModel->start_time = isset($value['start_time']) ? $value['start_time'] : '';
                     $StaffWorkingHoursModel->end_time = isset($value['end_time']) ? $value['end_time'] : '';
-                    $StaffWorkingHoursModel->break_time = (isset($value['break_time']) && $value['break_time']) ? json_encode($value['break_time']) : '';
+                    $StaffWorkingHoursModel->break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : '';
                     $StaffWorkingHoursModel->is_active_at = currentDateTime();
                     $StaffWorkingHoursModel->save();
                 }
@@ -148,7 +163,7 @@ class StaffApiController extends Controller
                     $StaffWorkingHoursModel->days = $value['days'];
                     $StaffWorkingHoursModel->start_time = isset($value['start_time']) ? $value['start_time'] : '';
                     $StaffWorkingHoursModel->end_time = isset($value['end_time']) ? $value['end_time'] : '';
-                    $StaffWorkingHoursModel->break_time = (isset($value['break_time']) && $value['break_time']) ? json_encode($value['break_time']) : '';
+                    $StaffWorkingHoursModel->break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : '';
                     $StaffWorkingHoursModel->save();
                 }
             }
@@ -185,9 +200,32 @@ class StaffApiController extends Controller
             $salon_field = array_merge(['id'], explode(',', $request->salon_field));
         }
 
+        $staff_service_field = $this->staff_service_field;
+        if (isset($requestAll['staff_service_field']) && empty($requestAll['staff_service_field'])) {
+            $staff_service_field = false;
+        } else if ($request->staff_service_field == '*') {
+            $staff_service_field = [$request->staff_service_field];
+        } else if ($request->staff_service_field) {
+            $staff_service_field = array_merge(['id'], explode(',', $request->staff_service_field));
+        }
+        $staff_working_hours_field = $this->staff_working_hours_field;
+        if (isset($requestAll['staff_working_hours_field']) && empty($requestAll['staff_working_hours_field'])) {
+            $staff_working_hours_field = false;
+        } else if ($request->staff_working_hours_field == '*') {
+            $staff_working_hours_field = [$request->staff_working_hours_field];
+        } else if ($request->staff_working_hours_field) {
+            $staff_working_hours_field = array_merge(['id'], explode(',', $request->staff_working_hours_field));
+        }
+
         $withArray = [];
         if ($salon_field) {
             $withArray[] = 'salon:' . implode(',', $salon_field);
+        }
+        if ($staff_service_field) {
+            $withArray[] = 'staffservices:' . implode(',', $staff_service_field);
+        }
+        if ($staff_working_hours_field) {
+            $withArray[] = 'staffworkinghours:' . implode(',', $staff_working_hours_field);
         }
 
         $pagination = $request->pagination ? $request->pagination : false;
