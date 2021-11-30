@@ -1,5 +1,7 @@
 <?php
+use App\Http\Controllers\Api\v1\AppointmentApiController;
 use App\Http\Controllers\Api\v1\AuthApiController;
+use App\Http\Controllers\Api\v1\BusytimeApiController;
 use App\Http\Controllers\Api\v1\CategoriesApiController;
 use App\Http\Controllers\Api\v1\ClientApiController;
 use App\Http\Controllers\Api\v1\GuestApiController;
@@ -9,6 +11,7 @@ use App\Http\Controllers\Api\v1\RosterApiController;
 use App\Http\Controllers\Api\v1\ServicesApiController;
 use App\Http\Controllers\Api\v1\StaffApiController;
 use App\Http\Controllers\Api\v1\SuppliersApiController;
+use App\Http\Controllers\Api\v1\VoucherApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,12 +34,18 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::prefix('v1')->group(function () {
     Route::post('/index', [GuestApiController::class, 'index']);
+    Route::prefix('beforelogin')->group(function () {
+        Route::post('/login', [GuestApiController::class, 'login']);
+        Route::post('/salonregistration', [GuestApiController::class, 'salonregistration']);
+        Route::post('/salons', [GuestApiController::class, 'salons']);
+        Route::post('/register', [GuestApiController::class, 'register']);
+    });
     Route::post('/login', [GuestApiController::class, 'login']);
     Route::post('/salonregistration', [GuestApiController::class, 'salonregistration']);
-    Route::post('/getSalons', [GuestApiController::class, 'getSalons']);
+    Route::post('/salons', [GuestApiController::class, 'salons']);
     Route::post('/register', [GuestApiController::class, 'register']);
     Route::middleware(['auth:api'])->prefix('afterlogin')->group(function () {
-        Route::post('/getUser', [AuthApiController::class, 'userdata']);
+        Route::post('/user', [AuthApiController::class, 'user']);
         Route::post('/logout', [GuestApiController::class, 'logout']);
 
         //Suppliers
@@ -102,5 +111,31 @@ Route::prefix('v1')->group(function () {
             Route::post('/update/{id}', [ClientApiController::class, 'update'])->name('update');
             Route::post('/delete/{id}', [ClientApiController::class, 'delete'])->name('delete');
         });
+
+        //Voucher
+        Route::prefix('voucher')->name('voucher.')->group(function () {
+            Route::post('/view', [VoucherApiController::class, 'view'])->name('view');
+            Route::post('/store', [VoucherApiController::class, 'store'])->name('store');
+            Route::post('/update/{id}', [VoucherApiController::class, 'update'])->name('update');
+            Route::post('/delete/{id}', [VoucherApiController::class, 'delete'])->name('delete');
+        });
+
+        //Appointment
+        Route::prefix('appointment')->name('appointment.')->group(function () {
+            Route::post('/view', [AppointmentApiController::class, 'view'])->name('view');
+            Route::post('/store', [AppointmentApiController::class, 'store'])->name('store');
+            Route::post('/update/{id}', [AppointmentApiController::class, 'update'])->name('update');
+            Route::post('/delete/{id}', [AppointmentApiController::class, 'delete'])->name('delete');
+            Route::post('/status/{id}', [AppointmentApiController::class, 'status'])->name('status');
+        });
+
+        //BusyTime
+        Route::prefix('busytime')->name('busytime.')->group(function () {
+            Route::post('/view', [BusytimeApiController::class, 'view'])->name('view');
+            Route::post('/store', [BusytimeApiController::class, 'store'])->name('store');
+            Route::post('/update/{id}', [BusytimeApiController::class, 'update'])->name('update');
+            Route::post('/delete/{id}', [BusytimeApiController::class, 'delete'])->name('delete');
+        });
+
     });
 });

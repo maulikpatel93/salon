@@ -83,4 +83,9 @@ class Services extends Model
     {
         return $this->hasMany(StaffServices::class, 'service_id', 'id')->select('staff_id');
     }
+
+    public function voucherservice()
+    {
+        return $this->belongsToMany(Voucher::class, 'voucher_services', 'service_id', 'voucher_id')->select('voucher_id', 'name');
+    }
 }

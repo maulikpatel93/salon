@@ -37,6 +37,7 @@ class CreateSalonsTable extends Migration
             $table->id();
             $table->string('name', 100)->unique();
             $table->text('description');
+            $table->decimal('percentage')->nullable()->comment('percentage %');
             $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();

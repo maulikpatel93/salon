@@ -10,6 +10,7 @@ class AuthApiController extends Controller
 {
 
     protected $successStatus = 200;
+    protected $errorStatus = 403;
     /**
      * Create a new controller instance.
      *
@@ -24,10 +25,13 @@ class AuthApiController extends Controller
     {
         return "It works!";
     }
-    public function userdata(Request $request)
+    public function user(Request $request)
     {
         $user = Auth::user();
-        return response()->json(['success' => $user], $this->successStatus);
+        if ($user) {
+            return response()->json(['status' => $this->successStatus, 'message' => 'Success', 'data' => $user]);
+        }
+        return response()->json(['status' => $this->errorStatus, 'message' => 'Failed']);
     }
 
 }
