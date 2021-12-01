@@ -71,7 +71,9 @@ mix.js("resources/js/app.js", "public/js")
     .copy("resources/js/library/demo.js", "public/js")
     .copy("resources/js/myfunction.js", "public/js")
     .sass("resources/sass/app.scss", "public/css")
-    .sass("resources/sass/styles.scss", "public/css");
+    .sass("resources/sass/styles.scss", "public/css")
+    .js("resources/src/index.js", "public/src")
+    .react();
 
 if (!mix.inProduction()) {
     mix.sourceMaps();
