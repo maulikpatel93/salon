@@ -9,8 +9,8 @@ use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\SalonsController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Auth\AdminController;
-use App\Http\Controllers\Auth\LoginController;
 //Web Panel
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
@@ -30,21 +30,21 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
+//Auth::routes();
 Route::fallback(function () {
     abort(404, 'API resource not found');
 });
 //Landing Page
-Route::middleware(['guest:web', 'PreventBackHistory'])->group(function () {
-    // Route::view('/login', 'auth.login')->name('login');
-});
-Route::middleware('auth:web', 'PreventBackHistory')->group(function () {
-    Route::view('/home', 'home')->name('home');
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::prefix('user')->name('user.')->group(function () {
-        // Route::view('/home', 'home')->name('home');
-    });
-});
+// Route::middleware(['guest:web', 'PreventBackHistory'])->group(function () {
+//     // Route::view('/login', 'auth.login')->name('login');
+// });
+// Route::middleware('auth:web', 'PreventBackHistory')->group(function () {
+//     // Route::view('/home', 'home')->name('home');
+//     // Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+//     // Route::prefix('user')->name('user.')->group(function () {
+//     //     // Route::view('/home', 'home')->name('home');
+//     // });
+// });
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['guest:admin', 'PreventBackHistory'])->group(function () {
@@ -73,7 +73,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             $request->validate([
                 'token' => 'required',
                 'email' => 'required|email',
-                'password' => 'required|min:8|confirmed',
+                'password' => 'required|min:6|confirmed',
             ]);
             $status = Password::reset(
                 $request->only('email', 'password', 'password_confirmation', 'token'),
