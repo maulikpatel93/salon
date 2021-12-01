@@ -28,11 +28,15 @@ class AppServiceProvider extends ServiceProvider
                 $getActionName = app('request')->route()->getAction();
                 if (isset($getActionName['middleware']) && count($getActionName['middleware']) >= 2 && is_array($getActionName['middleware'])) {
                     if (in_array('auth:admin', $getActionName['middleware']) || in_array('guest:admin', $getActionName['middleware'])) {
-                        $getControllerName = class_basename($getActionName['controller']);
-                        list($getControllerName, $getActionName) = explode('@', $getControllerName);
+                        if (isset($getActionName['controller']) && $getActionName['controller']) {
 
-                        $getControllerName = strtolower(str_replace('Controller', '', $getControllerName));
-                        $view->with(compact('getControllerName', 'getActionName'));
+                            $getControllerName = class_basename($getActionName['controller']);
+                            list($getControllerName, $getActionName) = explode('@', $getControllerName);
+
+                            $getControllerName = strtolower(str_replace('Controller', '', $getControllerName));
+                            $view->with(compact('getControllerName', 'getActionName'));
+
+                        }
                     }
                 }
             }

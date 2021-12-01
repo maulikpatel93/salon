@@ -9,8 +9,9 @@ use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\SalonsController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Auth\AdminController;
-use App\Http\Controllers\Auth\LoginController;
 //Web Panel
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,7 +26,7 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::get('/', function () {
-    return view('welcome');
+    // return view('welcome');
 });
 
 Auth::routes();
@@ -37,11 +38,11 @@ Route::middleware(['guest:web', 'PreventBackHistory'])->group(function () {
     // Route::view('/login', 'auth.login')->name('login');
 });
 Route::middleware('auth:web', 'PreventBackHistory')->group(function () {
-    Route::view('/home', 'home')->name('home');
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::prefix('user')->name('user.')->group(function () {
-        // Route::view('/home', 'home')->name('home');
-    });
+    // Route::view('/home', 'home')->name('home');
+    // Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    // Route::prefix('user')->name('user.')->group(function () {
+    //     // Route::view('/home', 'home')->name('home');
+    // });
 });
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -52,6 +53,43 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Route::view('/login', 'auth.adminlogin')->name('login');
         Route::get('/login', [AdminController::class, 'index'])->name('login');
         Route::post('/login', [AdminController::class, 'login'])->name('checklogin');
+        Route::get('/forgot-password', function () {
+            return view('admin.passwords.email');
+        })->name('password.request');
+        Route::post('/forgot-password', function (Request $request) {
+            $request->validate(['email' => 'required|email']);
+            $status = Password::sendResetLink(
+                $request->only('email')
+            );
+            return $status === Password::RESET_LINK_SENT
+            ? back()->with(['status' => __($status)])
+            : back()->withErrors(['email' => __($status)]);
+        })->name('password.email');
+        Route::get('/reset-password/{token}', function ($token) {
+            return view('admin.passwords.reset', ['token' => $token]);
+        })->name('password.reset');
+        Route::post('/reset-password', function (Request $request) {
+            $request->validate([
+                'token' => 'required',
+                'email' => 'required|email',
+                'password' => 'required|min:8|confirmed',
+            ]);
+            $status = Password::reset(
+                $request->only('email', 'password', 'password_confirmation', 'token'),
+                function ($user, $password) {
+                    $user->forceFill([
+                        'password' => Hash::make($password),
+                    ])->setRememberToken(Str::random(60));
+
+                    $user->save();
+
+                    event(new PasswordReset($user));
+                }
+            );
+            return $status === Password::PASSWORD_RESET
+            ? redirect()->route('admin.login')->with('status', __($status))
+            : back()->withErrors(['email' => [__($status)]]);
+        })->name('password.update');
     });
     Route::middleware('auth:admin', 'PreventBackHistory')->group(function () {
         // Route::view('/home', 'admin.dashboard')->name('dashboard');

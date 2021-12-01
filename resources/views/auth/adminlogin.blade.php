@@ -17,29 +17,33 @@
             'enableAjaxSubmit' => 1]) }}
             <div id="formerror" class="formerror"></div>
 
-            <div class="input-group mb-3">
-                <span class="input-group-text" id="username_addon"><i class="fas fa-user"></i></span>
-                {{ Form::text('email', old('email'), [
-                "class" => "form-control",
-                'id'=> 'loginform-email',
-                'placeholder'=> 'Email',
-                'autocomplete' => 'email',
-                'autofocus' => true,
-                'aria-describedby' => 'username_addon'
-                ]) }}
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text" id="username_addon"><i class="fas fa-user"></i></span>
+                    {{ Form::text('email', old('email'), [
+                    "class" => "form-control",
+                    'id'=> 'loginform-email',
+                    'placeholder'=> 'Email',
+                    'autocomplete' => 'email',
+                    'autofocus' => true,
+                    'aria-describedby' => 'username_addon'
+                    ]) }}
+                </div>
             </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text" id="password_addon"><i class="fas fa-lock"></i></span>
-                {{ Form::password('password', [
-                "class" => "form-control",
-                'id'=> 'loginform-password',
-                'placeholder' => 'Password',
-                'aria-describedby' => 'password_addon',
-                'autocomplete' => "off"
-                ]) }}
-                <span class="input-group-text"><i class="field-icon toggle-password fa-solid fas fa-eye cursor-pointer"
-                        toggle="#loginform-password"></i> </span>
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text" id="password_addon"><i class="fas fa-lock"></i></span>
+                    {{ Form::password('password', [
+                    "class" => "form-control",
+                    'id'=> 'loginform-password',
+                    'placeholder' => 'Password',
+                    'aria-describedby' => 'password_addon',
+                    'autocomplete' => "off"
+                    ]) }}
+                    <span class="input-group-text"><i class="field-icon toggle-password fa-solid fas fa-eye cursor-pointer"
+                            toggle="#loginform-password"></i> </span>
 
+                </div>
             </div>
 
             <div class="row">
@@ -58,8 +62,8 @@
             </div>
             {{ Form::close() }}
             <p class="mb-1">
-                @if (Route::has('password.request'))
-                <a class="fs--1" href="{{ route('password.request') }}">
+                @if (Route::has('admin.password.request'))
+                <a class="fs--1" href="{{ route('admin.password.request') }}">
                     {{ __('Forgot Password?') }}
                 </a>
                 @endif

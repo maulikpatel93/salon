@@ -84,8 +84,8 @@ class CreateBasicTable extends Migration
             $table->foreign('role_id')->references('id')->on('roles')->onUpdate('cascade')->onDelete('cascade');
         });
 
-        //php artisan make:migration create_password_reset_table
-        Schema::create('password_reset', function (Blueprint $table) {
+        //php artisan make:migration create_password_resets_table
+        Schema::create('password_resets', function (Blueprint $table) {
             $table->string('email')->index();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
@@ -235,7 +235,7 @@ class CreateBasicTable extends Migration
             'permission',
             'modules',
             'failed_jobs',
-            'password_reset',
+            'password_resets',
             'users',
             'roles',
         ]);

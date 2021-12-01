@@ -365,10 +365,10 @@ CREATE TABLE `oauth_refresh_tokens` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `password_reset`
+-- Table structure for table `password_resets`
 --
 
-CREATE TABLE `password_reset` (
+CREATE TABLE `password_resets` (
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL
@@ -1077,10 +1077,10 @@ ALTER TABLE `oauth_refresh_tokens`
   ADD KEY `oauth_refresh_tokens_access_token_id_index` (`access_token_id`);
 
 --
--- Indexes for table `password_reset`
+-- Indexes for table `password_resets`
 --
-ALTER TABLE `password_reset`
-  ADD KEY `password_reset_email_index` (`email`);
+ALTER TABLE `password_resets`
+  ADD KEY `password_resets_email_index` (`email`);
 
 --
 -- Indexes for table `permissions`

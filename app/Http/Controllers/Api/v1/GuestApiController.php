@@ -76,11 +76,12 @@ class GuestApiController extends Controller
         $credentials = [
             'email' => $request->email,
             'password' => $request->password,
-            'role_id' => 4,
             'is_active' => '1',
             'email_verified' => '1',
         ];
-        if (Auth::attempt($credentials)) {
+        $credentials_4 = array_merge(['role_id' => 4], $credentials); // Salon role
+        $credentials_5 = array_merge(['role_id' => 5], $credentials); // Client role
+        if (Auth::attempt($credentials_4) || Auth::attempt($credentials_5)) {
             $user = Auth::user();
             $successData = [];
             $successData['token'] = $user->createToken($user->id)->accessToken;
