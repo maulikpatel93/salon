@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\SalonsController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Auth\AdminController;
+use App\Http\Controllers\Auth\LoginController;
 //Web Panel
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -26,7 +27,7 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::get('/', function () {
-    // return view('welcome');
+    return view('welcome');
 });
 
 Auth::routes();
@@ -38,11 +39,11 @@ Route::middleware(['guest:web', 'PreventBackHistory'])->group(function () {
     // Route::view('/login', 'auth.login')->name('login');
 });
 Route::middleware('auth:web', 'PreventBackHistory')->group(function () {
-    // Route::view('/home', 'home')->name('home');
-    // Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-    // Route::prefix('user')->name('user.')->group(function () {
-    //     // Route::view('/home', 'home')->name('home');
-    // });
+    Route::view('/home', 'home')->name('home');
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::prefix('user')->name('user.')->group(function () {
+        // Route::view('/home', 'home')->name('home');
+    });
 });
 
 Route::prefix('admin')->name('admin.')->group(function () {
