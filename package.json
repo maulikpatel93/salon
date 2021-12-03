@@ -3,15 +3,11 @@
     "scripts": {
         "dev": "npm run development",
         "development": "mix",
-        "watch": "webpack --watch",
+        "watch": "mix watch",
         "watch-poll": "mix watch -- --watch-options-poll=1000",
         "hot": "mix watch --hot",
         "prod": "npm run production",
-        "production": "mix --production",
-        "build": "webpack --mode=production --node-env=production",
-        "build:dev": "webpack --mode=development",
-        "build:prod": "webpack --mode=production --node-env=production",
-        "serve": "webpack serve"
+        "production": "mix --production"
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.4",
@@ -30,13 +26,12 @@
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "react-scripts": "4.0.3",
-        "web-vitals": "^1.1.2",
         "select2": "^4.1.0-rc.0",
-        "sweetalert2": "^11.1.10"
+        "sweetalert2": "^11.1.10",
+        "web-vitals": "^1.1.2"
     },
     "devDependencies": {
         "@babel/preset-react": "^7.16.0",
-        "@webpack-cli/generators": "^2.4.1",
         "cross-env": "^7.0.3",
         "eslint": "^8.2.0",
         "eslint-config-airbnb-base": "^15.0.0",
@@ -50,6 +45,6 @@
         "sass-loader": "^12.3.0"
     },
     "version": "1.0.0",
-    "description": "My webpack project",
+    "description": "Freedom Salon",
     "name": "my-webpack-project"
 }

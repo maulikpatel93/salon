@@ -21,7 +21,14 @@ const mix = require("laravel-mix");
  | file for the application as well as bundling up all the JS files.
  |
  */
+// const path = require('path');
+// const HtmlWebpackPlugin = require('html-webpack-plugin');
+// const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+// const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
 
+// const isProduction = process.env.NODE_ENV == 'production';
+
+// const stylesHandler = MiniCssExtractPlugin.loader;
 // mix.js("resources/js/app.js", "public/js")
 // .js("node_modules/bootstrap/dist/js/bootstrap.bundle.js", "public/js")
 //     .js("node_modules/jquery/dist/jquery.min.js", "public/js")
@@ -73,7 +80,32 @@ mix.js("resources/js/app.js", "public/js")
     .sass("resources/sass/app.scss", "public/css")
     .sass("resources/sass/styles.scss", "public/css")
     .js("resources/src/index.js", "public/src")
-    .react();
+    .react()
+    .webpackConfig({
+        devServer: {
+            open: true,
+            host: 'localhost',
+        },
+        // module: {
+        //     rules: [
+        //         {
+        //             test: /\.s[ac]ss$/i,
+        //             use: [stylesHandler, 'css-loader', 'postcss-loader', 'sass-loader'],
+        //         },
+        //         {
+        //             test: /\.css$/i,
+        //             use: [stylesHandler, 'css-loader', 'postcss-loader'],
+        //         },
+        //         {
+        //             test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
+        //             type: 'asset',
+        //         },
+    
+        //         // Add your rules for custom modules here
+        //         // Learn more about loaders from https://webpack.js.org/loaders/
+        //     ],
+        // },
+    });
 
 if (!mix.inProduction()) {
     mix.sourceMaps();
