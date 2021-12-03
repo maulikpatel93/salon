@@ -1,11 +1,11 @@
 import { lazy } from 'react';
 
 // project imports
-import Loadable from 'ui-component/Loadable';
-import MinimalLayout from 'layout/MinimalLayout';
+import Loadable from '../component/Loadable';
+import MinimalLayout from '../layout/MinimalLayout';
 
 // login option 3 routing
-const Login = Loadable(lazy(() => import('pages/auth/Login')));
+const Login = Loadable(lazy(() => import('../pages/auth/Login')));
 
 // ==============================|| AUTHENTICATION ROUTING ||============================== //
 

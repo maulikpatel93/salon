@@ -1,11 +1,11 @@
 import { lazy } from 'react';
 
 // project imports
-import MainLayout from './layout/MainLayout';
-import Loadable from './component/Loadable';
+import MainLayout from '../layout/MainLayout';
+import Loadable from '../component/Loadable';
 
 // dashboard routing
-const Dashboard = Loadable(lazy(() => import('pages/dashboard/index')));
+const Dashboard = Loadable(lazy(() => import('../pages/dashboard/index')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
