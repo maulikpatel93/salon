@@ -8,6 +8,7 @@ use App\Http\Requests\Api\ClientRequest;
 use App\Models\Api\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ClientApiController extends Controller
@@ -96,7 +97,7 @@ class ClientApiController extends Controller
     public function delete(Request $request, $id)
     {
         $requestAll = $request->all();
-        Client::where('id', $id)->delete();
+        Client::where(['id' => $id, 'role_id' => 6])->delete();
         return response()->json(['status' => $this->successStatus, 'message' => 'success']);
     }
 

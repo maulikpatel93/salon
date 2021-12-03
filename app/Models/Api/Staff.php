@@ -14,7 +14,7 @@ class Staff extends Model
      *
      * @var string
      */
-    protected $table = 'staff';
+    protected $table = 'users';
 
     /**
      * The attributes that are mass assignable.
@@ -24,6 +24,7 @@ class Staff extends Model
     protected $fillable = [
         'salon_id',
         'price_tier_id',
+        'profile_photo',
         'first_name',
         'last_name',
         'username',

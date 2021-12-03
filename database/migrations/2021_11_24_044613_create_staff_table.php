@@ -71,7 +71,7 @@ class CreateStaffTable extends Migration
             $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
 
             $table->unsignedBigInteger('staff_id')->after('salon_id')->nullable()->comment('Type Of Staff');
-            $table->foreign('staff_id')->references('id')->on('staff')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('staff_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
         });
 
         Schema::create('staff_services', function (Blueprint $table) {
@@ -81,7 +81,7 @@ class CreateStaffTable extends Migration
 
         Schema::table('staff_services', function (Blueprint $table) {
             $table->unsignedBigInteger('staff_id')->after('id')->nullable()->comment('Type Of Staff');
-            $table->foreign('staff_id')->references('id')->on('staff')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('staff_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
 
             $table->unsignedBigInteger('service_id')->after('staff_id')->nullable()->comment('Type Of Category');
             $table->foreign('service_id')->references('id')->on('services')->onUpdate('cascade')->onDelete('cascade');
@@ -103,7 +103,7 @@ class CreateStaffTable extends Migration
             $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
 
             $table->unsignedBigInteger('staff_id')->after('salon_id')->nullable()->comment('Type Of Staff');
-            $table->foreign('staff_id')->references('id')->on('staff')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('staff_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
         });
 
         // Schema::create('clients', function (Blueprint $table) {

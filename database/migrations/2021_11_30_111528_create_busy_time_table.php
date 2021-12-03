@@ -30,7 +30,7 @@ class CreateBusyTimeTable extends Migration
             $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
 
             $table->unsignedBigInteger('staff_id')->after('salon_id')->nullable()->comment('Type Of Staff');
-            $table->foreign('staff_id')->references('id')->on('staff')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('staff_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
         });
 
         Schema::create('appointment', function (Blueprint $table) {
@@ -62,7 +62,7 @@ class CreateBusyTimeTable extends Migration
             $table->foreign('service_id')->references('id')->on('services')->onUpdate('cascade')->onDelete('cascade');
 
             $table->unsignedBigInteger('staff_id')->after('service_id')->nullable()->comment('Type Of Staff');
-            $table->foreign('staff_id')->references('id')->on('staff')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('staff_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

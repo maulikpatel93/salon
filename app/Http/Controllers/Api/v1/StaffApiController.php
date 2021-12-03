@@ -9,6 +9,7 @@ use App\Models\Api\Staff;
 use App\Models\Api\StaffServices;
 use App\Models\Api\StaffWorkingHours;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class StaffApiController extends Controller
 {
@@ -21,7 +22,7 @@ class StaffApiController extends Controller
         'price_tier_id',
         'first_name',
         'last_name',
-        'photo',
+        'profile_photo',
         'address',
         'street',
         'suburb',
@@ -78,11 +79,11 @@ class StaffApiController extends Controller
 
         $model = new Staff;
         $model->fill($requestAll);
-        $file = $request->file('photo');
+        $file = $request->file('profile_photo');
         if ($file) {
             $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
             $filePath = $file->storeAs('staff', $fileName, 'public');
-            $model->photo = $fileName;
+            $model->profile_photo = $fileName;
         }
         $model->save();
         if ($staff_services) {
@@ -138,12 +139,12 @@ class StaffApiController extends Controller
             return;
         })->toArray();
         $model->fill($requestAll);
-        $file = $request->file('photo');
+        $file = $request->file('profile_photo');
         if ($file) {
-            Storage::delete('/public/staff/' . $model->photo);
+            Storage::delete('/public/staff/' . $model->profile_photo);
             $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
             $filePath = $file->storeAs('staff', $fileName, 'public');
-            $model->photo = $fileName;
+            $model->profile_photo = $fileName;
         }
         $model->save();
         if ($staff_services) {

@@ -22,6 +22,7 @@ class Users extends Model
     protected $fillable = [
         'role_id',
         'salon_id',
+        'profile_photo',
         'first_name',
         'last_name',
         'username',
