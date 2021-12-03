@@ -152,21 +152,6 @@ class CreateBasicTable extends Migration
             $table->foreign('permission_id')->references('id')->on('permissions')->onUpdate('cascade')->onDelete('cascade');
         });
 
-        //php artisan make:migration create_users_access_table
-        Schema::create('users_access', function (Blueprint $table) {
-            $table->id();
-            $table->enum('access', ['0', '1'])->default('1'); // 1:Active, 0:Inactive
-            $table->timestamps();
-        });
-
-        Schema::table('users_access', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id')->after('id')->nullable()->comment('Type Of Role');
-            $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
-
-            $table->unsignedBigInteger('permission_id')->after('user_id')->nullable()->comment('Type Of Permission');
-            $table->foreign('permission_id')->references('id')->on('permissions')->onUpdate('cascade')->onDelete('cascade');
-        });
-
         //php artisan make:migration create_configuration_table
         Schema::create('configuration', function (Blueprint $table) {
             $table->integer('id', 20);

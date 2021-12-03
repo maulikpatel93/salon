@@ -173,6 +173,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
+// Route::get('/{any}', function ($any) {
+//     return view('index');
+// })->where('any', '.*');
+
 Route::get('/{any}', function ($any) {
     return view('index');
 })->where('any', '.*');
