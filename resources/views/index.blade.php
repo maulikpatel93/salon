@@ -8,9 +8,11 @@
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+        <link href="{{ asset('css/react-bootstrap.css') }}" rel="stylesheet">
     </head>
     <body>
         <div id="root"></div>
-        <script src="{{ mix('src/index.js') }}"></script>
+        <script src="{{ mix('src/main.js') }}"></script>
+        <script src="{{ asset('js/bootstrap.bundle.js') }}" type="text/javascript"></script>
     </body>
 </html>

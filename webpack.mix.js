@@ -79,8 +79,10 @@ mix.js("resources/js/app.js", "public/js")
     .copy("resources/js/myfunction.js", "public/js")
     .sass("resources/sass/app.scss", "public/css")
     .sass("resources/sass/styles.scss", "public/css")
-    .js("resources/src/index.js", "public/src")
+    .js("resources/src/index.js", "public/src/main.js")
     .react()
+    .sass("resources/sass/react-bootstrap.scss", "public/css")
+    .js("node_modules/bootstrap/dist/js/bootstrap.bundle.js", "public/js")
     .webpackConfig({
         devServer: {
             open: true,
