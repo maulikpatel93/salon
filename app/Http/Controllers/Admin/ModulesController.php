@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ModuleRequest;
 use App\Models\Modules;
@@ -24,7 +25,11 @@ class ModulesController extends Controller
 
     public function index(Request $request)
     {
-        $dataProvider = new EloquentDataProvider(Modules::query()->orderBy('id', 'desc'));
+        if ($sort) {
+            $dataProvider = new EloquentDataProvider(Modules::query());
+        } else {
+            $dataProvider = new EloquentDataProvider(Modules::query()->orderBy('id', 'desc'));
+        }
         return view('admin.modules.index', [
             'dataProvider' => $dataProvider,
         ]);
@@ -149,7 +154,7 @@ class ModulesController extends Controller
             return $model;
         }
 
-        throw new Exception('The requested page does not exist.');
+        throw new UnsecureException('The requested page does not exist.');
     }
 
     public function childmenu(Request $request)

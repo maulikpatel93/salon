@@ -162,21 +162,22 @@ if (!empty(checkaccess('delete', getControllerName()))) {
                     // You can set 'value' as a callback function to get a row data value dynamically.
                     $btnbg = $model->is_active == 1 ? 'success' : 'danger';
                     $active = $model->is_active == 1 ? 'Active' : 'Inactive';
-                    return Html::link('javascript:void(0)', $active, [
-                        'class' => 'btn btn-' . $btnbg . ' btn-sm',
-                        'id' => 'is_active_' . $model->id,
-                        'title' => $active,
-                        'onclick' =>
-                            '$.post({
-                                                                    url: "' .
-                            route('admin.roles.isactive', ['id' => encode($model->id)]) .
-                            '",
-                                                                    success: function (response) {
-                                                                    $.pjax.reload({container: "#gridtable-pjax"});
-                                                                },
-                                                            }); return false;',
-                    ]);
-                    return '<span class="icon fas '.($row->is_active == 1 ? 'fa-check' : 'fa-times').'"></span>';
+                    if (!empty(checkaccess('isactive', getControllerName()))) {
+                        return Html::link('javascript:void(0)', $active, [
+                            'class' => 'btn btn-' . $btnbg . ' btn-sm',
+                            'id' => 'is_active_' . $model->id,
+                            'title' => $active,
+                            'onclick' =>
+                                '$.post({
+                                url: "' .route('admin.roles.isactive', ['id' => encode($model->id)]) .'",
+                                    success: function (response) {
+                                    $.pjax.reload({container: "#gridtable-pjax"});
+                                    },
+                                }); return false;',
+                        ]);
+                    } else {
+                        return '<span class="btn btn-' . $btnbg . ' btn-sm cursor-auto">'.$active.'</span>';
+                    }
                 },
                 'filter' => [
                     // For dropdown it is necessary to set 'data' array. Array keys are for html <option> tag values, array values are for titles.

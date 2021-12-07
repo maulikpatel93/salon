@@ -4,19 +4,19 @@ namespace App\Http\Controllers\Admin;
 
 use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\PermissionsRequest;
-use App\Models\Modules;
-use App\Models\Permissions;
+use App\Http\Requests\Admin\SettingRequest;
+use App\Models\Settings;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Itstructure\GridView\DataProviders\EloquentDataProvider;
 
-class PermissionsController extends Controller
+class SettingsController extends Controller
 {
     const ACTIVE = 'Active';
     const INACTIVE = 'Inactive';
-    const DELETE = 'Delete';
     const ACTIVE_INT = '1';
     const INACTIVE_INT = '0';
+    const DELETE = 'Delete';
 
     public function __construct()
     {
@@ -28,87 +28,83 @@ class PermissionsController extends Controller
     {
         $sort = $request->sort;
         if ($sort) {
-            $dataProvider = new EloquentDataProvider(Permissions::query());
+            $dataProvider = new EloquentDataProvider(Settings::query());
         } else {
-            $dataProvider = new EloquentDataProvider(Permissions::query()->orderBy('id', 'desc'));
+            $dataProvider = new EloquentDataProvider(Settings::query()->orderBy('id', 'desc'));
         }
-        return view('admin.permissions.index', [
+        return view('admin.settings.index', [
             'dataProvider' => $dataProvider,
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $model = new Permissions();
-        $modules = $this->modulefindModel();
-        return view('admin.permissions.create', ['model' => $model, 'modules' => $modules]);
+        $model = new Settings();
+        $type = ($request->type) ? $request->type : $model->type;
+        $model->type = $type;
+        return view('admin.settings.create', ['model' => $model, 'type' => $type]);
     }
 
-    public function store(PermissionsRequest $request)
+    public function store(SettingRequest $request)
     {
         $inputVal = $request->all();
-
-        if ($request->ajax()) {
-            $title = $inputVal['title'];
-            $name = $inputVal['name'];
-            $controller = $inputVal['controller'];
-            $action = $inputVal['action'];
-            if ($name) {
-                for ($i = 0; $i < count($name); $i++) {
-                    $model = Permissions::where(['name' => $name[$i], 'module_id' => $inputVal['module_id']])->count();
-                    if (empty($model)) {
-                        $model = new Permissions();
-                        $model->module_id = $inputVal['module_id'];
-                        $model->panel = $inputVal['panel'];
-                        $model->title = $title[$i];
-                        $model->name = $name[$i];
-                        $model->controller = $controller[$i];
-                        $model->action = $action[$i];
-                        $model->save();
-                    }
-                }
-            }
+        $inputVal['is_active_at'] = currentDateTime();
+        $file = $request->file('value');
+        if ($file) {
+            $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $filePath = $file->storeAs('settings', $fileName, 'public');
+            $inputVal['value'] = $fileName;
+        }
+        $model = new Settings();
+        if ($request->ajax() && $model->create($inputVal)) {
             $responseData['status'] = 200;
             $responseData['message'] = 'Success';
             $responseData['url'] = false;
             return response()->json($responseData);
         }
-        return redirect()->route('admin.permissions.index');
+        return redirect()->route('admin.settings.index');
     }
 
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $model = $this->findModel(decode($id));
-        $modules = $this->modulefindModel();
-        return view('admin.permissions.update', ['model' => $model, 'modules' => $modules]);
+        $type = $model->type;
+        $type = ($request->type) ? $request->type : $type;
+        return view('admin.settings.update', ['model' => $model, 'type' => $type]);
     }
 
-    public function update(PermissionsRequest $request, $id)
+    public function update(SettingRequest $request, $id)
     {
         // $validated = $request->validated();
         $inputVal = $request->all();
-        $inputVal['controller'] = $inputVal['controller'] ?? '';
-        $inputVal['action'] = $inputVal['action'] ?? '';
         $model = $this->findModel(decode($id));
+        $file = $request->file('value');
+        $inputVal['value'] = $model->value;
+        if ($file) {
+            Storage::delete('/public/settings/' . $model->logo);
+            $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $filePath = $file->storeAs('settings', $fileName, 'public');
+            $inputVal['value'] = $fileName;
+        }
         if ($request->ajax() && $model->update($inputVal)) {
             $responseData['status'] = 200;
             $responseData['message'] = 'Success';
             $responseData['url'] = false;
             return response()->json($responseData);
         }
-        return redirect()->route('admin.permissions.index');
+        return redirect()->route('admin.settings.index');
     }
 
     public function view(Request $request, $id)
     {
         $model = $this->findModel(decode($id));
-        return view('admin.permissions.view', ['model' => $model]);
+        return view('admin.settings.view', ['model' => $model]);
     }
 
     public function delete(Request $request, $id)
     {
-        Permissions::where('id', decode($id))->delete();
-        return redirect()->route('admin.permissions.index');
+        Settings::where('id', decode($id))->delete();
+        return redirect()->route('admin.settings.index');
     }
 
     public function isactive(Request $request, $id)
@@ -157,7 +153,7 @@ class PermissionsController extends Controller
 
                     if (isset($inputall['keylist']) && $inputall['keylist']) {
                         foreach ($inputall['keylist'] as $id) {
-                            Permissions::where('id', $id)->delete();
+                            Settings::where('id', $id)->delete();
                         }
                     }
                 }
@@ -170,22 +166,9 @@ class PermissionsController extends Controller
 
     protected function findModel($id)
     {
-        if (($model = Permissions::find($id)) !== null) {
+        if (($model = Settings::find($id)) !== null) {
             return $model;
         }
-
         throw new UnsecureException('The requested page does not exist.');
-    }
-
-    protected function modulefindModel()
-    {
-        return Modules::where(['is_active' => '1'])->where('functionality', '!=', 'none')->where('title', '!=', '')->orderBy('title', 'ASC')->get()->pluck('title', 'id')->toArray();
-    }
-
-    protected function addPjaxHeaders(Request $request)
-    {
-        $request->headers->set('X-PJAX', true);
-        $request->headers->set('X-PJAX-Container', '#pjax-container');
-        return $request;
     }
 }

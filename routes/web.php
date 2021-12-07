@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\ModulesController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\SalonsController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Auth\AdminController;
 //Web Panel
@@ -139,6 +140,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/applystatus', [RolesController::class, 'applystatus'])->name('applystatus')->middleware('checkpermission');
             Route::get('/access/{id}', [RolesController::class, 'access'])->name('access')->middleware('checkpermission');
             Route::post('/accessupdate/{id}', [RolesController::class, 'accessupdate'])->name('accessupdate');
+        });
+
+        //Settings
+        Route::prefix('settings')->name('settings.')->group(function () {
+            Route::get('/', [SettingsController::class, 'index'])->name('index')->middleware('checkpermission');
+            Route::post('/create', [SettingsController::class, 'create'])->name('create')->middleware('checkpermission');
+            Route::post('/store', [SettingsController::class, 'store'])->name('store')->middleware('checkpermission');
+            Route::post('/edit/{id}', [SettingsController::class, 'edit'])->name('edit')->middleware('checkpermission');
+            Route::post('/update/{id}', [SettingsController::class, 'update'])->name('update')->middleware('checkpermission');
+            Route::post('/view/{id}', [SettingsController::class, 'view'])->name('view')->middleware('checkpermission');
+            Route::get('/delete/{id}', [SettingsController::class, 'delete'])->name('delete')->middleware('checkpermission');
+            Route::post('/isactive/{id}', [SettingsController::class, 'isactive'])->name('isactive')->middleware('checkpermission');
+            Route::post('/applystatus', [SettingsController::class, 'applystatus'])->name('applystatus')->middleware('checkpermission');
         });
 
         //Users

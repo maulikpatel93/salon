@@ -156,8 +156,8 @@ class CreateBasicTable extends Migration
         Schema::create('configuration', function (Blueprint $table) {
             $table->integer('id', 20);
             $table->string('name')->unique();
-            $table->text('value');
-            $table->text('description');
+            $table->text('value')->nullable();
+            $table->text('description')->nullable();
             $table->enum('type', ['Text', 'Textarea', 'File', 'Date', 'Time', 'Datetime', 'Radio', 'Checkbox', 'Select', 'Other'])->default('Text');
             $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();

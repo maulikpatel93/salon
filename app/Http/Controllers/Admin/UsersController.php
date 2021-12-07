@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserAccessRequest;
 use App\Http\Requests\Admin\UserRequest;
@@ -31,8 +32,12 @@ class UsersController extends Controller
 
     public function index(Request $request)
     {
-        // global $user;
-        $dataProvider = new EloquentDataProvider(Users::query()->where('role_id', '!=', 5)->orderBy('id', 'desc'));
+        $sort = $request->sort;
+        if ($sort) {
+            $dataProvider = new EloquentDataProvider(Users::query()->where('role_id', '!=', 5));
+        } else {
+            $dataProvider = new EloquentDataProvider(Users::query()->where('role_id', '!=', 5)->orderBy('id', 'desc'));
+        }
         return view('admin.users.index', [
             'dataProvider' => $dataProvider,
         ]);
@@ -203,7 +208,7 @@ class UsersController extends Controller
         if (($model = Users::find($id)) !== null) {
             return $model;
         }
-        throw new Exception('The requested page does not exist.');
+        throw new UnsecureException('The requested page does not exist.');
     }
 
     public function salons(Request $request)

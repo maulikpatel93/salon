@@ -1,11 +1,12 @@
 @extends('layouts.main')
+{{-- {{ dd(request()->route()) }} --}}
+
 @php
-    $title = 'Permissions';
-    $title_single = 'Permission';
+    $title = 'Settings';
+    $title_single = 'Setting';
     $unique_title = str_replace(' ', '_', strtolower($title_single));; //without space
-    $createbtn = '';
     if (!empty(checkaccess('create', getControllerName()))) {
-        $createbtn = '<a href="'.route('admin.permissions.create').'" class="btn btn-primary showModalButton" title="Add '.$title_single.'" data-bs-toggle="modal" data-bs-target="#gridviewModal">Add</a>';
+        $createbtn = '<a href="'.route('admin.settings.create').'" class="btn btn-primary showModalButton" title="Add '.$title_single.'" data-bs-toggle="modal" data-bs-target="#gridviewModal">Add</a>';
     }
     //Apply dropdwon status, delete
     $applydropdwon = '';
@@ -34,12 +35,12 @@
         $applyafter = $applydropdown . ' ' . $applySubmit;
     }
 
-    $actionTypes = [];
+$actionTypes = [];
 if (!empty(checkaccess('view', getControllerName()))) {
     $actionTypes[] = [
                     'class' => Itstructure\GridView\Actions\View::class, // Required
                     'url' => function ($model) { // Optional
-                        return route('admin.permissions.view', ['id' => encode($model->id)]);
+                        return route('admin.settings.view', ['id' => encode($model->id)]);
                     },
                     'htmlAttributes' => [ // Optional
                         'class' => 'showModalButton text-warning ms-1 me-1',
@@ -51,7 +52,7 @@ if (!empty(checkaccess('update', getControllerName()))) {
     $actionTypes[] = [
                     'class' => Itstructure\GridView\Actions\Edit::class, // Required
                     'url' => function ($model) { // Optional
-                        return route('admin.permissions.edit', ['id' => encode($model->id)]);
+                        return route('admin.settings.edit', ['id' => encode($model->id)]);
                     },
                     'htmlAttributes' => [ // Optional
                         'class' => 'showModalButton text-primary ms-1 me-1',
@@ -63,7 +64,7 @@ if (!empty(checkaccess('delete', getControllerName()))) {
     $actionTypes[] = [
                     'class' => Itstructure\GridView\Actions\Delete::class, // Required
                     'url' => function ($model) { // Optional
-                        return route('admin.permissions.delete', ['id' => encode($model->id)]);
+                        return route('admin.settings.delete', ['id' => encode($model->id)]);
                     },
                     'htmlAttributes' => [ // Optional
                         'title' => 'Delete '.$title_single,
@@ -108,7 +109,7 @@ if (!empty(checkaccess('delete', getControllerName()))) {
         'rowsPerPage' => config('params.rowsPerPage'), // The number of rows in one page. By default 10.
         'title' => 'List', // It can be empty ''
         'strictFilters' => false, // If true, then a searching by filters will be strict, using an equal '=' SQL operator instead of 'like'.
-        'rowsFormAction' => route('admin.permissions.applystatus'), // Route url to send slected checkbox items for deleting rows, for example.
+        'rowsFormAction' => route('admin.settings.applystatus'), // Route url to send slected checkbox items for deleting rows, for example.
         'useSendButtonAnyway' => false, // If true, even if there are no checkbox column, the main send button will be displayed.
         'columnFields' => [
                 [
@@ -116,17 +117,48 @@ if (!empty(checkaccess('delete', getControllerName()))) {
                     'field' => 'delete',
                     'attribute' => 'id'
                 ],
-                [
-                    'label' => 'Title', // Column label.
-                    'attribute' => 'title', // Attribute, by which the row column data will be taken from a model.
-                ],
                 'name',
-                'controller',
-                'action',
-                'panel',
+                'value',
+                'type',
+                [
+                    'label' => 'Active', // Column label.
+                    'value' => function ($model) { // You can set 'value' as a callback function to get a row data value dynamically.
+                        $btnbg = ($model->is_active == 1) ? 'success' : 'danger';
+                        $active = ($model->is_active == 1) ? 'Active' : 'Inactive';
+                        if (!empty(checkaccess('isactive', getControllerName()))) {
+                            return Html::link('javascript:void(0)', $active, [
+                                'class' => 'btn btn-' . $btnbg . ' btn-sm',
+                                'id' => 'is_active_' . $model->id,
+                                'title' => $active,
+                                'onclick' =>
+                                    '$.post({
+                                    url: "' .route('admin.settings.isactive', ['id' => encode($model->id)]) .'",
+                                        success: function (response) {
+                                        $.pjax.reload({container: "#gridtable-pjax"});
+                                        },
+                                    }); return false;',
+                            ]);
+                        } else {
+                            return '<span class="btn btn-' . $btnbg . ' btn-sm cursor-auto">'.$active.'</span>';
+                        }
+                    },
+                    'filter' => [ // For dropdown it is necessary to set 'data' array. Array keys are for html <option> tag values, array values are for titles.
+                        'class' => Itstructure\GridView\Filters\DropdownFilter::class, // REQUIRED. For this case it is necessary to set 'class'.
+                        'name' => 'is_active', // REQUIRED if 'attribute' is not defined for column.
+                        'data' => [ // REQUIRED.
+                            0 => 'Inactive',
+                            1 => 'Active',
+                        ]
+                    ],
+                    'format' => 'html', // To render column content without lossless of html tags, set 'html' formatter.
+                    'sort' => 'is_active' // To sort rows. Have to set if an attribute is not defined for column.
+                ],
                 [
                     'label' => 'Actions', // Optional
-                    'class' => Itstructure\GridView\Columns\ActionColumn::class, // Required
+                    'class' => Itstructure\GridView\Columns\ActionColumn::class, // Required,
+                    'htmlAttributes' => [
+                        'width' => '110px' // Width of table column.
+                    ],
                     'actionTypes' => $actionTypes
                 ],
             ],
@@ -134,7 +166,7 @@ if (!empty(checkaccess('delete', getControllerName()))) {
             'toolbar' =>  [
                 'content' => '<div class="btn-group" role="group">
                                 '.$createbtn.'
-                                <a href="'.route("admin.permissions.index").'" class="btn btn-secondary" title="Refresh Module" data-trigger-pjax="1" ><i class="fas fa-redo"></i></a>
+                                <a href="'.route("admin.settings.index").'" class="btn btn-secondary" title="Refresh Setting" data-trigger-pjax="1" ><i class="fas fa-redo"></i></a>
                             </div>
                             ',
                 'applybtn' => $applyafter,
@@ -147,9 +179,9 @@ if (!empty(checkaccess('delete', getControllerName()))) {
 @section('modal')
 {!! Modal::start([
     'options' => ['id' => 'gridviewModal'],
-    'title' => 'Create Module',
+    'title' => 'Create Setting',
     'header' => true,
-    'size' => 'modal-lg',
+    'size' => 'modal-md',
     'clientOptions' => [
         'backdrop' => true,
         'keyboard' => true
@@ -212,7 +244,6 @@ if (!empty(checkaccess('delete', getControllerName()))) {
                 });
             }
         }
-        
 </script>
 @endsection
 

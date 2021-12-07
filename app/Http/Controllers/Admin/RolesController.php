@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RoleAccessRequest;
 use App\Http\Requests\Admin\RoleRequest;
@@ -29,8 +30,12 @@ class RolesController extends Controller
 
     public function index(Request $request)
     {
-        // global $user;
-        $dataProvider = new EloquentDataProvider(Roles::query()->orderBy('id', 'desc'));
+        $sort = $request->sort;
+        if ($sort) {
+            $dataProvider = new EloquentDataProvider(Roles::query());
+        } else {
+            $dataProvider = new EloquentDataProvider(Roles::query()->orderBy('id', 'desc'));
+        }
         return view('admin.roles.index', [
             'dataProvider' => $dataProvider,
         ]);
@@ -194,6 +199,6 @@ class RolesController extends Controller
         if (($model = Roles::find($id)) !== null) {
             return $model;
         }
-        throw new Exception('The requested page does not exist.');
+        throw new UnsecureException('The requested page does not exist.');
     }
 }
