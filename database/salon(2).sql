@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Dec 03, 2021 at 12:19 PM
+-- Generation Time: Dec 07, 2021 at 12:38 PM
 -- Server version: 10.4.20-MariaDB
 -- PHP Version: 8.0.9
 
@@ -146,14 +146,22 @@ INSERT INTO `categories` (`id`, `salon_id`, `name`, `description`, `is_active`, 
 CREATE TABLE `configuration` (
   `id` int(11) NOT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `value` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `type` enum('Text','Textarea','File','Date','Time','Datetime','Radio','Checkbox','Select','Other') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Text',
   `is_active` enum('0','1') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '1',
   `is_active_at` datetime DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `configuration`
+--
+
+INSERT INTO `configuration` (`id`, `name`, `value`, `description`, `type`, `is_active`, `is_active_at`, `created_at`, `updated_at`) VALUES
+(1, 'SiteName', 'Beauty', NULL, 'Text', '1', '2021-12-07 09:51:16', '2021-12-07 03:48:51', '2021-12-07 04:21:16'),
+(2, 'logo', '1638870773_Screenshot_from_2021-09-14_10-24-25.png', NULL, 'File', '1', '2021-12-07 09:53:41', '2021-12-07 04:22:42', '2021-12-07 04:23:41');
 
 -- --------------------------------------------------------
 
@@ -172,6 +180,13 @@ CREATE TABLE `custom_pages` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `custom_pages`
+--
+
+INSERT INTO `custom_pages` (`id`, `name`, `title`, `description`, `is_active`, `is_active_at`, `created_at`, `updated_at`) VALUES
+(1, 'aboutus', 'About us', 'test test', '1', '2021-12-07 10:22:09', '2021-12-07 04:52:00', '2021-12-07 04:57:21');
+
 -- --------------------------------------------------------
 
 --
@@ -184,12 +199,19 @@ CREATE TABLE `email_templates` (
   `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `html` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` enum('Backend','Web','App','Common') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Common',
+  `panel` enum('Backend','Web','App','Common') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Common',
   `is_active` enum('0','1') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '1',
   `is_active_at` datetime DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `email_templates`
+--
+
+INSERT INTO `email_templates` (`id`, `code`, `title`, `subject`, `html`, `panel`, `is_active`, `is_active_at`, `created_at`, `updated_at`) VALUES
+(1, 'forgot_password', 'Back Management', 'forgot_password', 'dsa sad', 'Common', '1', '2021-12-07 10:53:40', '2021-12-07 05:23:37', '2021-12-07 05:23:43');
 
 -- --------------------------------------------------------
 
@@ -313,11 +335,11 @@ INSERT INTO `modules` (`id`, `panel`, `title`, `controller`, `action`, `icon`, `
 (4, 'Backend', 'Permissions', 'permissions', 'index', 'far fa-circle', 'crud', 'Submenu', 2, NULL, NULL, NULL, '0', '1', '2021-11-17 06:53:25', '2021-11-16 23:52:14', '2021-11-22 00:24:10'),
 (5, 'Backend', 'Roles', 'roles', 'index', 'far fa-circle', 'crud', 'Submenu', 2, NULL, NULL, NULL, '0', '1', '2021-11-17 06:53:35', '2021-11-16 23:52:51', '2021-11-22 00:09:18'),
 (6, 'Backend', 'Templates', '', '', 'fas fa-envelope-open-text', 'other', 'Menu', NULL, NULL, NULL, NULL, '0', '1', NULL, '2021-11-17 02:03:07', '2021-11-17 02:03:07'),
-(7, 'Backend', 'Email Templates', 'email-templates', 'index', 'far fa-circle', 'crud', 'Submenu', 6, NULL, NULL, NULL, '0', '1', '2021-11-18 06:23:57', '2021-11-17 02:03:53', '2021-11-18 00:53:57'),
+(7, 'Backend', 'Email Templates', 'emailtemplates', 'index', 'far fa-circle', 'crud', 'Submenu', 6, NULL, NULL, NULL, '0', '1', '2021-11-18 06:23:57', '2021-11-17 02:03:53', '2021-12-07 05:09:17'),
 (8, 'Backend', 'Settings', 'settings', 'index', 'fas fa-cog', 'crud', 'Menu', NULL, NULL, NULL, NULL, '0', '1', '2021-11-19 05:42:58', '2021-11-18 03:41:22', '2021-11-22 00:09:55'),
 (9, 'Backend', 'Custom Pages', 'custompages', 'index', 'far fa-circle', 'crud', 'Submenu', 6, NULL, NULL, NULL, '0', '1', NULL, '2021-11-18 03:44:49', '2021-11-18 03:44:49'),
 (10, 'Backend', 'Users', 'users', 'index', 'far fa-circle', 'crud', 'Submenu', 2, NULL, NULL, NULL, '0', '1', '2021-11-19 06:45:13', '2021-11-18 22:56:20', '2021-11-24 05:24:43'),
-(11, 'Backend', 'Salons', 'salons', 'index', 'fas fa-spa', 'crud', 'Menu', NULL, NULL, NULL, NULL, '0', '1', '2021-11-23 10:55:16', '2021-11-23 05:25:16', '2021-11-23 05:25:16');
+(11, 'Backend', 'Salons', 'salons', 'index', 'fas fa-spa', 'crud', 'Menu', NULL, NULL, NULL, NULL, '0', '1', '2021-12-07 08:45:19', '2021-11-23 05:25:16', '2021-12-07 03:15:19');
 
 -- --------------------------------------------------------
 
@@ -441,7 +463,7 @@ CREATE TABLE `password_resets` (
 CREATE TABLE `permissions` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `module_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'Type Of Module',
-  `panel` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Backend',
+  `panel` enum('Backend','Frontend','App','Common') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Backend',
   `title` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `controller` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -475,12 +497,12 @@ INSERT INTO `permissions` (`id`, `module_id`, `panel`, `title`, `name`, `control
 (20, 5, 'Backend', 'Is active', 'isactive', 'roles', 'isactive'),
 (21, 5, 'Backend', 'Export', 'export', 'roles', 'export'),
 (22, 5, 'Backend', 'Access', 'access', 'roles', 'index'),
-(23, 7, 'Backend', 'List', 'list', 'email-templates', 'index'),
-(24, 7, 'Backend', 'Create', 'create', 'email-templates', 'create'),
-(25, 7, 'Backend', 'Update', 'update', 'email-templates', 'update'),
-(26, 7, 'Backend', 'View', 'view', 'email-templates', 'view'),
-(27, 7, 'Backend', 'Delete', 'delete', 'email-templates', 'delete'),
-(28, 7, 'Backend', 'Is active', 'isactive', 'email-templates', 'isactive'),
+(23, 7, 'Backend', 'List', 'list', 'emailtemplates', 'index'),
+(24, 7, 'Backend', 'Create', 'create', 'emailtemplates', 'create'),
+(25, 7, 'Backend', 'Update', 'update', 'emailtemplates', 'update'),
+(26, 7, 'Backend', 'View', 'view', 'emailtemplates', 'view'),
+(27, 7, 'Backend', 'Delete', 'delete', 'emailtemplates', 'delete'),
+(28, 7, 'Backend', 'Is active', 'isactive', 'emailtemplates', 'isactive'),
 (29, 8, 'Backend', 'List', 'list', 'settings', 'index'),
 (30, 8, 'Backend', 'Create', 'create', 'settings', 'create'),
 (31, 8, 'Backend', 'Update', 'update', 'settings', 'update'),
@@ -688,8 +710,8 @@ INSERT INTO `roles_access` (`id`, `role_id`, `permission_id`, `access`, `created
 (47, 1, 47, '1', '2021-11-18 23:19:03', '2021-11-18 23:19:03'),
 (48, 1, 48, '1', '2021-11-18 23:19:03', '2021-11-18 23:19:03'),
 (49, 1, 49, '0', '2021-11-18 23:19:03', '2021-11-22 01:57:50'),
-(50, 2, 1, '0', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(51, 2, 2, '0', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
+(50, 2, 1, '0', '2021-11-18 23:55:00', '2021-12-07 00:31:35'),
+(51, 2, 2, '0', '2021-11-18 23:55:00', '2021-12-07 00:49:52'),
 (52, 2, 3, '0', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
 (53, 2, 4, '0', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
 (54, 2, 5, '0', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
@@ -702,39 +724,39 @@ INSERT INTO `roles_access` (`id`, `role_id`, `permission_id`, `access`, `created
 (61, 2, 12, '0', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
 (62, 2, 13, '0', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
 (63, 2, 14, '0', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(64, 2, 15, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(65, 2, 16, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(66, 2, 17, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(67, 2, 18, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(68, 2, 19, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(69, 2, 20, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(70, 2, 21, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(71, 2, 22, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(72, 2, 23, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(73, 2, 24, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(74, 2, 25, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(75, 2, 26, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(76, 2, 27, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(77, 2, 28, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(78, 2, 29, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(79, 2, 30, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(80, 2, 31, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(81, 2, 32, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(82, 2, 33, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(83, 2, 34, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(84, 2, 35, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
+(64, 2, 15, '0', '2021-11-18 23:55:00', '2021-12-07 00:32:46'),
+(65, 2, 16, '0', '2021-11-18 23:55:00', '2021-12-07 00:33:50'),
+(66, 2, 17, '0', '2021-11-18 23:55:00', '2021-12-07 00:32:46'),
+(67, 2, 18, '0', '2021-11-18 23:55:00', '2021-12-07 00:32:46'),
+(68, 2, 19, '0', '2021-11-18 23:55:00', '2021-12-07 00:32:46'),
+(69, 2, 20, '0', '2021-11-18 23:55:00', '2021-12-07 00:32:46'),
+(70, 2, 21, '0', '2021-11-18 23:55:00', '2021-12-07 00:32:46'),
+(71, 2, 22, '0', '2021-11-18 23:55:00', '2021-12-07 00:32:46'),
+(72, 2, 23, '0', '2021-11-18 23:55:00', '2021-12-07 05:31:02'),
+(73, 2, 24, '0', '2021-11-18 23:55:00', '2021-12-07 05:31:02'),
+(74, 2, 25, '0', '2021-11-18 23:55:00', '2021-12-07 05:31:02'),
+(75, 2, 26, '0', '2021-11-18 23:55:00', '2021-12-07 05:31:02'),
+(76, 2, 27, '0', '2021-11-18 23:55:00', '2021-12-07 05:31:02'),
+(77, 2, 28, '0', '2021-11-18 23:55:00', '2021-12-07 05:31:02'),
+(78, 2, 29, '0', '2021-11-18 23:55:00', '2021-12-07 05:31:02'),
+(79, 2, 30, '0', '2021-11-18 23:55:00', '2021-12-07 05:31:02'),
+(80, 2, 31, '0', '2021-11-18 23:55:00', '2021-12-07 05:31:02'),
+(81, 2, 32, '0', '2021-11-18 23:55:00', '2021-12-07 05:31:02'),
+(82, 2, 33, '0', '2021-11-18 23:55:00', '2021-12-07 05:31:02'),
+(83, 2, 34, '0', '2021-11-18 23:55:00', '2021-12-07 05:31:02'),
+(84, 2, 35, '0', '2021-11-18 23:55:00', '2021-12-07 05:31:02'),
 (85, 2, 36, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(86, 2, 37, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
+(86, 2, 37, '0', '2021-11-18 23:55:00', '2021-12-07 05:31:02'),
 (87, 2, 38, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
 (88, 2, 39, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(89, 2, 40, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(90, 2, 41, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
+(89, 2, 40, '0', '2021-11-18 23:55:00', '2021-12-07 05:31:02'),
+(90, 2, 41, '0', '2021-11-18 23:55:00', '2021-12-07 05:31:02'),
 (91, 2, 42, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(92, 2, 43, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(93, 2, 44, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
+(92, 2, 43, '1', '2021-11-18 23:55:00', '2021-12-07 01:36:57'),
+(93, 2, 44, '1', '2021-11-18 23:55:00', '2021-12-07 01:47:02'),
 (94, 2, 45, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(95, 2, 46, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
-(96, 2, 47, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
+(95, 2, 46, '1', '2021-11-18 23:55:00', '2021-12-07 01:47:26'),
+(96, 2, 47, '1', '2021-11-18 23:55:00', '2021-12-07 01:46:41'),
 (97, 2, 48, '1', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
 (98, 2, 49, '0', '2021-11-18 23:55:00', '2021-11-18 23:55:00'),
 (99, 1, 50, '1', '2021-11-23 05:26:14', '2021-11-23 05:26:14'),
@@ -743,7 +765,14 @@ INSERT INTO `roles_access` (`id`, `role_id`, `permission_id`, `access`, `created
 (102, 1, 53, '1', '2021-11-23 05:26:14', '2021-11-23 05:26:14'),
 (103, 1, 54, '1', '2021-11-23 05:26:14', '2021-11-23 05:26:14'),
 (104, 1, 55, '1', '2021-11-23 05:26:14', '2021-11-23 05:26:14'),
-(105, 1, 56, '1', '2021-11-23 05:26:14', '2021-11-23 05:26:14');
+(105, 1, 56, '1', '2021-11-23 05:26:14', '2021-11-23 05:26:14'),
+(106, 2, 50, '1', '2021-12-07 00:31:07', '2021-12-07 00:32:46'),
+(107, 2, 51, '1', '2021-12-07 00:31:07', '2021-12-07 00:32:46'),
+(108, 2, 52, '1', '2021-12-07 00:31:07', '2021-12-07 00:32:46'),
+(109, 2, 53, '1', '2021-12-07 00:31:07', '2021-12-07 00:32:46'),
+(110, 2, 54, '1', '2021-12-07 00:31:07', '2021-12-07 00:32:46'),
+(111, 2, 55, '1', '2021-12-07 00:31:07', '2021-12-07 00:32:46'),
+(112, 2, 56, '0', '2021-12-07 00:31:07', '2021-12-07 00:31:07');
 
 -- --------------------------------------------------------
 
@@ -799,7 +828,7 @@ CREATE TABLE `salons` (
 INSERT INTO `salons` (`id`, `business_name`, `owner_name`, `business_email`, `business_email_verified`, `business_email_verified_at`, `business_phone_number`, `business_phone_number_verified`, `business_phone_number_verified_at`, `business_telephone_number`, `business_address`, `salon_type`, `logo`, `timezone`, `is_active`, `is_active_at`, `created_at`, `updated_at`) VALUES
 (1, 'Test', 'test1', 'test@gmail.com', '1', '2021-11-24 04:20:39', '454-545-4452', '0', NULL, NULL, 'test', 'Unisex', '1637747227_Screenshot_from_2021-09-14_10-24-25.png', 'US/Pacific', '1', '2021-11-24 09:50:39', '2021-11-24 01:46:27', '2021-11-24 04:20:39'),
 (2, 'Test2', 'test12', 'test1@gmail.com', '1', '2021-11-24 04:21:23', '121-254-5454', '0', NULL, NULL, 'test', 'Unisex', '1637747472_Screenshot_from_2021-09-25_17-04-14.png', 'US/Pacific', '1', '2021-11-24 09:51:23', '2021-11-24 04:21:12', '2021-11-24 04:21:23'),
-(3, 'salons business', 'Maulik Patel', 'maulik245@gmail.com', '1', '2021-11-24 07:06:19', '999-999-9999', '0', NULL, NULL, 'montreal, canada', 'Unisex', NULL, 'US/Pacific', '1', '2021-11-29 10:17:08', '2021-11-24 07:06:19', '2021-11-29 04:47:08');
+(3, 'salons business', 'Maulik Patel', 'maulik245@gmail.com', '1', '2021-11-24 07:06:19', '999-999-9999', '0', NULL, NULL, 'montreal, canada', 'Unisex', NULL, 'US/Pacific', '1', '2021-12-07 08:54:38', '2021-11-24 07:06:19', '2021-12-07 03:24:38');
 
 -- --------------------------------------------------------
 
@@ -865,50 +894,6 @@ INSERT INTO `services_price` (`id`, `service_id`, `name`, `price`, `add_on_price
 (4, 5, 'General', '0.00', '0.00', '1', '2021-11-26 18:47:49', '2021-11-26 13:17:49', '2021-11-26 13:17:49'),
 (5, 5, 'Junior', '0.00', '0.00', '1', '2021-11-26 18:47:49', '2021-11-26 13:17:49', '2021-11-26 13:17:49'),
 (6, 5, 'Senior', '0.00', '0.00', '1', '2021-11-26 18:47:49', '2021-11-26 13:17:49', '2021-11-26 13:17:49');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `staff`
---
-
-CREATE TABLE `staff` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `salon_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'Type Of Salon',
-  `price_tier_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'Type Of Price tier',
-  `first_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `last_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email_verified` enum('1','0') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
-  `email_verified_at` timestamp NULL DEFAULT NULL,
-  `phone_number` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `phone_number_verified` enum('1','0') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
-  `phone_number_verified_at` timestamp NULL DEFAULT NULL,
-  `telephone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `photo` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `address` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `street` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `suburb` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `state` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `postcode` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `calendar_booking` enum('0','1') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '1',
-  `is_active` enum('0','1') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '1',
-  `is_active_at` datetime DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `staff`
---
-
-INSERT INTO `staff` (`id`, `salon_id`, `price_tier_id`, `first_name`, `last_name`, `email`, `email_verified`, `email_verified_at`, `phone_number`, `phone_number_verified`, `phone_number_verified_at`, `telephone`, `photo`, `address`, `street`, `suburb`, `state`, `postcode`, `calendar_booking`, `is_active`, `is_active_at`, `created_at`, `updated_at`) VALUES
-(4, 1, 1, 'maulik', 'patel1', 'maulikpatel221401@gmail.com', '0', NULL, '456-258-5694', '0', NULL, NULL, '1638009962_Screenshot_from_2021-09-14_10-24-25.png', '1629 Cherry Camp Road\nChicago, IL 60626', '1629', 'Cherry Camp Road', 'Chicago', 'IL 60626', '1', '1', '2021-11-27 16:16:02', '2021-11-27 10:46:02', '2021-11-27 11:41:51'),
-(5, 1, 1, 'maulik', 'patel1', 'maulikpatel2@gmail.com', '0', NULL, '456-258-5694', '0', NULL, NULL, '1638010081_Screenshot_from_2021-09-14_10-24-25.png', '1629 Cherry Camp Road\nChicago, IL 60626', '1629', 'Cherry Camp Road', 'Chicago', 'IL 60626', '1', '1', '2021-11-27 16:18:01', '2021-11-27 10:48:01', '2021-11-29 07:32:59'),
-(6, 2, 1, 'maulik', 'patel', 'maulikpatel22@gmail.com', '0', NULL, '456-258-5694', '0', NULL, NULL, '1638013192_Screenshot_from_2021-09-14_10-24-25.png', '1629 Cherry Camp Road\nChicago, IL 60626', '1629', 'Cherry Camp Road', 'Chicago', 'IL 60626', '1', '1', '2021-11-27 17:09:52', '2021-11-27 11:39:52', '2021-11-27 11:39:52'),
-(7, 2, 1, 'maulik', 'patel', 'maulikpatel212@gmail.com', '0', NULL, '456-258-5694', '0', NULL, NULL, '1638013222_Screenshot_from_2021-09-14_10-24-25.png', '1629 Cherry Camp Road\nChicago, IL 60626', '1629', 'Cherry Camp Road', 'Chicago', 'IL 60626', '1', '1', '2021-11-27 17:10:22', '2021-11-27 11:40:22', '2021-11-27 11:40:22'),
-(8, 2, 1, 'maulik', 'patel', 'maulikpatel12212@gmail.com', '0', NULL, '456-258-5694', '0', NULL, NULL, '1638013247_Screenshot_from_2021-09-14_10-24-25.png', '1629 Cherry Camp Road\nChicago, IL 60626', '1629', 'Cherry Camp Road', 'Chicago', 'IL 60626', '1', '1', '2021-11-27 17:10:47', '2021-11-27 11:40:47', '2021-11-27 11:40:47'),
-(9, 2, 1, 'maulik', 'patel', 'maulikpatel122w12@gmail.com', '0', NULL, '456-258-5694', '0', NULL, NULL, '1638019535_Screenshot_from_2021-09-14_10-24-25.png', '1629 Cherry Camp Road\nChicago, IL 60626', '1629', 'Cherry Camp Road', 'Chicago', 'IL 60626', '1', '1', '2021-11-27 18:55:35', '2021-11-27 13:25:35', '2021-11-27 13:25:35');
 
 -- --------------------------------------------------------
 
@@ -1086,32 +1071,17 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `panel`, `role_id`, `salon_id`, `price_tier_id`, `first_name`, `last_name`, `username`, `email`, `email_otp`, `email_verified`, `email_verified_at`, `password`, `auth_key`, `phone_number`, `phone_number_otp`, `phone_number_verified`, `phone_number_verified_at`, `profile_photo`, `remember_token`, `is_active`, `is_active_at`, `created_at`, `updated_at`, `gender`, `date_of_birth`, `address`, `street`, `suburb`, `state`, `postcode`, `description`, `send_sms_notification`, `send_email_notification`, `recieve_marketing_email`, `calendar_booking`) VALUES
-(1, 'Backend', 1, NULL, NULL, 'Lyla', 'Murazik', 'kyundt1', 'programmer93.dynamicdreamz@gmail.com', NULL, '1', '1984-02-29 21:41:52', '$2y$10$TO7IKbjAPp3gVDgqXdKZFudyZU1OPLt66i4dhLQs6E3whd6/P631W', '93b2b4aff84e168afc31e5f5e0dc8a7d23c801f1d6212f9a7986d5fff4c01f60', '153-189-6311', NULL, '1', '1996-05-03 08:30:23', '', 'cLroWrGq1meDQKJsOxw8bbXXUbn0rIQPpviHy95xRyBotFlPtoSmLe5kjXQF', '1', '2021-11-22 06:33:12', '1981-08-23 23:48:57', '2021-12-01 10:22:44', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(2, 'Backend', 3, NULL, NULL, 'Lyla', 'Murazik1', 'kyundt2', 'programmer.dynamicdreamz@gmail.com', NULL, '1', '1984-02-29 21:41:52', '$2y$10$7pWq7Y9s4nXoW1yTypEO8OwTjJSMlb1Qam/CQ6FMN9zzGQprEAdGm', NULL, '153-189-6311', NULL, '1', '1996-05-03 08:30:23', '', NULL, '1', '1994-09-25 23:03:02', '1981-08-23 23:48:57', '2021-11-29 06:44:25', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(3, 'Backend', 2, NULL, NULL, 'Lyla', 'Murazik2', 'kyundt3', 'programmer_.dynamicdreamz@gmail.com', NULL, '1', '1984-02-29 21:41:52', '$2y$10$7pWq7Y9s4nXoW1yTypEO8OwTjJSMlb1Qam/CQ6FMN9zzGQprEAdGm', NULL, '1-531-896-3112', NULL, '1', '1996-05-03 08:30:23', '', NULL, '1', '1994-09-25 23:03:02', '1981-08-23 23:48:57', '2007-11-15 19:36:23', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Backend', 1, NULL, NULL, 'MasterAdmin', 'Murazik', 'kyundt1', 'programmer93.dynamicdreamz@gmail.com', NULL, '1', '1984-02-29 21:41:52', '$2y$10$TO7IKbjAPp3gVDgqXdKZFudyZU1OPLt66i4dhLQs6E3whd6/P631W', '93b2b4aff84e168afc31e5f5e0dc8a7d23c801f1d6212f9a7986d5fff4c01f60', '153-189-6311', NULL, '1', '1996-05-03 08:30:23', '', 'KVHeEWMld6KRuSreQjLWi9W9mtHVxKspXvRhGwRs4G5QmJV5rJ9VCPIfTiCK', '1', '2021-11-22 06:33:12', '1981-08-23 23:48:57', '2021-12-01 10:22:44', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(2, 'Backend', 3, NULL, NULL, 'SubAdmin', 'Murazik1', 'kyundt2', 'programmer.dynamicdreamz@gmail.com', NULL, '1', '1984-02-29 21:41:52', '$2y$10$TO7IKbjAPp3gVDgqXdKZFudyZU1OPLt66i4dhLQs6E3whd6/P631W', NULL, '153-189-6311', NULL, '1', '1996-05-03 08:30:23', '', NULL, '1', '1994-09-25 23:03:02', '1981-08-23 23:48:57', '2021-11-29 06:44:25', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(3, 'Backend', 2, NULL, NULL, 'Admin', 'Murazik2', 'kyundt3', 'programmer_.dynamicdreamz@gmail.com', NULL, '1', '1984-02-29 21:41:52', '$2y$10$TO7IKbjAPp3gVDgqXdKZFudyZU1OPLt66i4dhLQs6E3whd6/P631W', NULL, '1-531-896-3112', NULL, '1', '1996-05-03 08:30:23', '', NULL, '1', '1994-09-25 23:03:02', '1981-08-23 23:48:57', '2007-11-15 19:36:23', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (4, 'Frontend', 4, 1, NULL, 'Maulik', 'Patel', 'test', 'maulik@gmail.com', NULL, '1', '2021-11-24 06:07:01', '$2y$10$b71X26hghS/gIMIT.IuOOuUq/BFrtTEyIrc2Pxeh7GEV/dOYkcu3G', 'f3d8f51ae70f08633a25e25604d4c3c5c7a22fec50f073a02d1bbcc3ade79e24', '232-131-2312', NULL, '0', NULL, NULL, NULL, '1', '2021-11-24 11:37:01', '2021-11-24 06:07:01', '2021-11-24 06:07:01', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(5, 'Frontend', 4, 1, 1, 'maulik', 'patel1', 'maulik', 'maulikpatel2@gmail.com', NULL, '1', '2021-11-24 06:09:38', '$2y$10$slkzPbCFiuTza1lMEfg8v.6rYwVNXSBNdlozC/Vy9jig3KTRDl4z6', '2939fa84d2f32a51284c7242f46a91f2d92341bab8a94832c5e99f69ce36deda', '456-258-5694', NULL, '0', NULL, NULL, NULL, '1', '2021-11-24 11:39:38', '2021-11-24 06:09:38', '2021-12-03 11:17:43', NULL, NULL, '1629 Cherry Camp Road\nChicago, IL 60626', '1629', 'Cherry Camp Road', 'Chicago', 'IL 60626', NULL, NULL, NULL, NULL, '1'),
+(5, 'Frontend', 4, 1, NULL, 'maulik', 'patel1', 'maulik', 'maulikpatel2@gmail.com', NULL, '1', '2021-11-24 06:09:38', '$2y$10$slkzPbCFiuTza1lMEfg8v.6rYwVNXSBNdlozC/Vy9jig3KTRDl4z6', '2939fa84d2f32a51284c7242f46a91f2d92341bab8a94832c5e99f69ce36deda', '456-258-5694', NULL, '0', NULL, '1638530836_Screenshot_from_2021-09-14_10-24-25.png', NULL, '1', '2021-11-24 11:39:38', '2021-11-24 06:09:38', '2021-12-03 11:27:16', NULL, NULL, '1629 Cherry Camp Road\nChicago, IL 60626', '1629', 'Cherry Camp Road', 'Chicago', 'IL 60626', NULL, NULL, NULL, NULL, '1'),
 (8, 'Frontend', 4, 1, NULL, 'maulik', 'patel', 'maulik240', 'maulikpatel240@gmail.com', NULL, '1', '2021-11-24 07:17:46', '$2y$10$6kGylmqx/gnGP15SHD2FBumBtP61Ot7h9/RKJptud9WOIjd6vRzxe', '16814e53d4ed993c6664d1f42a68b4a211e71b48892a008aadaa5c0a7f4693ad', '456-258-5694', NULL, '0', NULL, NULL, NULL, '1', '2021-11-24 12:47:46', '2021-11-24 07:17:46', '2021-11-24 07:17:46', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (9, 'Frontend', 4, 1, NULL, 'maulik', 'patel', 'maulik2401', 'maulikpatel2401@gmail.com', NULL, '1', '2021-11-24 08:00:12', '$2y$10$xeSBIM0cWGsW4P3QhtpLsuIPpY1/2QTEEfxw6eoa3pAYVdmW./aS6', '900f2ce21b019ad7c89c245d424420e081c8bedba1da43e49d4877c6ebae6ff1', '456-258-5694', NULL, '0', NULL, NULL, NULL, '1', '2021-11-24 13:30:12', '2021-11-24 08:00:12', '2021-11-24 08:00:12', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (10, 'Frontend', 4, 1, NULL, 'maulik', 'patel', 'maulik24012', 'maulikpatel24230@gmail.com', NULL, '1', '2021-11-24 08:00:32', '$2y$10$.i1RCQcjcbzt0V9tk1IWyOV/al2XZ7wO592tZ.FrCxZkQ1kYElraG', '6cd50ccd7a0f08152aa4089ac3da843c4cc01120fa94ab5c76d6891dfded6801', '456-258-5694', NULL, '0', NULL, NULL, NULL, '1', '2021-11-25 13:19:23', '2021-11-24 08:00:32', '2021-11-25 07:49:23', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (25, 'Backend', 5, 1, NULL, 'maulik', 'patel', 'maulikpatel2401', 'maulikpatel2401@gmail.com', NULL, '0', NULL, '$2y$10$ur0K8dpjBljYJDES4.oTg.8o2SL84NWCh8Mct9aeQddxWfuJrq4Ui', NULL, '456-258-5694', NULL, '0', NULL, NULL, NULL, '1', '2021-11-29 12:19:33', '2021-11-29 06:49:33', '2021-11-29 06:49:33', 'Male', '2021-11-05', '1629 Cherry Camp Road\nChicago, IL 60626', '1629', 'Cherry Camp Road', 'Chicago', 'IL 60626', 'test', '0', '0', '0', NULL),
 (26, 'Backend', 5, 1, NULL, 'maulik', 'patel', 'maulikpatel242', 'maulikpatel242@gmail.com', NULL, '0', NULL, '$2y$10$dZhMp88aIO8.F.bMreIfpuy0gRrgOT/EFq7ElP5Tz8rAcu43u5AY.', NULL, '456-258-5694', NULL, '0', NULL, NULL, NULL, '1', '2021-11-29 12:24:38', '2021-11-29 06:54:38', '2021-11-29 06:54:38', 'Male', '2021-11-05', '1629 Cherry Camp Road\nChicago, IL 60626', '1629', 'Cherry Camp Road', 'Chicago', 'IL 60626', 'test', '0', '0', '0', NULL),
-(31, 'Backend', 4, 1, NULL, 'maulik', 'patel', 'maulikpatel21401', 'maulikpatel21401@gmail.com', NULL, '0', NULL, '$2y$10$XIhZ.rUjL4o4eojyQ8NOV.HgTsFrgyW9yctBFqmenAB6zDu0uzIKu', 'cada04c8680cbf64a5103d7e4441d1c9ea0c2415344ae2e2578bfca9b0963be5', '456-258-5694', NULL, '0', NULL, NULL, NULL, '1', NULL, '2021-11-30 11:56:52', '2021-11-30 11:56:52', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `users_access`
---
-
-CREATE TABLE `users_access` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'Type Of Role',
-  `permission_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'Type Of Permission',
-  `access` enum('0','1') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '1',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+(31, 'Backend', 4, 1, NULL, 'maulik', 'patel', 'maulikpatel21401', 'maulikpatel21401@gmail.com', NULL, '0', NULL, '$2y$10$XIhZ.rUjL4o4eojyQ8NOV.HgTsFrgyW9yctBFqmenAB6zDu0uzIKu', 'cada04c8680cbf64a5103d7e4441d1c9ea0c2415344ae2e2578bfca9b0963be5', '456-258-5694', NULL, '0', NULL, NULL, NULL, '1', '2021-12-07 06:26:57', '2021-11-30 11:56:52', '2021-12-07 00:56:57', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1368,14 +1338,6 @@ ALTER TABLE `services_price`
   ADD KEY `services_price_service_id_foreign` (`service_id`);
 
 --
--- Indexes for table `staff`
---
-ALTER TABLE `staff`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `staff_salon_id_foreign` (`salon_id`),
-  ADD KEY `staff_price_tier_id_foreign` (`price_tier_id`);
-
---
 -- Indexes for table `staff_services`
 --
 ALTER TABLE `staff_services`
@@ -1413,14 +1375,6 @@ ALTER TABLE `users`
   ADD KEY `users_role_id_foreign` (`role_id`),
   ADD KEY `users_salon_id_foreign` (`salon_id`),
   ADD KEY `users_price_tier_id_foreign` (`price_tier_id`);
-
---
--- Indexes for table `users_access`
---
-ALTER TABLE `users_access`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `users_access_user_id_foreign` (`user_id`),
-  ADD KEY `users_access_permission_id_foreign` (`permission_id`);
 
 --
 -- Indexes for table `voucher`
@@ -1470,19 +1424,19 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `configuration`
 --
 ALTER TABLE `configuration`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `custom_pages`
 --
 ALTER TABLE `custom_pages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `email_templates`
 --
 ALTER TABLE `email_templates`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `email_templates_field`
@@ -1554,7 +1508,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `roles_access`
 --
 ALTER TABLE `roles_access`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=113;
 
 --
 -- AUTO_INCREMENT for table `roster`
@@ -1579,12 +1533,6 @@ ALTER TABLE `services`
 --
 ALTER TABLE `services_price`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT for table `staff`
---
-ALTER TABLE `staff`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `staff_services`
@@ -1615,12 +1563,6 @@ ALTER TABLE `tax`
 --
 ALTER TABLE `users`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
-
---
--- AUTO_INCREMENT for table `users_access`
---
-ALTER TABLE `users_access`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `voucher`
@@ -1722,13 +1664,6 @@ ALTER TABLE `services_price`
   ADD CONSTRAINT `services_price_service_id_foreign` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `staff`
---
-ALTER TABLE `staff`
-  ADD CONSTRAINT `staff_price_tier_id_foreign` FOREIGN KEY (`price_tier_id`) REFERENCES `price_tier` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `staff_salon_id_foreign` FOREIGN KEY (`salon_id`) REFERENCES `salons` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
 -- Constraints for table `staff_services`
 --
 ALTER TABLE `staff_services`
@@ -1755,13 +1690,6 @@ ALTER TABLE `users`
   ADD CONSTRAINT `users_price_tier_id_foreign` FOREIGN KEY (`price_tier_id`) REFERENCES `price_tier` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `users_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `users_salon_id_foreign` FOREIGN KEY (`salon_id`) REFERENCES `salons` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `users_access`
---
-ALTER TABLE `users_access`
-  ADD CONSTRAINT `users_access_permission_id_foreign` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `users_access_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `voucher`
