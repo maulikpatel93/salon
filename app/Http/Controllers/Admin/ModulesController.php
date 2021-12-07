@@ -24,7 +24,6 @@ class ModulesController extends Controller
 
     public function index(Request $request)
     {
-        // global $user;
         $dataProvider = new EloquentDataProvider(Modules::query()->orderBy('id', 'desc'));
         return view('admin.modules.index', [
             'dataProvider' => $dataProvider,

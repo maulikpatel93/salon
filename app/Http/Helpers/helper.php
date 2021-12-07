@@ -209,19 +209,34 @@ if (!function_exists('currentTime')) {
 if (!function_exists('checkaccess')) {
     function checkaccess($action = "", $controller = "")
     {
-        global $user;
-        $adminuser = $user;
+        if ($action == 'store') {
+            $action = 'create';
+        } elseif ($action == 'edit') {
+            $action = 'update';
+        } elseif ($action == 'accessupdate') {
+            $action = 'access';
+        }
+
+        $adminuser = auth()->user();
         if ($action && $controller) {
             $modulesdata = Modules::where(['is_active' => '1', 'controller' => $controller, 'action' => $action])->first();
             if (empty($modulesdata)) {
                 $modulesdata = Modules::where(['is_active' => '1', 'controller' => $controller])->first();
             }
             if ($modulesdata) {
-                $permission = Permissions::where(['module_id' => $modulesdata->id, 'controller' => $controller])->where('action', $action)->orWhere('name', $action)->first();
-                if ($permission) {
-                    $module_access = RoleAccess::where(['role_id' => $adminuser->role_id, 'permission_id' => $permission->id, 'access' => '1'])->first();
+                $permissionAction = Permissions::where(['module_id' => $modulesdata->id, 'controller' => $controller])->where('action', $action)->first();
+                if ($permissionAction) {
+                    $module_access = RoleAccess::where(['role_id' => $adminuser->role_id, 'permission_id' => $permissionAction->id, 'access' => '1'])->first();
                     if ($module_access) {
                         return true;
+                    }
+                } else {
+                    $permissionName = Permissions::where(['module_id' => $modulesdata->id, 'controller' => $controller])->where('name', $action)->first();
+                    if ($permissionName) {
+                        $module_access = RoleAccess::where(['role_id' => $adminuser->role_id, 'permission_id' => $permissionName->id, 'access' => '1'])->first();
+                        if ($module_access) {
+                            return true;
+                        }
                     }
                 }
             }

@@ -9,11 +9,13 @@ $(document).ready(function() {
         }
     });
 
-    $(".select2").select2({
-        dropdownParent: $("#gridviewModal"),
-        width: "100%",
-        allowClear: true,
-    });
+    if($(".select2").length > 0){
+        $(".select2").select2({
+            dropdownParent: $("#gridviewModal"),
+            width: "100%",
+            allowClear: true,
+        });
+    }
     // $.fn.modal.Constructor.prototype.enforceFocus = function() {};
 });
 

@@ -52,13 +52,28 @@ class AdminController extends Controller
         $inputVal = $request->all();
 
         $credentials = [
-            'email' => $inputVal['email'],
-            'password' => $inputVal['password'],
-            'role_id' => 1,
+            'email' => $request->email,
+            'password' => $request->password,
+            'is_active' => '1',
+            'email_verified' => '1',
+            'salon_id' => null,
         ];
+        $credentials_1 = array_merge(['role_id' => 1], $credentials); // Masteradmin role
+        $credentials_2 = array_merge(['role_id' => 2], $credentials); // Admin role
+        $credentials_3 = array_merge(['role_id' => 3], $credentials); // SubAdmin role
         $remember_me = (isset($inputVal['remember']) && $inputVal['remember'] == 'on') ? true : false;
         $responseData = [];
-        if (Auth::guard('admin')->attempt($credentials, $remember_me)) {
+        if (Auth::guard('admin')->attempt($credentials_1)) {
+            $responseData['status'] = 200;
+            $responseData['message'] = 'Success';
+            $responseData['url'] = route('admin.dashboard');
+            return response()->json($responseData);
+        } else if (Auth::guard('admin')->attempt($credentials_2)) {
+            $responseData['status'] = 200;
+            $responseData['message'] = 'Success';
+            $responseData['url'] = route('admin.dashboard');
+            return response()->json($responseData);
+        } else if (Auth::guard('admin')->attempt($credentials_3)) {
             $responseData['status'] = 200;
             $responseData['message'] = 'Success';
             $responseData['url'] = route('admin.dashboard');

@@ -5,16 +5,74 @@
     $title = 'Salons';
     $title_single = 'Salon';
     $unique_title = str_replace(' ', '_', strtolower($title_single));; //without space
-    $createbtn = '<a href="'.route('admin.salons.create').'" class="btn btn-primary showModalButton" title="Add '.$title_single.'" data-bs-toggle="modal" data-bs-target="#gridviewModal">Add</a>';
-    $applydropdown = '<select class="form-select w-auto me-3" name="applyoption" id="applyoption">
-        <option value="">--Select--</option>
-        <option value="Active">Active</option>
-        <option value="Inactive">Inactive</option>
-        <option value="Delete">Delete</option>
-        </select>';
+    if (!empty(checkaccess('create', getControllerName()))) {
+        $createbtn = '<a href="'.route('admin.salons.create').'" class="btn btn-primary showModalButton" title="Add '.$title_single.'" data-bs-toggle="modal" data-bs-target="#gridviewModal">Add</a>';
+    }
+    //Apply dropdwon status, delete
+    $applydropdwon = '';
+    if (!empty(checkaccess('isactive', getControllerName())) && !empty(checkaccess('delete', getControllerName()))) {
+        $applydropdown = '<select class="form-select w-auto me-3" name="applyoption" id="applyoption">
+            <option value="">--Select--</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+            <option value="Delete">Delete</option>
+            </select>';
+    } elseif (!empty(checkaccess('isactive', getControllerName())) && empty(checkaccess('delete', getControllerName()))) {
+        $applydropdown = '<select class="form-select w-auto me-3" name="applyoption" id="applyoption">
+            <option value="">--Select--</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+            </select>';
+    } elseif (empty(checkaccess('isactive', getControllerName())) && !empty(checkaccess('delete', getControllerName()))) {
+        $applydropdown = '<select class="form-select w-auto me-3" name="applyoption" id="applyoption">
+            <option value="">--Select--</option>
+            <option value="Delete">Delete</option>
+            </select>';
+    }
+    $applyafter = '';
+    if (!empty(checkaccess('isactive', getControllerName())) || !empty(checkaccess('delete', getControllerName()))) {
+        $applySubmit = Form::button('Apply', ['class' => 'btn btn-primary', 'id' => 'applysubmit', 'onclick' => 'applyjs(this);']);
+        $applyafter = $applydropdown . ' ' . $applySubmit;
+    }
 
-    $applySubmit = Form::button('Apply', ['class' => 'btn btn-primary', 'id' => 'applysubmit', 'onclick' => 'applyjs(this);']);
-    $applyafter = $applydropdown.' '.$applySubmit;
+$actionTypes = [];
+if (!empty(checkaccess('view', getControllerName()))) {
+    $actionTypes[] = [
+                    'class' => Itstructure\GridView\Actions\View::class, // Required
+                    'url' => function ($model) { // Optional
+                        return route('admin.salons.view', ['id' => encode($model->id)]);
+                    },
+                    'htmlAttributes' => [ // Optional
+                        'class' => 'showModalButton text-warning ms-1 me-1',
+                        'title' => 'View '.$title_single,
+                    ]
+                ];
+}
+if (!empty(checkaccess('update', getControllerName()))) {
+    $actionTypes[] = [
+                    'class' => Itstructure\GridView\Actions\Edit::class, // Required
+                    'url' => function ($model) { // Optional
+                        return route('admin.salons.edit', ['id' => encode($model->id)]);
+                    },
+                    'htmlAttributes' => [ // Optional
+                        'class' => 'showModalButton text-primary ms-1 me-1',
+                        'title' => 'Update '.$title_single,
+                    ]
+                ];
+}
+if (!empty(checkaccess('delete', getControllerName()))) {
+    $actionTypes[] = [
+                    'class' => Itstructure\GridView\Actions\Delete::class, // Required
+                    'url' => function ($model) { // Optional
+                        return route('admin.salons.delete', ['id' => encode($model->id)]);
+                    },
+                    'htmlAttributes' => [ // Optional
+                        'title' => 'Delete '.$title_single,
+                        'class' => 'text-danger ms-1 me-1',
+                        'onclick' => 'return window.confirm("Are you sure you want to delete?");'
+                    ]
+                ];
+}
 @endphp
 @section('title')
 {{ $title }}
@@ -69,23 +127,24 @@
                 [
                     'label' => 'Active', // Column label.
                     'value' => function ($model) { // You can set 'value' as a callback function to get a row data value dynamically.
-                            $btnbg = ($model->is_active == 1) ? 'success' : 'danger';
-                            $active = ($model->is_active == 1) ? 'Active' : 'Inactive';
-                            return Html::link('javascript:void(0)',
-                                            $active,
-                                            [
-                                                'class' => 'btn btn-' . $btnbg . ' btn-sm',
-                                                'id' => 'is_active_' . $model->id,
-                                                'title' => $active,
-                                                'onclick' => '$.post({
-                                                    url: "'.route('admin.salons.isactive',['id'=>encode($model->id)]).'",
-                                                    success: function (response) {
-                                                    $.pjax.reload({container: "#gridtable-pjax"});
-                                                },
-                                            }); return false;'
-                                    ]
-                            );
-                        return '<span class="icon fas '.($row->is_active == 1 ? 'fa-check' : 'fa-times').'"></span>';
+                        $btnbg = ($model->is_active == 1) ? 'success' : 'danger';
+                        $active = ($model->is_active == 1) ? 'Active' : 'Inactive';
+                        if (!empty(checkaccess('isactive', getControllerName()))) {
+                            return Html::link('javascript:void(0)', $active, [
+                                'class' => 'btn btn-' . $btnbg . ' btn-sm',
+                                'id' => 'is_active_' . $model->id,
+                                'title' => $active,
+                                'onclick' =>
+                                    '$.post({
+                                    url: "' .route('admin.salons.isactive', ['id' => encode($model->id)]) .'",
+                                        success: function (response) {
+                                        $.pjax.reload({container: "#gridtable-pjax"});
+                                        },
+                                    }); return false;',
+                            ]);
+                        } else {
+                            return '<span class="btn btn-' . $btnbg . ' btn-sm cursor-auto">'.$active.'</span>';
+                        }
                     },
                     'filter' => [ // For dropdown it is necessary to set 'data' array. Array keys are for html <option> tag values, array values are for titles.
                         'class' => Itstructure\GridView\Filters\DropdownFilter::class, // REQUIRED. For this case it is necessary to set 'class'.
@@ -104,39 +163,7 @@
                     'htmlAttributes' => [
                         'width' => '110px' // Width of table column.
                     ],
-                    'actionTypes' => [ 
-                        [
-                            'class' => Itstructure\GridView\Actions\View::class, // Required
-                            'url' => function ($model) { // Optional
-                                return route('admin.salons.view', ['id' => encode($model->id)]);
-                            },
-                            'htmlAttributes' => [ // Optional
-                                'class' => 'showModalButton text-warning ms-1 me-1',
-                                'title' => 'View '.$title_single,
-                            ]
-                        ],
-                        [
-                            'class' => Itstructure\GridView\Actions\Edit::class, // Required
-                            'url' => function ($model) { // Optional
-                                return route('admin.salons.edit', ['id' => encode($model->id)]);
-                            },
-                            'htmlAttributes' => [ // Optional
-                                'class' => 'showModalButton text-primary ms-1 me-1',
-                                'title' => 'Update '.$title_single,
-                            ]
-                        ],
-                        [
-                            'class' => Itstructure\GridView\Actions\Delete::class, // Required
-                            'url' => function ($model) { // Optional
-                                return route('admin.salons.delete', ['id' => encode($model->id)]);
-                            },
-                            'htmlAttributes' => [ // Optional
-                                'title' => 'Delete '.$title_single,
-                                'class' => 'text-danger ms-1 me-1',
-                                'onclick' => 'return window.confirm("Are you sure you want to delete?");'
-                            ]
-                        ],
-                    ]
+                    'actionTypes' => $actionTypes
                 ],
             ],
             // set your toolbar

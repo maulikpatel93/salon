@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+
 // use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -15,7 +16,7 @@ class DashboardController extends Controller
 
     public function index()
     {
-        global $user;
+        // global $user;
         return view('admin.dashboard');
     }
 }

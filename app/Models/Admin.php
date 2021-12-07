@@ -26,10 +26,12 @@ class Admin extends Authenticatable
      * @var string[]
      */
     protected $fillable = [
-        'name',
+        'salon_id',
         'email',
         'password',
         'role_id', // adding this
+        'is_active',
+        'email_verified',
     ];
 
     /**

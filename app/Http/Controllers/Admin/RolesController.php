@@ -182,7 +182,7 @@ class RolesController extends Controller
                     }
                     $model->role_id = $id;
                     $model->permission_id = $value;
-                    $model->access = isset($access[$key]) ? $access[$key] : '0';
+                    $model->access = (isset($access[$key]) && $access[$key]) ? $access[$key] : '0';
                     $model->save();
                 }
             }
