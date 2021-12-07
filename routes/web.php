@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\Admin\DashboardController;
-
 //Admin Panel
+use App\Http\Controllers\Admin\CustompagesController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EmailtemplatesController;
 use App\Http\Controllers\Admin\ModulesController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\RolesController;
@@ -153,6 +154,32 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/delete/{id}', [SettingsController::class, 'delete'])->name('delete')->middleware('checkpermission');
             Route::post('/isactive/{id}', [SettingsController::class, 'isactive'])->name('isactive')->middleware('checkpermission');
             Route::post('/applystatus', [SettingsController::class, 'applystatus'])->name('applystatus')->middleware('checkpermission');
+        });
+
+        //Custom Page
+        Route::prefix('custompages')->name('custompages.')->group(function () {
+            Route::get('/', [CustompagesController::class, 'index'])->name('index')->middleware('checkpermission');
+            Route::post('/create', [CustompagesController::class, 'create'])->name('create')->middleware('checkpermission');
+            Route::post('/store', [CustompagesController::class, 'store'])->name('store')->middleware('checkpermission');
+            Route::post('/edit/{id}', [CustompagesController::class, 'edit'])->name('edit')->middleware('checkpermission');
+            Route::post('/update/{id}', [CustompagesController::class, 'update'])->name('update')->middleware('checkpermission');
+            Route::post('/view/{id}', [CustompagesController::class, 'view'])->name('view')->middleware('checkpermission');
+            Route::get('/delete/{id}', [CustompagesController::class, 'delete'])->name('delete')->middleware('checkpermission');
+            Route::post('/isactive/{id}', [CustompagesController::class, 'isactive'])->name('isactive')->middleware('checkpermission');
+            Route::post('/applystatus', [CustompagesController::class, 'applystatus'])->name('applystatus')->middleware('checkpermission');
+        });
+
+        //Email Templates
+        Route::prefix('emailtemplates')->name('emailtemplates.')->group(function () {
+            Route::get('/', [EmailtemplatesController::class, 'index'])->name('index')->middleware('checkpermission');
+            Route::post('/create', [EmailtemplatesController::class, 'create'])->name('create')->middleware('checkpermission');
+            Route::post('/store', [EmailtemplatesController::class, 'store'])->name('store')->middleware('checkpermission');
+            Route::post('/edit/{id}', [EmailtemplatesController::class, 'edit'])->name('edit')->middleware('checkpermission');
+            Route::post('/update/{id}', [EmailtemplatesController::class, 'update'])->name('update')->middleware('checkpermission');
+            Route::post('/view/{id}', [EmailtemplatesController::class, 'view'])->name('view')->middleware('checkpermission');
+            Route::get('/delete/{id}', [EmailtemplatesController::class, 'delete'])->name('delete')->middleware('checkpermission');
+            Route::post('/isactive/{id}', [EmailtemplatesController::class, 'isactive'])->name('isactive')->middleware('checkpermission');
+            Route::post('/applystatus', [EmailtemplatesController::class, 'applystatus'])->name('applystatus')->middleware('checkpermission');
         });
 
         //Users

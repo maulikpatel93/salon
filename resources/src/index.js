@@ -5,7 +5,7 @@ import { store } from "./store";
 import { Provider } from "react-redux";
 import App from './App';
 import reportWebVitals from "./reportWebVitals";
-
+import './i18n';
 
 ReactDOM.render(
     <React.StrictMode>

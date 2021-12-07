@@ -4,13 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\SettingRequest;
-use App\Models\Settings;
+use App\Http\Requests\Admin\EmailtemplateRequest;
+use App\Models\Emailtemplates;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Itstructure\GridView\DataProviders\EloquentDataProvider;
 
-class SettingsController extends Controller
+class EmailtemplatesController extends Controller
 {
     const ACTIVE = 'Active';
     const INACTIVE = 'Inactive';
@@ -28,41 +27,36 @@ class SettingsController extends Controller
     {
         $sort = $request->sort;
         if ($sort) {
-            $dataProvider = new EloquentDataProvider(Settings::query());
+            $dataProvider = new EloquentDataProvider(Emailtemplates::query());
         } else {
-            $dataProvider = new EloquentDataProvider(Settings::query()->orderBy('id', 'desc'));
+            $dataProvider = new EloquentDataProvider(Emailtemplates::query()->orderBy('id', 'desc'));
         }
-        return view('admin.settings.index', [
+        return view('admin.emailtemplates.index', [
             'dataProvider' => $dataProvider,
         ]);
     }
 
     public function create(Request $request)
     {
-        $model = new Settings();
+        $model = new Emailtemplates();
         $type = ($request->type) ? $request->type : $model->type;
         $model->type = $type;
-        return view('admin.settings.create', ['model' => $model, 'type' => $type]);
+        return view('admin.emailtemplates.create', ['model' => $model, 'type' => $type]);
     }
 
-    public function store(SettingRequest $request)
+    public function store(EmailtemplateRequest $request)
     {
         $inputVal = $request->all();
         $inputVal['is_active_at'] = currentDateTime();
-        $file = $request->file('value');
-        if ($file) {
-            $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-            $filePath = $file->storeAs('settings', $fileName, 'public');
-            $inputVal['value'] = $fileName;
-        }
-        $model = new Settings();
+
+        $model = new Emailtemplates();
         if ($request->ajax() && $model->create($inputVal)) {
             $responseData['status'] = 200;
             $responseData['message'] = 'Success';
             $responseData['url'] = false;
             return response()->json($responseData);
         }
-        return redirect()->route('admin.settings.index');
+        return redirect()->route('admin.emailtemplates.index');
     }
 
     public function edit(Request $request, $id)
@@ -70,41 +64,34 @@ class SettingsController extends Controller
         $model = $this->findModel(decode($id));
         $type = $model->type;
         $type = ($request->type) ? $request->type : $type;
-        return view('admin.settings.update', ['model' => $model, 'type' => $type]);
+        return view('admin.emailtemplates.update', ['model' => $model, 'type' => $type]);
     }
 
-    public function update(SettingRequest $request, $id)
+    public function update(EmailtemplateRequest $request, $id)
     {
         // $validated = $request->validated();
         $inputVal = $request->all();
         $model = $this->findModel(decode($id));
-        $file = $request->file('value');
-        $inputVal['value'] = $model->value;
-        if ($file) {
-            Storage::delete('/public/settings/' . $model->logo);
-            $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-            $filePath = $file->storeAs('settings', $fileName, 'public');
-            $inputVal['value'] = $fileName;
-        }
+
         if ($request->ajax() && $model->update($inputVal)) {
             $responseData['status'] = 200;
             $responseData['message'] = 'Success';
             $responseData['url'] = false;
             return response()->json($responseData);
         }
-        return redirect()->route('admin.settings.index');
+        return redirect()->route('admin.emailtemplates.index');
     }
 
     public function view(Request $request, $id)
     {
         $model = $this->findModel(decode($id));
-        return view('admin.settings.view', ['model' => $model]);
+        return view('admin.emailtemplates.view', ['model' => $model]);
     }
 
     public function delete(Request $request, $id)
     {
-        Settings::where('id', decode($id))->delete();
-        return redirect()->route('admin.settings.index');
+        Emailtemplates::where('id', decode($id))->delete();
+        return redirect()->route('admin.emailtemplates.index');
     }
 
     public function isactive(Request $request, $id)
@@ -153,7 +140,7 @@ class SettingsController extends Controller
 
                     if (isset($inputall['keylist']) && $inputall['keylist']) {
                         foreach ($inputall['keylist'] as $id) {
-                            Settings::where('id', $id)->delete();
+                            Emailtemplate::where('id', $id)->delete();
                         }
                     }
                 }
@@ -166,7 +153,7 @@ class SettingsController extends Controller
 
     protected function findModel($id)
     {
-        if (($model = Settings::find($id)) !== null) {
+        if (($model = Emailtemplates::find($id)) !== null) {
             return $model;
         }
         throw new UnsecureException('The requested page does not exist.');

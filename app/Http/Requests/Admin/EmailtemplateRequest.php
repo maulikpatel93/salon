@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SettingRequest extends FormRequest
+class EmailtemplateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +25,11 @@ class SettingRequest extends FormRequest
     {
         $id = decode($this->id);
         return [
-            'name' => 'required|max:200|unique:configuration,name,' . $id,
+            'code' => 'required|max:200|unique:email_templates,code,' . $id,
+            'title' => 'required',
+            'subject' => 'required',
+            'html' => 'required',
+            'panel' => 'required',
         ];
     }
 }

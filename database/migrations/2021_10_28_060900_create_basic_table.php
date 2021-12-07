@@ -182,7 +182,7 @@ class CreateBasicTable extends Migration
             $table->string('title');
             $table->string('subject')->nullable();
             $table->text('html');
-            $table->enum('type', ['Backend', 'Web', 'App', 'Common'])->default('Common');
+            $table->enum('panel', ['Backend', 'Web', 'App', 'Common'])->default('Common');
             $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();

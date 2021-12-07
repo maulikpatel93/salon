@@ -216,7 +216,6 @@ if (!function_exists('checkaccess')) {
         } elseif ($action == 'accessupdate') {
             $action = 'access';
         }
-
         $adminuser = auth()->user();
         if ($action && $controller) {
             $modulesdata = Modules::where(['is_active' => '1', 'controller' => $controller, 'action' => $action])->first();
