@@ -5,6 +5,7 @@ const config = {
       imagepath: '/react/images/',
       defaultPath: '/dashboard/default',
       fontFamily: `'Roboto', sans-serif`,
+      API_URL: 'http://127.0.0.1:8000/api/v1/',
       borderRadius: 12
   };
   

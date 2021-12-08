@@ -6,6 +6,7 @@ import { Provider } from "react-redux";
 import App from './App';
 import reportWebVitals from "./reportWebVitals";
 import './i18n';
+import toast, { Toaster } from 'react-hot-toast';
 
 ReactDOM.render(
     <React.StrictMode>
