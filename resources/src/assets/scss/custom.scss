@@ -10,11 +10,11 @@
 }
 
 .btn-primary:hover {
-    color: $blue;
-    background-color: #fff;
-    border-color: $blue;
+    color: $primary;
+    background-color: $white;
+    border-color: $primary;
 }
 
 .btn.btn-primary-outline.active {
-    color: #8C1C4D;
+    color: $primary;
 }

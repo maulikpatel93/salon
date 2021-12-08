@@ -1,7 +1,6 @@
 import { t } from "i18next";
 import { useTranslation } from "react-i18next";
-
-
+import "../yupconfig";
 
 const Language = () => {
     const { i18n } = useTranslation();
