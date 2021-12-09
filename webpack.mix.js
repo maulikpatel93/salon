@@ -85,7 +85,7 @@ mix.js("resources/js/app.js", "public/js")
             host: 'localhost',
         },
         // module: {
-        //     rules: [
+        //     rules: [ 
         //         {
         //             test: /\.s[ac]ss$/i,
         //             use: [stylesHandler, 'css-loader', 'postcss-loader', 'sass-loader'],
