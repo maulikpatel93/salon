@@ -79,15 +79,6 @@ mix.js("resources/js/app.js", "public/js")
     .copy("resources/js/myfunction.js", "public/js")
     .sass("resources/sass/app.scss", "public/css")
     .sass("resources/sass/styles.scss", "public/css")
-    .js("resources/src/index.js", "public/src/main.js")
-    .react()
-    .sass("resources/src/assets/scss/react-bootstrap.scss", "public/css")
-    .sass("resources/src/assets/scss/custom.scss", "public/react/css")
-    .copy("resources/src/assets/css/style.css", "public/react/css")
-    .copy("resources/src/assets/css/font-awsome.css", "public/react/css")
-    .copy("resources/src/assets/font/", "public/react/font")
-    .copyDirectory("resources/src/assets/images/", "public/react/images")
-    .js("node_modules/bootstrap/dist/js/bootstrap.bundle.js", "public/js")
     .webpackConfig({
         devServer: {
             open: true,

@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::get('/', function () {
-    return redirect('login');
+    return redirect('admin');
 });
 
 //Auth::routes();
@@ -213,14 +213,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         });
     });
 });
-
-// Route::get('/{any}', function ($any) {
-//     return view('index');
-// })->where('any', '.*');
-
-Route::get('/{any}', function ($any) {
-    return view('index');
-})->where('any', '.*');
 
 // Route::get('home', [HomeController::class, 'index'])->name('home');
 // Route::get('admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard')->middleware('admin');
