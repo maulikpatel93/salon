@@ -4,17 +4,17 @@ import { useRoutes } from 'react-router-dom';
 import MainRoutes from './MainRoutes';
 import AuthenticationRoutes from './AuthenticationRoutes';
 import config from '../config';
-import { PrivateRoute } from '../helpers/PrivateRoute';
+// import { PrivateRoute } from '../helpers/PrivateRoute';
 
 
 // ==============================|| ROUTING RENDER ||============================== //
 
 export default function ThemeRoutes() {
-    // return useRoutes([AuthenticationRoutes], config.basename);
     if(localStorage.getItem('token')){
+        import ("../assets/css/style.css");
         return useRoutes([MainRoutes], config.basename);
     }else{
         return useRoutes([AuthenticationRoutes], config.basename);
     }
-    <PrivateRoute exact component={Dashboard} path="/" />
+    // <PrivateRoute exact component={Dashboard} path="/" />
 }

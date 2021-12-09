@@ -1,10 +1,13 @@
 import { Link, Outlet } from "react-router-dom";
-import "../../assets/css/style.css";
 import config from "../../config";
 
 // ==============================|| MAIN LAYOUT ||============================== //
-
+console.log(localStorage.getItem("token"));
 const MainLayout = () => {
+    if (localStorage.getItem("token") === null) {
+        const navigate = useNavigate();
+        return navigate('/login');
+    }
     return (
         <>
             {/* <div id="preloader">
@@ -22,7 +25,7 @@ const MainLayout = () => {
                                     className="mobile-menu-icon pe-2 d-lg-none"
                                 >
                                     <img
-                                        src="assets/images/favicon.png"
+                                        src={config.imagepath+"favicon.png"}
                                         alt=""
                                     />
                                 </Link>
@@ -35,7 +38,7 @@ const MainLayout = () => {
                                         className="search-icon"
                                     >
                                         <img
-                                            src="assets/images/search.png"
+                                            src={config.imagepath+"search.png"}
                                             alt=""
                                         />
                                     </Link>
@@ -119,11 +122,11 @@ const MainLayout = () => {
                                     </div>
                                 </div>
                                 <Link to="" className="ms-lg-4 ms-2">
-                                    <img src="assets/images/bell.png" alt="" />
+                                    <img src={config.imagepath+"bell.png"} alt="" />
                                 </Link>
                                 <Link to="" className="ms-lg-4 ms-2">
                                     <img
-                                        src="assets/images/setting-icon.png"
+                                        src={config.imagepath+"setting-icon.png"}
                                         alt=""
                                     />
                                 </Link>
@@ -132,7 +135,7 @@ const MainLayout = () => {
                                     className="position-relative user-profile-icon ms-lg-4 ms-2"
                                 >
                                     <img
-                                        src="assets/images/Avatar.png"
+                                        src={config.imagepath+"Avatar.png"}
                                         alt=""
                                     />
                                     <span className="user-status online"></span>
@@ -144,7 +147,7 @@ const MainLayout = () => {
                         <div className="sidenav-logo py-4 text-center">
                             <Link to="../dashboard.html">
                                 <img
-                                    src="assets/images/logo-small.png"
+                                    src={config.imagepath+"logo-small.png"}
                                     alt=""
                                 />
                             </Link>
@@ -161,7 +164,7 @@ const MainLayout = () => {
                                     >
                                         <span className="icon">
                                             <img
-                                                src="assets/images/dashboard.png"
+                                                src={config.imagepath+"dashboard.png"}
                                                 alt=""
                                             />
                                         </span>
@@ -179,7 +182,7 @@ const MainLayout = () => {
                                     >
                                         <span className="icon">
                                             <img
-                                                src="assets/images/caleder.png"
+                                                src={config.imagepath+"caleder.png"}
                                                 alt=""
                                             />
                                         </span>
@@ -197,7 +200,7 @@ const MainLayout = () => {
                                     >
                                         <span className="icon">
                                             <img
-                                                src="assets/images/sales.png"
+                                                src={config.imagepath+"sales.png"}
                                                 alt=""
                                             />
                                         </span>
@@ -215,7 +218,7 @@ const MainLayout = () => {
                                     >
                                         <span className="icon">
                                             <img
-                                                src="assets/images/Vouchers.png"
+                                                src={config.imagepath+"Vouchers.png"}
                                                 alt=""
                                             />
                                         </span>
@@ -233,7 +236,7 @@ const MainLayout = () => {
                                     >
                                         <span className="icon">
                                             <img
-                                                src="assets/images/refresh.png"
+                                                src={config.imagepath+"refresh.png"}
                                                 alt=""
                                             />
                                         </span>
@@ -251,7 +254,7 @@ const MainLayout = () => {
                                     >
                                         <span className="icon">
                                             <img
-                                                src="assets/images/dashboard.png"
+                                                src={config.imagepath+"dashboard.png"}
                                                 alt=""
                                             />
                                         </span>
@@ -269,7 +272,7 @@ const MainLayout = () => {
                                     >
                                         <span className="icon">
                                             <img
-                                                src="assets/images/user.png"
+                                                src={config.imagepath+"user.png"}
                                                 alt=""
                                             />
                                         </span>
@@ -287,7 +290,7 @@ const MainLayout = () => {
                                     >
                                         <span className="icon">
                                             <img
-                                                src="assets/images/Services.png"
+                                                src={config.imagepath+"Services.png"}
                                                 alt=""
                                             />
                                         </span>
@@ -305,7 +308,7 @@ const MainLayout = () => {
                                     >
                                         <span className="icon">
                                             <img
-                                                src="assets/images/product.png"
+                                                src={config.imagepath+"product.png"}
                                                 alt=""
                                             />
                                         </span>
@@ -323,7 +326,7 @@ const MainLayout = () => {
                                     >
                                         <span className="icon">
                                             <img
-                                                src="assets/images/Reports.png"
+                                                src={config.imagepath+"Reports.png"}
                                                 alt=""
                                             />
                                         </span>
@@ -341,7 +344,7 @@ const MainLayout = () => {
                                     >
                                         <span className="icon">
                                             <img
-                                                src="assets/images/Marketing.png"
+                                                src={config.imagepath+"Marketing.png"}
                                                 alt=""
                                             />
                                         </span>
@@ -360,7 +363,7 @@ const MainLayout = () => {
                                         <span className="icon">
                                             {" "}
                                             <img
-                                                src="assets/images/setting.png"
+                                                src={config.imagepath+"setting.png"}
                                                 alt=""
                                             />
                                         </span>

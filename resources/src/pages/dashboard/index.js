@@ -21,9 +21,7 @@ const Dashboard = () => {
     }, [isError]);
 
     const onLogOut = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("auth_key");
-        localStorage.removeItem("id");
+        localStorage.clear();
         navigate("/login");
     };
     return (
