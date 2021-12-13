@@ -84,10 +84,10 @@ class GuestApiController extends Controller
         if (Auth::attempt($credentials_4) || Auth::attempt($credentials_5)) {
             $user = Auth::user();
             $successData = [];
-            $successData['token'] = $user->createToken($user->id)->accessToken;
+            $token = $user->createToken($user->id)->accessToken;
             $successData['auth_key'] = $user->auth_key;
             $successData['id'] = $user->id;
-            return response()->json(['status' => $this->successStatus, 'message' => 'success', 'data' => $successData]);
+            return response()->json(['status' => $this->successStatus, 'message' => 'success', 'token' => $token, 'data' => $successData]);
         } else {
             return response()->json(['status' => $this->errorStatus, 'message' => 'Unauthorised']);
         }
