@@ -14,7 +14,8 @@ use Illuminate\Http\Request;
 class ServicesApiController extends Controller
 {
     protected $successStatus = 200;
-    protected $errorStatus = 403;
+    protected $errorStatus = 422;
+    protected $unauthorizedStatus = 401;
 
     //Services Column name
     protected $field = [

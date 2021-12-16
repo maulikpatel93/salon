@@ -35,7 +35,8 @@ class GuestApiController extends Controller
      */
     // protected $redirectTo = RouteServiceProvider::HOME;
     protected $successStatus = 200;
-    protected $errorStatus = 401;
+    protected $errorStatus = 422;
+    protected $unauthorizedStatus = 401;
 
     protected $salon_field = [
         'id',
@@ -85,11 +86,20 @@ class GuestApiController extends Controller
             $user = Auth::user();
             $successData = [];
             $token = $user->createToken($user->id)->accessToken;
+            $successData['token'] = $token;
             $successData['auth_key'] = $user->auth_key;
             $successData['id'] = $user->id;
-            return response()->json(['status' => $this->successStatus, 'message' => 'success', 'token' => $token, 'data' => $successData]);
+            return response()->json($successData, $this->successStatus);
         } else {
-            return response()->json(['status' => $this->errorStatus, 'message' => 'Unauthorised']);
+            $EmailCheckAccount = Users::where('email', $request->email)->count();
+            if (empty($EmailCheckAccount)) {
+                return response()->json(['message' => __('messages.user_email_not_available')], $this->errorStatus);
+            }
+            $unVerifyAccount = Users::where(['is_active' => 0, 'email' => $request->email])->count();
+            if ($unVerifyAccount > 0) {
+                return response()->json(['message' => __('messages.user_email_unverify')], $this->errorStatus);
+            }
+            return response()->json(['message' => __('messages.user_passowrd_wrong')], $this->errorStatus);
         }
     }
 

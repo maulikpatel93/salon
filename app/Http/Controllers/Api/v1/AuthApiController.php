@@ -11,7 +11,8 @@ class AuthApiController extends Controller
 {
 
     protected $successStatus = 200;
-    protected $errorStatus = 403;
+    protected $errorStatus = 422;
+    protected $unauthorizedStatus = 401;
 
     protected $field = ['*'];
 
@@ -55,9 +56,9 @@ class AuthApiController extends Controller
         $where = (Auth::user()) ? array_merge($where, ['id' => Auth::user()->id]) : $where;
         $model = Users::with($withArray)->select($field)->where($where)->first();
         if ($model) {
-            return response()->json(['status' => $this->successStatus, 'message' => 'Success', 'data' => $model]);
+            return response()->json($model, $this->successStatus);
         }
-        return response()->json(['status' => $this->errorStatus, 'message' => 'Failed']);
+        return response()->json(['message' => __('messages.failed')], $this->errorStatus);
     }
 
 }

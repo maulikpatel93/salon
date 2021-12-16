@@ -13,7 +13,8 @@ use Illuminate\Support\Str;
 class VoucherApiController extends Controller
 {
     protected $successStatus = 200;
-    protected $errorStatus = 403;
+    protected $errorStatus = 422;
+    protected $unauthorizedStatus = 401;
 
     protected $field = [
         'id',
