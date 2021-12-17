@@ -65,6 +65,9 @@ class ClientApiController extends Controller
         $requestAll['panel'] = 'Frontend';
         $requestAll['username'] = $email_username ? $email_username[0] : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
         $requestAll['password'] = Hash::make(Str::random(10));
+        $requestAll['send_sms_notification'] = isset($requestAll['send_sms_notification']) ? $requestAll['send_sms_notification'] : '0';
+        $requestAll['send_email_notification'] = isset($requestAll['send_email_notification']) ? $requestAll['send_email_notification'] : '0';
+        $requestAll['recieve_marketing_email'] = isset($requestAll['recieve_marketing_email']) ? $requestAll['recieve_marketing_email'] : '0';
         $model = new Client;
         $model->fill($requestAll);
         $file = $request->file('profile_photo');
@@ -131,7 +134,7 @@ class ClientApiController extends Controller
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
-        $where = ['is_active' => '1', 'role_id' => 5];
+        $where = ['is_active' => '1', 'role_id' => 6];
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
         if ($pagination == true) {
@@ -144,13 +147,10 @@ class ClientApiController extends Controller
             if ($successData) {
                 if ($pagination == true) {
                     // return response()->json(array_merge(['status' => $this->successStatus, 'message' => 'Success'], $successData));
-                    return response()->json(array_merge($successData, $this->successStatus));
                 }
-                // return response()->json(['status' => $this->successStatus, 'message' => 'Success', 'data' => $successData]);
-                return response()->json(array_merge($successData, $this->successStatus));
+                return response()->json($successData, $this->successStatus);
             }
         }
-        // return response()->json(['status' => $this->errorStatus, 'message' => 'Failed']);
-        return response()->json(array_merge($successData, $this->errorStatus));
+        return response()->json(['message' => __('messages.failed')], $this->errorStatus);
     }
 }
