@@ -1,6 +1,6 @@
 @php
     use App\Models\Modules;
-
+    use Illuminate\Support\Facades\Storage;
     $controller = $getControllerName;
     $action = $getActionName;
 @endphp

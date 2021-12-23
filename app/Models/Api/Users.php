@@ -13,7 +13,7 @@ class Users extends Model
 
     protected $table = 'users';
 
-    protected $appends = ['isNewRecord'];
+    protected $appends = ['isNewRecord', 'profile_photo_url'];
     /**
      * The attributes that are mass assignable.
      *
@@ -62,6 +62,20 @@ class Users extends Model
     public function getIsNewRecordAttribute()
     {
         return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
+    }
+
+    public function getProfilePhotoUrlAttribute()
+    {
+        if ($this->role_id == 4) {
+            $profile_photo_url = asset('storage/owner');
+        } else if ($this->role_id == 5) {
+            $profile_photo_url = asset('storage/staff');
+        } else if ($this->role_id == 6) {
+            $profile_photo_url = asset('storage/client');
+        } else {
+            $profile_photo_url = "";
+        }
+        return $this->attributes['profile_photo_url'] = $this->profile_photo ? $profile_photo_url . '/' . $this->profile_photo : "";
     }
 
     public function role()

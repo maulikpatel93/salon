@@ -102,7 +102,7 @@ class ClientApiController extends Controller
     {
         $requestAll = $request->all();
         Client::where(['id' => $id, 'role_id' => 6])->delete();
-        return response()->json(['status' => $this->successStatus, 'message' => 'success']);
+        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
     }
 
     protected function findModel($id)
@@ -117,6 +117,7 @@ class ClientApiController extends Controller
     {
         $requestAll = $request->all();
         $field = ($request->field) ? array_merge(['id', 'salon_id'], explode(',', $request->field)) : $this->field;
+        $sort = ($request->sort) ? $request->sort : "";
 
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
@@ -134,23 +135,41 @@ class ClientApiController extends Controller
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
-        $where = ['is_active' => '1', 'role_id' => 6];
+        $where = ['is_active' => '1', 'role_id' => 6, 'salon_id' => $request->salon_id];
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
-        if ($pagination == true) {
-            $model = Client::with($withArray)->select($field)->where($where)->simplePaginate($limit);
-        } else {
-            $model = Client::with($withArray)->select($field)->where($where)->get();
+        $orderby = 'id desc';
+        if ($sort) {
+            $sd = [];
+            foreach ($sort as $key => $value) {
+                $sd[] = $key . ' ' . $value;
+            }
+            if ($sd) {
+                $orderby = implode(", ", $sd);
+            }
+
         }
-        if ($model->count()) {
+        if ($id) {
+            $model = Client::with($withArray)->select($field)->where($where)->first();
             $successData = $model->toArray();
-            if ($successData) {
-                if ($pagination == true) {
-                    // return response()->json(array_merge(['status' => $this->successStatus, 'message' => 'Success'], $successData));
+            return response()->json($successData, $this->successStatus);
+        } else {
+            if ($pagination == true) {
+                $model = Client::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->simplePaginate($limit);
+            } else {
+                $model = Client::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+            }
+            if ($model->count()) {
+                $successData = $model->toArray();
+                if ($successData) {
+                    if ($pagination == true) {
+                        // return response()->json(array_merge(['status' => $this->successStatus, 'message' => 'Success'], $successData));
+                    }
+                    return response()->json($successData, $this->successStatus);
                 }
-                return response()->json($successData, $this->successStatus);
             }
         }
+
         return response()->json(['message' => __('messages.failed')], $this->errorStatus);
     }
 }
