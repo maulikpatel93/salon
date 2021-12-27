@@ -127,7 +127,6 @@ class ClientApiController extends Controller
         } else if ($request->salon_field) {
             $salon_field = array_merge(['id'], explode(',', $request->salon_field));
         }
-
         $withArray = [];
         if ($salon_field) {
             $withArray[] = 'salon:' . implode(',', $salon_field);
@@ -137,6 +136,8 @@ class ClientApiController extends Controller
 
         $where = ['is_active' => '1', 'role_id' => 6, 'salon_id' => $request->salon_id];
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
+
+        $whereLike = $request->q;
 
         $orderby = 'id desc';
         if ($sort) {
@@ -150,14 +151,32 @@ class ClientApiController extends Controller
 
         }
         if ($id) {
-            $model = Client::with($withArray)->select($field)->where($where)->first();
+            if ($request->result == 'result_array') {
+                $model = Client::with($withArray)->select($field)->where($where)->get();
+            } else {
+                $model = Client::with($withArray)->select($field)->where($where)->first();
+            }
             $successData = $model->toArray();
             return response()->json($successData, $this->successStatus);
         } else {
             if ($pagination == true) {
-                $model = Client::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->simplePaginate($limit);
+                if ($whereLike) {
+                    $model = Client::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                        $query->where('first_name', "like", "%" . $whereLike . "%");
+                        $query->orWhere('last_name', "like", "%" . $whereLike . "%");
+                    })->where($where)->orderByRaw($orderby)->paginate($limit);
+                } else {
+                    $model = Client::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
+                }
             } else {
-                $model = Client::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                if ($whereLike) {
+                    $model = Client::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                        $query->where('first_name', "like", "%" . $whereLike . "%");
+                        $query->orWhere('last_name', "like", "%" . $whereLike . "%");
+                    })->where($where)->orderByRaw($orderby)->get();
+                } else {
+                    $model = Client::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                }
             }
             if ($model->count()) {
                 $successData = $model->toArray();

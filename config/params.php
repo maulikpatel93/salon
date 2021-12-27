@@ -4,7 +4,7 @@ return [
     'bsVersion' => '5.x',
     'access' => 'role', // Permission acces User Base => 'user' and Role base => 'role' type
     'rowsPerPage' => 25,
-    'apiPerPage' => 1,
+    'apiPerPage' => 10,
     'auth_key_character' => 32,
     'phone_number_pattern' => "/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/",
     'service_price' => [
