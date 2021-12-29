@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\SupplierRequest;
 use App\Models\Api\Suppliers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class SuppliersApiController extends Controller
 {
@@ -21,6 +22,14 @@ class SuppliersApiController extends Controller
         'first_name',
         'last_name',
         'logo',
+        'email',
+        'phone_number',
+        'website',
+        'address',
+        'street',
+        'suburb',
+        'state',
+        'postcode',
     ];
 
     protected $salon_field = [
@@ -86,7 +95,7 @@ class SuppliersApiController extends Controller
     {
         $requestAll = $request->all();
         Suppliers::where('id', $id)->delete();
-        return response()->json(['status' => $this->successStatus, 'message' => 'success']);
+        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
     }
 
     protected function findModel($id)
@@ -100,8 +109,9 @@ class SuppliersApiController extends Controller
     public function returnResponse($request, $id, $data = [])
     {
         $requestAll = $request->all();
-        $field = ($request->field) ? array_merge(['id', 'salon_id'], explode(',', $request->field)) : $this->field;
 
+        $field = ($request->field) ? array_merge(['id', 'salon_id'], explode(',', $request->field)) : $this->field;
+        $sort = ($request->sort) ? $request->sort : "";
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
             $salon_field = false;
@@ -130,23 +140,57 @@ class SuppliersApiController extends Controller
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
-        $where = ['is_active' => '1'];
+        $where = ['is_active' => '1', 'salon_id' => $request->salon_id];
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
-        if ($pagination == true) {
-            $model = Suppliers::with($withArray)->select($field)->where($where)->simplePaginate($limit);
-        } else {
-            $model = Suppliers::with($withArray)->select($field)->where($where)->get();
-        }
-        if ($model->count()) {
-            $successData = $model->toArray();
-            if ($successData) {
-                if ($pagination == true) {
-                    return response()->json(array_merge(['status' => $this->successStatus, 'message' => 'Success'], $successData));
-                }
-                return response()->json(['status' => $this->successStatus, 'message' => 'Success', 'data' => $successData]);
+        $whereLike = $request->q;
+
+        $orderby = 'id desc';
+        if ($sort) {
+            $sd = [];
+            foreach ($sort as $key => $value) {
+                $sd[] = $key . ' ' . $value;
+            }
+            if ($sd) {
+                $orderby = implode(", ", $sd);
             }
         }
-        return response()->json(['status' => $this->errorStatus, 'message' => 'Failed']);
+
+        if ($id) {
+            if ($request->result == 'result_array') {
+                $model = Suppliers::with($withArray)->select($field)->where($where)->get();
+            } else {
+                $model = Suppliers::with($withArray)->select($field)->where($where)->first();
+            }
+            $successData = $model->toArray();
+            return response()->json($successData, $this->successStatus);
+        } else {
+            if ($pagination == true) {
+                if ($whereLike) {
+                    $model = Suppliers::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                        $query->where('first_name', "like", "%" . $whereLike . "%");
+                        $query->orWhere('last_name', "like", "%" . $whereLike . "%");
+                    })->where($where)->orderByRaw($orderby)->paginate($limit);
+                } else {
+                    $model = Suppliers::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
+                }
+            } else {
+                if ($whereLike) {
+                    $model = Suppliers::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                        $query->where('first_name', "like", "%" . $whereLike . "%");
+                        $query->orWhere('last_name', "like", "%" . $whereLike . "%");
+                    })->where($where)->orderByRaw($orderby)->get();
+                } else {
+                    $model = Suppliers::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                }
+            }
+            if ($model->count()) {
+                $successData = $model->toArray();
+                if ($successData) {
+                    return response()->json($successData, $this->successStatus);
+                }
+            }
+        }
+        return response()->json(['message' => __('messages.failed')], $this->errorStatus);
     }
 }

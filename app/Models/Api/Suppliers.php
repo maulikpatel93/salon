@@ -5,6 +5,7 @@ namespace App\Models\Api;
 // use App\Models\Api\Salons;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Suppliers extends Model
 {
@@ -17,7 +18,7 @@ class Suppliers extends Model
      */
     protected $table = 'suppliers';
 
-    protected $appends = ['isNewRecord'];
+    protected $appends = ['isNewRecord', 'logo_url'];
     /**
      * The attributes that are mass assignable.
      *
@@ -66,6 +67,12 @@ class Suppliers extends Model
     public function getIsNewRecordAttribute()
     {
         return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
+    }
+
+    public function getLogoUrlAttribute()
+    {
+        $logo_url = asset('storage/suppliers');
+        return $this->attributes['logo_url'] = $this->logo && Storage::disk('public')->exists('suppliers/' . $this->logo) ? $logo_url . '/' . $this->logo : "";
     }
 
     public function salon()

@@ -34,7 +34,7 @@ class SupplierRequest extends FormRequest
             'last_name' => 'required|max:150',
             'phone_number' => "required|regex:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/",
             'email' => 'required|email|unique:suppliers,email,' . $id . ',id,salon_id,' . $salon_id,
-            'logo' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'website' => 'required|url',
             'address' => 'required',
             'street' => 'required|max:100',

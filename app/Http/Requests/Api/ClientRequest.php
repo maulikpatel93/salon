@@ -34,7 +34,7 @@ class ClientRequest extends FormRequest
             'phone_number' => "required|regex:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/",
             'username' => 'username|unique:users,username,' . $id . ',id,salon_id,' . $salon_id . ',role_id,' . $role_id,
             'email' => 'required|email|unique:users,email,' . $id . ',id,salon_id,' . $salon_id . ',role_id,' . $role_id,
-            'profile_photo' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'gender' => 'required',
             'date_of_birth' => 'required',
             'address' => 'required',

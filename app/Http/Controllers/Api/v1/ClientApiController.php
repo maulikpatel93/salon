@@ -62,12 +62,13 @@ class ClientApiController extends Controller
         $requestAll = $request->all();
         $requestAll['is_active_at'] = currentDateTime();
         $email_username = explode('@', $requestAll['email']);
+
         $requestAll['panel'] = 'Frontend';
         $requestAll['username'] = $email_username ? $email_username[0] : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
         $requestAll['password'] = Hash::make(Str::random(10));
-        $requestAll['send_sms_notification'] = isset($requestAll['send_sms_notification']) ? $requestAll['send_sms_notification'] : '0';
-        $requestAll['send_email_notification'] = isset($requestAll['send_email_notification']) ? $requestAll['send_email_notification'] : '0';
-        $requestAll['recieve_marketing_email'] = isset($requestAll['recieve_marketing_email']) ? $requestAll['recieve_marketing_email'] : '0';
+        $requestAll['send_sms_notification'] = (isset($requestAll['send_sms_notification']) && $requestAll['send_sms_notification']) ? '1' : '0';
+        $requestAll['send_email_notification'] = (isset($requestAll['send_email_notification']) && $requestAll['send_email_notification']) ? '1' : '0';
+        $requestAll['recieve_marketing_email'] = (isset($requestAll['recieve_marketing_email']) && $requestAll['recieve_marketing_email']) ? '1' : '0';
         $model = new Client;
         $model->fill($requestAll);
         $file = $request->file('profile_photo');
@@ -85,6 +86,9 @@ class ClientApiController extends Controller
     {
         $requestAll = $request->all();
         $model = $this->findModel($id);
+        $requestAll['send_sms_notification'] = (isset($requestAll['send_sms_notification']) && $requestAll['send_sms_notification']) ? '1' : '0';
+        $requestAll['send_email_notification'] = (isset($requestAll['send_email_notification']) && $requestAll['send_email_notification']) ? '1' : '0';
+        $requestAll['recieve_marketing_email'] = (isset($requestAll['recieve_marketing_email']) && $requestAll['recieve_marketing_email']) ? '1' : '0';
         $model->fill($requestAll);
         $file = $request->file('profile_photo');
         if ($file) {
