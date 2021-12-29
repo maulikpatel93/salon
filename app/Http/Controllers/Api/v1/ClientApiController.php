@@ -141,7 +141,7 @@ class ClientApiController extends Controller
         $where = ['is_active' => '1', 'role_id' => 6, 'salon_id' => $request->salon_id];
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
-        $whereLike = $request->q;
+        $whereLike = $request->q ? explode(' ', $request->q) : '';
 
         $orderby = 'id desc';
         if ($sort) {
@@ -166,8 +166,13 @@ class ClientApiController extends Controller
             if ($pagination == true) {
                 if ($whereLike) {
                     $model = Client::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
-                        $query->where('first_name', "like", "%" . $whereLike . "%");
-                        $query->orWhere('last_name', "like", "%" . $whereLike . "%");
+                        if ($whereLike) {
+                            $query->where('first_name', "like", "%" . $whereLike[0] . "%");
+                            foreach ($whereLike as $row) {
+                                $query->orWhere('first_name', "like", "%" . $row . "%");
+                                $query->orWhere('last_name', "like", "%" . $row . "%");
+                            }
+                        }
                     })->where($where)->orderByRaw($orderby)->paginate($limit);
                 } else {
                     $model = Client::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
@@ -175,8 +180,13 @@ class ClientApiController extends Controller
             } else {
                 if ($whereLike) {
                     $model = Client::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
-                        $query->where('first_name', "like", "%" . $whereLike . "%");
-                        $query->orWhere('last_name', "like", "%" . $whereLike . "%");
+                        if ($whereLike) {
+                            $query->where('first_name', "like", "%" . $whereLike[0] . "%");
+                            foreach ($whereLike as $row) {
+                                $query->orWhere('first_name', "like", "%" . $row . "%");
+                                $query->orWhere('last_name', "like", "%" . $row . "%");
+                            }
+                        }
                     })->where($where)->orderByRaw($orderby)->get();
                 } else {
                     $model = Client::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
