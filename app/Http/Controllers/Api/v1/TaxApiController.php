@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\SupplierRequest;
-use App\Models\Api\Suppliers;
+use App\Models\Api\Tax;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
-class SuppliersApiController extends Controller
+class TaxApiController extends Controller
 {
     protected $successStatus = 200;
     protected $errorStatus = 422;
@@ -19,17 +16,8 @@ class SuppliersApiController extends Controller
         'id',
         'salon_id',
         'name',
-        'first_name',
-        'last_name',
-        'logo',
-        'email',
-        'phone_number',
-        'website',
-        'address',
-        'street',
-        'suburb',
-        'state',
-        'postcode',
+        'description',
+        'percentage',
     ];
 
     protected $salon_field = [
@@ -38,11 +26,7 @@ class SuppliersApiController extends Controller
         'owner_name',
     ];
 
-    protected $product_field = [
-        'id',
-        'supplier_id',
-        'name',
-    ];
+    protected $product_field = [];
 
     public function __construct()
     {
@@ -57,50 +41,9 @@ class SuppliersApiController extends Controller
         return $this->returnResponse($request, $id);
     }
 
-    public function store(SupplierRequest $request)
-    {
-        $requestAll = $request->all();
-        $requestAll['is_active_at'] = currentDateTime();
-        $model = new Suppliers;
-        $model->fill($requestAll);
-        $file = $request->file('logo');
-        if ($file) {
-            $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-            $filePath = $file->storeAs('suppliers', $fileName, 'public');
-            $model->logo = $fileName;
-        }
-        $model->description = isset($requestAll['description']) ? $requestAll['description'] : '';
-        $model->save();
-        return $this->returnResponse($request, $model->id);
-    }
-
-    public function update(SupplierRequest $request, $id)
-    {
-        $requestAll = $request->all();
-        $model = $this->findModel($id);
-        $model->fill($requestAll);
-        $file = $request->file('logo');
-        if ($file) {
-            Storage::delete('/public/suppliers/' . $model->logo);
-            $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-            $filePath = $file->storeAs('suppliers', $fileName, 'public');
-            $model->logo = $fileName;
-        }
-        $model->description = isset($requestAll['description']) ? $requestAll['description'] : $model->description;
-        $model->save();
-        return $this->returnResponse($request, $model->id);
-    }
-
-    public function delete(Request $request, $id)
-    {
-        $requestAll = $request->all();
-        Suppliers::where('id', $id)->delete();
-        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
-    }
-
     protected function findModel($id)
     {
-        if (($model = Suppliers::find($id)) !== null) {
+        if (($model = Tax::find($id)) !== null) {
             return $model;
         }
         throw new UnsecureException('The requested page does not exist.');
@@ -131,6 +74,7 @@ class SuppliersApiController extends Controller
         } else if ($request->product_field) {
             $product_field = array_merge(['id', 'supplier_id'], explode(',', $request->product_field));
         }
+
         $withArray = [];
         if ($salon_field) {
             $withArray[] = 'salon:' . implode(',', $salon_field);
@@ -159,21 +103,21 @@ class SuppliersApiController extends Controller
         }
 
         if ($option) {
-            $successData = Suppliers::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where($where)->get()->makeHidden(['isNewRecord', 'logo_url', 'products'])->toArray();
+            $successData = Tax::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where($where)->get()->makeHidden(['isNewRecord'])->toArray();
             return response()->json($successData, $this->successStatus);
         }
         if ($id) {
             if ($request->result == 'result_array') {
-                $model = Suppliers::with($withArray)->select($field)->where($where)->get();
+                $model = Tax::with($withArray)->select($field)->where($where)->get();
             } else {
-                $model = Suppliers::with($withArray)->select($field)->where($where)->first();
+                $model = Tax::with($withArray)->select($field)->where($where)->first();
             }
             $successData = $model->toArray();
             return response()->json($successData, $this->successStatus);
         } else {
             if ($pagination == true) {
                 if ($whereLike) {
-                    $model = Suppliers::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                    $model = Tax::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
                         if ($whereLike) {
                             $query->where('name', "like", "%" . $whereLike[0] . "%");
                             foreach ($whereLike as $row) {
@@ -182,11 +126,11 @@ class SuppliersApiController extends Controller
                         }
                     })->where($where)->orderByRaw($orderby)->paginate($limit);
                 } else {
-                    $model = Suppliers::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
+                    $model = Tax::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
                 }
             } else {
                 if ($whereLike) {
-                    $model = Suppliers::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                    $model = Tax::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
                         if ($whereLike) {
                             $query->where('name', "like", "%" . $whereLike[0] . "%");
                             foreach ($whereLike as $row) {
@@ -195,7 +139,7 @@ class SuppliersApiController extends Controller
                         }
                     })->where($where)->orderByRaw($orderby)->get();
                 } else {
-                    $model = Suppliers::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                    $model = Tax::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
                 }
             }
             if ($model->count()) {

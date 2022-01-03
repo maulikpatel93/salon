@@ -43,6 +43,11 @@ class CreateSalonsTable extends Migration
             $table->timestamps();
         });
 
+        Schema::table('tax', function (Blueprint $table) {
+            $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
+            $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
+        });
+
         Schema::create('suppliers', function (Blueprint $table) {
             $table->id();
             $table->string('name', 150);

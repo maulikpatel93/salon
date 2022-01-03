@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\v1\RosterApiController;
 use App\Http\Controllers\Api\v1\ServicesApiController;
 use App\Http\Controllers\Api\v1\StaffApiController;
 use App\Http\Controllers\Api\v1\SuppliersApiController;
+use App\Http\Controllers\Api\v1\TaxApiController;
 use App\Http\Controllers\Api\v1\VoucherApiController;
 use Illuminate\Support\Facades\Route;
 
@@ -137,5 +138,9 @@ Route::prefix('v1')->group(function () {
             Route::post('/delete/{id}', [BusytimeApiController::class, 'delete'])->name('delete');
         });
 
+        //Tax
+        Route::prefix('tax')->name('tax.')->group(function () {
+            Route::post('/view', [TaxApiController::class, 'view'])->name('view');
+        });
     });
 });

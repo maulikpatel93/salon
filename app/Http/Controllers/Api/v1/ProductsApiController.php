@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ProductRequest;
 use App\Models\Api\Products;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductsApiController extends Controller
 {
@@ -18,6 +19,7 @@ class ProductsApiController extends Controller
         'id',
         'salon_id',
         'supplier_id',
+        'tax_id',
         'name',
         'image',
         'sku',
@@ -41,6 +43,13 @@ class ProductsApiController extends Controller
         'first_name',
         'last_name',
         'email',
+    ];
+
+    protected $tax_field = [
+        'id',
+        'name',
+        'description',
+        'percentage',
     ];
 
     public function __construct()
@@ -108,7 +117,7 @@ class ProductsApiController extends Controller
     public function returnResponse($request, $id, $data = [])
     {
         $requestAll = $request->all();
-        $field = ($request->field) ? array_merge(['id', 'salon_id', 'supplier_id'], explode(',', $request->field)) : $this->field;
+        $field = ($request->field) ? array_merge(['id', 'salon_id', 'supplier_id', 'tax_id'], explode(',', $request->field)) : $this->field;
         $sort = ($request->sort) ? $request->sort : "";
 
         $salon_field = $this->salon_field;
@@ -128,12 +137,26 @@ class ProductsApiController extends Controller
         } else if ($request->supplier_field) {
             $supplier_field = array_merge(['id'], explode(',', $request->supplier_field));
         }
+
+        $tax_field = $this->tax_field;
+        if (isset($requestAll['tax_field']) && empty($requestAll['tax_field'])) {
+            $tax_field = false;
+        } else if ($request->tax_field == '*') {
+            $tax_field = [$request->tax_field];
+        } else if ($request->tax_field) {
+            $tax_field = array_merge(['id'], explode(',', $request->tax_field));
+        }
+
         $withArray = [];
         if ($salon_field) {
             $withArray[] = 'salon:' . implode(',', $salon_field);
         }
         if ($supplier_field) {
             $withArray[] = 'supplier:' . implode(',', $supplier_field);
+        }
+
+        if ($tax_field) {
+            $withArray[] = 'tax:' . implode(',', $tax_field);
         }
 
         $pagination = $request->pagination ? $request->pagination : false;

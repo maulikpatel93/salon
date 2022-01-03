@@ -4,9 +4,8 @@ namespace App\Models\Api;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
-class Products extends Model
+class Tax extends Model
 {
     use HasFactory;
 
@@ -15,28 +14,18 @@ class Products extends Model
      *
      * @var string
      */
-    protected $table = 'products';
+    protected $table = 'tax';
 
-    protected $appends = ['isNewRecord', 'image_url'];
+    protected $appends = ['isNewRecord'];
     /**
      * The attributes that are mass assignable.
      *
      * @var string[]
      */
     protected $fillable = [
-        'salon_id',
-        'supplier_id',
-        'tax_id',
-        'image',
         'name',
-        'sku',
-        'last_name',
         'description',
-        'cost_price',
-        'retail_price',
-        'manage_stock',
-        'stock_quantity',
-        'low_stock_threshold',
+        'percentage',
         'is_active',
         'is_active_at',
     ];
@@ -63,24 +52,8 @@ class Products extends Model
         return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
     }
 
-    public function getImageUrlAttribute()
-    {
-        $image_url = asset('storage/products');
-        return $this->attributes['image_url'] = $this->image && Storage::disk('public')->exists('products/' . $this->logo) ? $image_url . '/' . $this->image : "";
-    }
-
     public function salon()
     {
         return $this->belongsTo(Salons::class, 'salon_id', 'id');
-    }
-
-    public function supplier()
-    {
-        return $this->belongsTo(Suppliers::class, 'supplier_id', 'id');
-    }
-
-    public function tax()
-    {
-        return $this->belongsTo(Tax::class, 'tax_id', 'id');
     }
 }

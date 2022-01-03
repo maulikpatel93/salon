@@ -30,7 +30,7 @@ class ProductRequest extends FormRequest
             'salon_id' => 'required|integer',
             'supplier_id' => 'required|integer',
             'tax_id' => 'required|integer',
-            'image' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'name' => 'required|max:150|unique:products,name,' . $id . ',id,salon_id,' . $salon_id . ',supplier_id,' . $supplier_id,
             'sku' => 'required|max:150|unique:products,sku,' . $id . ',id,salon_id,' . $salon_id . ',supplier_id,' . $supplier_id,
             'description' => 'required',
