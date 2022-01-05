@@ -19,7 +19,7 @@ class LoginController extends Controller
     | redirecting them to your home screen. The controller uses a trait
     | to conveniently provide its functionality to your applications.
     |
-    */
+     */
 
     use AuthenticatesUsers;
 
@@ -51,14 +51,14 @@ class LoginController extends Controller
         $credentials = [
             'email' => $inputVal['email'],
             'password' => $inputVal['password'],
-            'role_id' => 3
+            'role_id' => 3,
         ];
 
-        if(Auth::guard('web')->attempt($credentials)){
+        if (Auth::guard('web')->attempt($credentials)) {
             $user = Auth::user();
             return redirect()->route('home');
-        }else{
-            return redirect()->route('login')->with('error','Email & Password are incorrect.');
+        } else {
+            return redirect()->route('login')->with('error', 'Email & Password are incorrect.');
         }
     }
 
