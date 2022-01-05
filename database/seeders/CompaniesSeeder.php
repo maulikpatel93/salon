@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-// use Illuminate\Support\Str;
 use Faker\Factory as Faker;
+use Illuminate\Database\Seeder;
+// use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class CompaniesSeeder extends Seeder
 {
@@ -17,18 +17,20 @@ class CompaniesSeeder extends Seeder
     public function run()
     {
         $facker = Faker::create();
-        DB::table('companies')->insert([
+        DB::table('salons')->insert([
             'business_name' => $facker->company(),
-            'business_phone' => $facker->phoneNumber(),
+            'owner_name' => $facker->name(),
+            'business_phone_number' => $facker->phoneNumber(),
             'business_email' => $facker->email(),
+            'business_email_verified' => '1',
+            'business_phone_number_verified' => '1',
             'business_address' => $facker->address(),
-            'type' => '',
-            'number_of_staff' => 0,
-            'timezone' => $facker->timezone(),
+            'salon_type' => 'Unisex',
             'logo' => '',
+            'timezone' => $facker->timezone(),
             'is_active' => 1,
             'created_at' => $facker->DateTime(),
-            'updated_at' => $facker->DateTime()
+            'updated_at' => $facker->DateTime(),
         ]);
     }
 }

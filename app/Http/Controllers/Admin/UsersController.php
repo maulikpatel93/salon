@@ -33,10 +33,19 @@ class UsersController extends Controller
     public function index(Request $request)
     {
         $sort = $request->sort;
-        if ($sort) {
-            $dataProvider = new EloquentDataProvider(Users::query()->where('role_id', '!=', 5));
+
+        if (auth() && auth()->user() && auth()->user()->role_id != 1) {
+            if ($sort) {
+                $dataProvider = new EloquentDataProvider(Users::query()->where('role_id', '!=', 5)->where('role_id', '!=', 1));
+            } else {
+                $dataProvider = new EloquentDataProvider(Users::query()->where('role_id', '!=', 5)->where('role_id', '!=', 1)->orderBy('id', 'desc'));
+            }
         } else {
-            $dataProvider = new EloquentDataProvider(Users::query()->where('role_id', '!=', 5)->orderBy('id', 'desc'));
+            if ($sort) {
+                $dataProvider = new EloquentDataProvider(Users::query()->where('role_id', '!=', 5));
+            } else {
+                $dataProvider = new EloquentDataProvider(Users::query()->where('role_id', '!=', 5)->orderBy('id', 'desc'));
+            }
         }
         return view('admin.users.index', [
             'dataProvider' => $dataProvider,

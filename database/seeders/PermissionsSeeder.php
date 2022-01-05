@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 // use Illuminate\Support\Str;
 
-class RoleSeeder extends Seeder
+class PermissionsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -18,7 +18,7 @@ class RoleSeeder extends Seeder
     public function run()
     {
         $facker = Faker::create();
-        DB::table('roles')->insert([
+        DB::table('permissions')->insert([
             [
                 'name' => 'masteradmin',
                 'is_active' => '1',

@@ -80,7 +80,7 @@ class CreateSalonsTable extends Migration
 
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('image')->after('name')->nullable();
+            $table->string('image')->nullable();
             $table->string('name', 150);
             $table->string('sku', 100);
             $table->text('description');

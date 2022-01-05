@@ -44,10 +44,6 @@ class CreateVoucherTable extends Migration
             $table->foreign('service_id')->references('id')->on('services')->onUpdate('cascade')->onDelete('cascade');
         });
 
-        Schema::table('tax', function (Blueprint $table) {
-            $table->decimal('percentage')->after('description')->nullable()->comment('percentage %');
-        });
-
     }
 
     /**

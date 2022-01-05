@@ -176,6 +176,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\ModalServiceProvider::class,
         Laravel\Passport\PassportServiceProvider::class,
+        Orangehill\Iseed\IseedServiceProvider::class,
     ],
 
     /*

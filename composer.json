@@ -21,6 +21,7 @@
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.3",
         "laravelcollective/html": "^6.2",
+        "orangehill/iseed": "^3.0",
         "proengsoft/laravel-jsvalidation": "^4.5",
         "symfony/css-selector": "^5.3",
         "symfony/dom-crawler": "^5.3"
