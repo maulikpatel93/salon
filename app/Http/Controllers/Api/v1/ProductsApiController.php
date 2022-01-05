@@ -85,6 +85,9 @@ class ProductsApiController extends Controller
     public function update(ProductRequest $request, $id)
     {
         $requestAll = $request->all();
+        $requestAll['manage_stock'] = (isset($requestAll['manage_stock']) && $requestAll['manage_stock']) ? '1' : '0';
+        $requestAll['stock_quantity'] = (isset($requestAll['stock_quantity']) && $requestAll['stock_quantity']) ? $requestAll['stock_quantity'] : null;
+        $requestAll['low_stock_threshold'] = (isset($requestAll['low_stock_threshold']) && $requestAll['low_stock_threshold']) ? $requestAll['low_stock_threshold'] : null;
         $model = $this->findModel($id);
         $model->fill($requestAll);
         $file = $request->file('image');
@@ -154,7 +157,6 @@ class ProductsApiController extends Controller
         if ($supplier_field) {
             $withArray[] = 'supplier:' . implode(',', $supplier_field);
         }
-
         if ($tax_field) {
             $withArray[] = 'tax:' . implode(',', $tax_field);
         }
@@ -171,7 +173,9 @@ class ProductsApiController extends Controller
         if ($sort) {
             $sd = [];
             foreach ($sort as $key => $value) {
-                $sd[] = $key . ' ' . $value;
+                if (!in_array($key, ['supplier'])) {
+                    $sd[] = $key . ' ' . $value;
+                }
             }
             if ($sd) {
                 $orderby = implode(", ", $sd);
@@ -204,6 +208,18 @@ class ProductsApiController extends Controller
                 }
             }
             if ($model->count()) {
+                // if ($sort && isset($sort['supplier']) && $sort['supplier']) {
+                //     $supplierSorting = $sort['supplier'];
+                //     if (isset($supplierSorting['name']) && $supplierSorting['name'] == 'asc') {
+                //         $model->sortBy(function ($model) {
+                //             return $model->supplier->name;
+                //         });
+                //     } else {
+                //         $model->sortByDesc(function ($model) {
+                //             return $model->supplier->name;
+                //         });
+                //     }
+                // }
                 $successData = $model->toArray();
                 if ($successData) {
                     return response()->json($successData, $this->successStatus);
