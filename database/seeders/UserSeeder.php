@@ -55,6 +55,25 @@ class UserSeeder extends Seeder
                 'created_at' => $facker->DateTime(),
                 'updated_at' => $facker->DateTime(),
             ],
+            [
+                'role_id' => 4,
+                'salon_id' => 1,
+                'first_name' => $facker->firstName(),
+                'last_name' => $facker->lastName(),
+                'username' => $facker->userName(),
+                'email' => $facker->email(),
+                'email_verified' => '1',
+                'email_verified_at' => $facker->DateTime(),
+                'password' => Hash::make('123456'),
+                'phone_number' => $facker->phoneNumber(),
+                'phone_number_verified' => '1',
+                'phone_number_verified_at' => $facker->DateTime(),
+                'profile_photo' => '',
+                'is_active' => '1',
+                'is_active_at' => $facker->DateTime(),
+                'created_at' => $facker->DateTime(),
+                'updated_at' => $facker->DateTime(),
+            ],
         ]);
     }
 }
