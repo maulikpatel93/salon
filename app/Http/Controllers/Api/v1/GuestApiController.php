@@ -77,8 +77,8 @@ class GuestApiController extends Controller
         $credentials = [
             'email' => $request->email,
             'password' => $request->password,
-            'is_active' => '1',
-            'email_verified' => '1',
+            // 'is_active' => 1,
+            // 'email_verified' => 1,
         ];
         $credentials_4 = array_merge(['role_id' => 4], $credentials); // Salon role
         $credentials_5 = array_merge(['role_id' => 5], $credentials); // Client role

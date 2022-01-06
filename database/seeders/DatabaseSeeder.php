@@ -20,9 +20,8 @@ class DatabaseSeeder extends Seeder
         $this->call(RolesAccessTableSeeder::class);
         $this->call([
             CompaniesSeeder::class,
-            // RoleSeeder::class,
-            // ModuleSeeder::class,
             UserSeeder::class,
+            TaxSeeder::class,
         ]);
     }
 }
