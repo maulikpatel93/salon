@@ -127,7 +127,7 @@ https://github.com/itstructure/laravel-grid-view
 Multiple form clonData library
 https://www.jqueryscript.net/demo/clone-field-increment-id/
 
-Storage folder pass public
+Storage folder pass
 php artisan storage:link
 
 
@@ -143,3 +143,20 @@ SET  @num := 0;
 UPDATE your_table SET id = @num := (@num+1);
 
 ALTER TABLE your_table AUTO_INCREMENT =1;
+
+
+
+Server Side databse export to seed file command
+
+php artisan iseed roles
+php artisan iseed modules
+php artisan iseed permissions
+php artisan iseed roles_access
+
+
+Server file buid in laravel
+
+1.Create .env file
+2.php artisan migrate
+3.php artisan db:seed  (Data insert in datatable)
+2.Api use command - php artisan passport:install
