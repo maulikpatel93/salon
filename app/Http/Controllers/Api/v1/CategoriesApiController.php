@@ -70,7 +70,7 @@ class CategoriesApiController extends Controller
     {
         $requestAll = $request->all();
         Categories::where('id', $id)->delete();
-        return response()->json(['status' => $this->successStatus, 'message' => 'success']);
+        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
     }
 
     protected function findModel($id)

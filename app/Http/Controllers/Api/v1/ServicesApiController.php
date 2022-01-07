@@ -199,7 +199,7 @@ class ServicesApiController extends Controller
     {
         $requestAll = $request->all();
         Services::where('id', $id)->delete();
-        return response()->json(['status' => $this->successStatus, 'message' => 'success']);
+        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
     }
 
     protected function findModel($id)
@@ -214,6 +214,8 @@ class ServicesApiController extends Controller
     {
         $requestAll = $request->all();
         $field = ($request->field) ? array_merge(['id', 'salon_id', 'category_id'], explode(',', $request->field)) : $this->field;
+        $sort = ($request->sort) ? $request->sort : "";
+        $option = ($request->option) ? $request->option : "";
 
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
@@ -255,23 +257,69 @@ class ServicesApiController extends Controller
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
-        $where = ['is_active' => '1'];
+        $where = ['is_active' => '1', 'salon_id' => $request->salon_id];
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
-        if ($pagination == true) {
-            $model = Services::with($withArray)->select($field)->where($where)->simplePaginate($limit);
-        } else {
-            $model = Services::with($withArray)->select($field)->where($where)->get();
-        }
-        if ($model->count()) {
-            $successData = $model->toArray();
-            if ($successData) {
-                if ($pagination == true) {
-                    return response()->json(array_merge(['status' => $this->successStatus, 'message' => 'Success'], $successData));
-                }
-                return response()->json(['status' => $this->successStatus, 'message' => 'Success', 'data' => $successData]);
+        $whereLike = $request->q ? explode(' ', $request->q) : '';
+
+        $orderby = 'id desc';
+        if ($sort) {
+            $sd = [];
+            foreach ($sort as $key => $value) {
+                $sd[] = $key . ' ' . $value;
+            }
+            if ($sd) {
+                $orderby = implode(", ", $sd);
             }
         }
-        return response()->json(['status' => $this->errorStatus, 'message' => 'Failed']);
+
+        if ($option) {
+            $successData = Services::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where($where)->get()->makeHidden(['isNewRecord', 'logo_url', 'products'])->toArray();
+            return response()->json($successData, $this->successStatus);
+        }
+        if ($id) {
+            if ($request->result == 'result_array') {
+                $model = Services::with($withArray)->select($field)->where($where)->get();
+            } else {
+                $model = Services::with($withArray)->select($field)->where($where)->first();
+            }
+            $successData = $model->toArray();
+            return response()->json($successData, $this->successStatus);
+        } else {
+            if ($pagination == true) {
+                if ($whereLike) {
+                    $model = Services::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                        if ($whereLike) {
+                            $query->where('name', "like", "%" . $whereLike[0] . "%");
+                            foreach ($whereLike as $row) {
+                                $query->orWhere('name', "like", "%" . $row . "%");
+                            }
+                        }
+                    })->where($where)->orderByRaw($orderby)->paginate($limit);
+                } else {
+                    $model = Services::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
+                }
+            } else {
+                if ($whereLike) {
+                    $model = Services::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                        if ($whereLike) {
+                            $query->where('name', "like", "%" . $whereLike[0] . "%");
+                            foreach ($whereLike as $row) {
+                                $query->orWhere('name', "like", "%" . $row . "%");
+                            }
+                        }
+                    })->where($where)->orderByRaw($orderby)->get();
+                } else {
+                    $model = Services::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                }
+            }
+            if ($model->count()) {
+                $successData = $model->toArray();
+                if ($successData) {
+                    return response()->json($successData, $this->successStatus);
+                }
+            }
+        }
+        return response()->json(['message' => __('messages.failed')], $this->errorStatus);
     }
 }
