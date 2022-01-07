@@ -16,7 +16,10 @@
 10. sudo chmod 777 -R project/public
 11. itstructure/laravel-detail-view and itstructure/laravel-grid-view  override vendor folder (Copy and paste in vendor folder) use link : https://github.com/maulikpatel93/itstructure
 12. npm run dev  (laravel mix css js use)
-13. git add -f public/fonts/vendor
+13. npm install dotenv
+14. webpack.mix.js file add 
+require('dotenv').config(); top in file
+mix.setResourceRoot(process.env.APP_URL);
 ================================================================================================================================
 
 #Laravel New Project setuap
