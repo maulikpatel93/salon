@@ -1,5 +1,5 @@
 const mix = require("laravel-mix");
-
+require('dotenv').config();
 /*
  |--------------------------------------------------------------------------
  | Mix Asset Management
@@ -104,7 +104,8 @@ mix.js("resources/js/app.js", "public/js")
         //     ],
         // },
     });
-
+//mix.setPublicPath('public');
+mix.setResourceRoot(process.env.APP_URL);
 if (!mix.inProduction()) {
     mix.sourceMaps();
     mix.webpackConfig({ devtool: "inline-source-map" });

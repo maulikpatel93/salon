@@ -205,7 +205,7 @@
 
 .kv-loader {
   position: absolute;
-  background: #fff url(/images/loading.gif?60b8b112d26390fbea0346650025a9f1) center center no-repeat !important;
+  background: #fff url(http://localhost/images/loading.gif?60b8b112d26390fbea0346650025a9f1) center center no-repeat !important;
   width: 100px;
   height: 100px;
   top: 50%;
