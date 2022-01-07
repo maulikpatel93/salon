@@ -14,7 +14,7 @@
 8. php artisan vendor:publish --tag=laravel-errors
 9. sudo chmod 777 -R project/storage
 10. sudo chmod 777 -R project/public
-11. itstructure/laravel-detail-view and itstructure/laravel-grid-view  override vendor folder (Copy and paste in vendor folder)
+11. itstructure/laravel-detail-view and itstructure/laravel-grid-view  override vendor folder (Copy and paste in vendor folder) use link : https://github.com/maulikpatel93/itstructure
 ================================================================================================================================
 
 #Laravel New Project setuap
