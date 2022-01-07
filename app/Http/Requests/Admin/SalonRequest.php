@@ -32,7 +32,7 @@ class SalonRequest extends FormRequest
             'business_address' => 'required',
             'salon_type' => 'required',
             'timezone' => 'required',
-            'logo' => 'image|mimes:jpeg,png,jpg,svg|max:2048',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
         ];
         return $rules;
     }

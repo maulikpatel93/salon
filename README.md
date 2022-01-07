@@ -3,6 +3,7 @@
 #Laravel Curret Salon Project setuap
 ======================================================================================================
 #Salon Project setuap- Command with filechanges
+
 1. check .env file (Database Name change)
 2. composer install (Composer letest verison)
 3. npm install (node package letest verison)
@@ -13,6 +14,7 @@
 8. php artisan vendor:publish --tag=laravel-errors
 9. sudo chmod 777 -R project/storage
 10. sudo chmod 777 -R project/public
+11. itstructure/laravel-detail-view and itstructure/laravel-grid-view  override vendor folder (Copy and paste in vendor folder)
 ================================================================================================================================
 
 #Laravel New Project setuap
