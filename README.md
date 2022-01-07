@@ -20,6 +20,7 @@
 14. webpack.mix.js file add 
 require('dotenv').config(); top in file
 mix.setResourceRoot(process.env.APP_URL);
+15.npm run dev
 ================================================================================================================================
 
 #Laravel New Project setuap
