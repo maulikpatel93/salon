@@ -4,7 +4,7 @@
     $unique_title = str_replace(' ', '_', strtolower($title_single)); //without space
     $formName = $title_single.'form';
     $formRoute = (!$model->id) ? route('admin.users.store') : route('admin.users.update', ['id' => encode($model->id)]);
-    $roles = Roles::where('is_active', '1')->whereIn('id', [2,3])->get()->pluck('name', 'id')->toArray();
+    $roles = Roles::where('is_active', '1')->whereIn('id', [2,4])->get()->pluck('name', 'id')->toArray();
     $salonsUrl = route('admin.users.salons', ['role_id' => $model->role_id, 'salon_id' => $model->salon_id]);
 @endphp
 {{ Form::open([
