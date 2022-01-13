@@ -43,12 +43,18 @@ class ServicesApiController extends Controller
     protected $category_field = ['id', 'name'];
 
     //Services_Price Column name default ['*']
-    protected $service_field = [
+    protected $serviceprice_field = [
         'id',
         'service_id',
         'name',
         'price',
         'add_on_price',
+    ];
+
+    protected $addOnService_field = [
+        'id',
+        'service_id',
+        'add_on_service_id',
     ];
 
     protected $service_price = [
@@ -235,14 +241,24 @@ class ServicesApiController extends Controller
             $category_field = array_merge(['id'], explode(',', $request->category_field));
         }
 
-        $service_field = $this->service_field;
-        if (isset($requestAll['service_field']) && empty($requestAll['service_field'])) {
-            $service_field = false;
-        } else if ($request->service_field == '*') {
-            $service_field = [$request->service_field];
-        } else if ($request->service_field) {
-            $service_field = array_merge(['id', 'service_id'], explode(',', $request->service_field));
+        $serviceprice_field = $this->serviceprice_field;
+        if (isset($requestAll['serviceprice_field']) && empty($requestAll['serviceprice_field'])) {
+            $serviceprice_field = false;
+        } else if ($request->serviceprice_field == '*') {
+            $serviceprice_field = [$request->serviceprice_field];
+        } else if ($request->serviceprice_field) {
+            $serviceprice_field = array_merge(['id', 'service_id'], explode(',', $request->serviceprice_field));
         }
+
+        $addOnService_field = $this->addOnService_field;
+        if (isset($requestAll['addOnService_field']) && empty($requestAll['addOnService_field'])) {
+            $addOnService_field = false;
+        } else if ($request->addOnService_field == '*') {
+            $addOnService_field = [$request->addOnService_field];
+        } else if ($request->addOnService_field) {
+            $addOnService_field = array_merge(['id'], explode(',', $request->addOnService_field));
+        }
+
         $withArray = [];
         if ($salon_field) {
             $withArray[] = 'salon:' . implode(',', $salon_field);
@@ -250,10 +266,12 @@ class ServicesApiController extends Controller
         if ($category_field) {
             $withArray[] = 'category:' . implode(',', $category_field);
         }
-        if ($service_field) {
-            $withArray[] = 'serviceprice:' . implode(',', $service_field);
+        if ($serviceprice_field) {
+            $withArray[] = 'serviceprice:' . implode(',', $serviceprice_field);
         }
-
+        if ($addOnService_field) {
+            $withArray[] = 'addonservices:' . implode(',', $addOnService_field);
+        }
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
