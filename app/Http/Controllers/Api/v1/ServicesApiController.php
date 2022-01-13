@@ -222,6 +222,7 @@ class ServicesApiController extends Controller
         $field = ($request->field) ? array_merge(['id', 'salon_id', 'category_id'], explode(',', $request->field)) : $this->field;
         $sort = ($request->sort) ? $request->sort : "";
         $option = ($request->option) ? $request->option : "";
+        $not_id = ($request->not_id) ? $request->not_id : "";
 
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
@@ -277,7 +278,6 @@ class ServicesApiController extends Controller
 
         $where = ['is_active' => '1', 'salon_id' => $request->salon_id];
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
-
         $whereLike = $request->q ? explode(' ', $request->q) : '';
 
         $orderby = 'id desc';
@@ -328,7 +328,11 @@ class ServicesApiController extends Controller
                         }
                     })->where($where)->orderByRaw($orderby)->get();
                 } else {
-                    $model = Services::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                    if ($not_id) {
+                        $model = Services::with($withArray)->select($field)->where($where)->whereNotIn('id', explode(',', $not_id))->orderByRaw($orderby)->get();
+                    } else {
+                        $model = Services::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                    }
                 }
             }
             if ($model->count()) {

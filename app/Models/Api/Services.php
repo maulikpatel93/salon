@@ -15,6 +15,7 @@ class Services extends Model
      * @var string
      */
     protected $table = 'services';
+    protected $appends = ['isNotId', 'isServiceChecked'];
 
     /**
      * The attributes that are mass assignable.
@@ -87,5 +88,20 @@ class Services extends Model
     public function voucherservice()
     {
         return $this->belongsToMany(Voucher::class, 'voucher_services', 'service_id', 'voucher_id')->select('voucher_id', 'name');
+    }
+
+    public function getIsNotIdAttribute($data)
+    {
+        echo '<pre>';
+        print_r($data);
+        echo '<pre>';
+        dd();
+
+        return $this->attributes['isNotId'] = '';
+    }
+
+    public function getIsServiceCheckedAttribute()
+    {
+        return $this->attributes['isServiceChecked'] = ($this->created_at != $this->updated_at) ? false : true;
     }
 }
