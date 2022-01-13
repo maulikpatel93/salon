@@ -18,7 +18,34 @@
     ],
     'showHead' => false,
     'rowFields' => [
-        'fisrt_name',
+        'panel',
+        'first_name',
+        'last_name',
+        'username',
+        'email',
+        [
+            'label' => 'Email verify',
+            'value' => function ($model) { // You can set 'value' as a callback function to get a row data value dynamically.
+                return $model->email_verified == 1 ? 'Verified' : 'Not Verify';
+            },
+            'format' => 'html', // To render row content without lossless of html tags, set 'html' formatter.
+        ],
+        'phone_number',
+        [
+            'label' => 'Phonenumber verify',
+            'value' => function ($model) { // You can set 'value' as a callback function to get a row data value dynamically.
+                return $model->email_verified == 1 ? 'Verified' : 'Not Verify';
+            },
+            'format' => 'html', // To render row content without lossless of html tags, set 'html' formatter.
+        ],
+        'gender',
+        'date_of_birth',
+        'address',
+        'street',
+        'suburb',
+        'state',
+        'postcode',
+        'description',
         [
             'label' => 'Active', // Row label.
             'value' => function ($model) { // You can set 'value' as a callback function to get a row data value dynamically.

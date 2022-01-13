@@ -36,6 +36,21 @@ if (!empty(checkaccess('isactive', getControllerName())) || !empty(checkaccess('
     $applyafter = $applydropdown . ' ' . $applySubmit;
 }
 $actionTypes = [];
+if (!empty(checkaccess('changepassword', getControllerName()))) {
+    $actionTypes[] = [
+        'class' => Itstructure\GridView\Actions\Custom::class,
+        'url' => function ($model) {
+            // Optional
+            return route('admin.users.changepassword', ['id' => encode($model->id)]);
+        },
+        'htmlAttributes' => [
+            // Optional
+            'class' => 'showModalButton text-dark ms-1 me-1',
+            'title' => 'Change Password',
+        ],
+        'label' => '<span class="fas fa-key"></span>',
+    ];
+}
 if (!empty(checkaccess('view', getControllerName()))) {
     $actionTypes[] = [
                         'class' => Itstructure\GridView\Actions\View::class, // Required

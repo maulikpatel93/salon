@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ChangePasswordRequest;
 use App\Http\Requests\Admin\UserAccessRequest;
 use App\Http\Requests\Admin\UserRequest;
 use App\Models\Permissions;
@@ -60,20 +61,20 @@ class UsersController extends Controller
 
     public function store(UserRequest $request)
     {
-        $inputVal = $request->all();
+        $requestAll = $request->all();
         $email_username = explode('@', $requestAll['email']);
 
-        $inputVal['salon_id'] = (isset($inputVal['salon_id'])) ? $inputVal['salon_id'] : '';
-        $inputVal['email_verified'] = '1';
-        $inputVal['email_verified_at'] = currentDateTime();
-        $inputVal['phone_number_verified'] = '0';
-        $inputVal['password'] = Hash::make($inputVal['password']);
-        $inputVal['is_active_at'] = currentDateTime();
+        $requestAll['salon_id'] = (isset($requestAll['salon_id'])) ? $requestAll['salon_id'] : '';
+        $requestAll['email_verified'] = '1';
+        $requestAll['email_verified_at'] = currentDateTime();
+        $requestAll['phone_number_verified'] = '0';
+        $requestAll['password'] = Hash::make($requestAll['password']);
+        $requestAll['is_active_at'] = currentDateTime();
         $token = Str::random(config('params.auth_key_character'));
-        $inputVal['auth_key'] = hash('sha256', $token);
-        $inputVal['username'] = $email_username ? $email_username[0] : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
+        $requestAll['auth_key'] = hash('sha256', $token);
+        $requestAll['username'] = $email_username ? $email_username[0] : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
         $model = new Users();
-        if ($request->ajax() && $model->create($inputVal)) {
+        if ($request->ajax() && $model->create($requestAll)) {
             $responseData['status'] = 200;
             $responseData['message'] = 'Success';
             $responseData['url'] = false;
@@ -91,11 +92,32 @@ class UsersController extends Controller
     public function update(UserRequest $request, $id)
     {
         // $validated = $request->validated();
-        $inputVal = $request->all();
-        $inputVal['controller'] = $inputVal['controller'] ?? '';
-        $inputVal['action'] = $inputVal['action'] ?? '';
+        $requestAll = $request->all();
+        $requestAll['controller'] = $requestAll['controller'] ?? '';
+        $requestAll['action'] = $requestAll['action'] ?? '';
         $model = $this->findModel(decode($id));
-        if ($request->ajax() && $model->update($inputVal)) {
+        if ($request->ajax() && $model->update($requestAll)) {
+            $responseData['status'] = 200;
+            $responseData['message'] = 'Success';
+            $responseData['url'] = false;
+            return response()->json($responseData);
+        }
+        return redirect()->route('admin.users.index');
+    }
+
+    public function changepassword($id)
+    {
+        $model = $this->findModel(decode($id));
+        return view('admin.users.changepassword', ['model' => $model]);
+    }
+
+    public function changepasswordupdate(ChangePasswordRequest $request, $id)
+    {
+        // $validated = $request->validated();
+        $requestAll = $request->all();
+        $requestAll['password'] = Hash::make($requestAll['password']);
+        $model = $this->findModel(decode($id));
+        if ($request->ajax() && $model->update($requestAll)) {
             $responseData['status'] = 200;
             $responseData['message'] = 'Success';
             $responseData['url'] = false;
@@ -106,7 +128,8 @@ class UsersController extends Controller
 
     public function view(Request $request, $id)
     {
-        return view('admin.users.view');
+        $model = $this->findModel(decode($id));
+        return view('admin.users.view', ['model' => $model]);
     }
 
     public function delete(Request $request, $id)
@@ -192,9 +215,9 @@ class UsersController extends Controller
     public function accessupdate(UserAccessRequest $request, $id)
     {
         $id = decode($id);
-        $inputVal = $request->all();
-        $permission_id = isset($inputVal['permission_id']) ? $inputVal['permission_id'] : [];
-        $access = isset($inputVal['access']) ? $inputVal['access'] : [];
+        $requestAll = $request->all();
+        $permission_id = isset($requestAll['permission_id']) ? $requestAll['permission_id'] : [];
+        $access = isset($requestAll['access']) ? $requestAll['access'] : [];
         if ($permission_id) {
             foreach ($permission_id as $key => $value) {
                 $checkPermissionId = Permissions::where(['id' => $value])->count();

@@ -39,7 +39,7 @@ class UserRequest extends FormRequest
             return $rules;
         } else {
             $add_validate_rules = [
-                'username' => 'required|username|unique:users,username,' . $id . ',id,salon_id,' . $salon_id . ',role_id,' . $role_id,
+                'username' => 'unique:users,username,' . $id . ',id,salon_id,' . $salon_id . ',role_id,' . $role_id,
                 'password' => 'required|min:6',
                 'confirm_password' => 'required|required_with:password|same:password|min:6',
             ];

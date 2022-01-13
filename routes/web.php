@@ -193,8 +193,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/delete/{id}', [UsersController::class, 'delete'])->name('delete')->middleware('checkpermission');
             Route::post('/isactive/{id}', [UsersController::class, 'isactive'])->name('isactive')->middleware('checkpermission');
             Route::post('/applystatus', [UsersController::class, 'applystatus'])->name('applystatus')->middleware('checkpermission');
-            Route::get('/access/{id}', [UsersController::class, 'access'])->name('access')->middleware('checkpermission');
-            Route::post('/accessupdate/{id}', [UsersController::class, 'accessupdate'])->name('accessupdate');
+            Route::post('/changepassword/{id}', [UsersController::class, 'changepassword'])->name('changepassword')->middleware('checkpermission');
+            Route::post('/changepasswordupdate/{id}', [UsersController::class, 'changepasswordupdate'])->name('changepasswordupdate');
             //Dependent-Dropdown
             Route::post('/salons', [UsersController::class, 'salons'])->name('salons');
         });
