@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SalonRequest;
 use App\Models\Salons;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Itstructure\GridView\DataProviders\EloquentDataProvider;
 
@@ -51,7 +50,7 @@ class SalonsController extends Controller
         $inputVal['business_email_verified'] = '1';
         $inputVal['business_email_verified_at'] = currentDateTime();
         $inputVal['business_phone_number_verified'] = '0';
-        $inputVal['password'] = Hash::make($inputVal['password']);
+        // $inputVal['password'] = Hash::make($inputVal['password']);
         $inputVal['is_active_at'] = currentDateTime();
 
         $file = $request->file('logo');
