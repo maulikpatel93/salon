@@ -35,12 +35,12 @@ class SupplierRequest extends FormRequest
             'phone_number' => "required|regex:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/",
             'email' => 'required|email|unique:suppliers,email,' . $id . ',id,salon_id,' . $salon_id,
             'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'website' => 'required|url',
-            'address' => 'required',
-            'street' => 'required|max:100',
-            'suburb' => 'required|max:50',
-            'state' => 'required|max:50',
-            'postcode' => 'required|max:10',
+            // 'website' => 'required|url',
+            // 'address' => 'required',
+            // 'street' => 'required|max:100',
+            // 'suburb' => 'required|max:50',
+            // 'state' => 'required|max:50',
+            // 'postcode' => 'required|max:10',
         ];
         if ($id) {
             $update_validate = [];

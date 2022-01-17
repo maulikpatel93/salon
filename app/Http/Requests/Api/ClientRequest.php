@@ -36,13 +36,13 @@ class ClientRequest extends FormRequest
             'email' => 'required|email|unique:users,email,' . $id . ',id,salon_id,' . $salon_id . ',role_id,' . $role_id,
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'gender' => 'required',
-            'date_of_birth' => 'required',
-            'address' => 'required',
-            'street' => 'required|max:100',
-            'suburb' => 'required|max:50',
-            'state' => 'required|max:50',
-            'postcode' => 'required|max:10',
-            'description' => 'required|max:10',
+            // 'date_of_birth' => 'required',
+            // 'address' => 'required',
+            // 'street' => 'required|max:100',
+            // 'suburb' => 'required|max:50',
+            // 'state' => 'required|max:50',
+            // 'postcode' => 'required|max:10',
+            // 'description' => 'required|max:10',
         ];
         return $rules;
     }
