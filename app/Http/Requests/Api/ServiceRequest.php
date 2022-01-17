@@ -34,8 +34,8 @@ class ServiceRequest extends FormRequest
             'description' => 'required',
             'duration' => 'required|max:6',
             'padding_time' => 'required|max:6',
-            'color' => 'required|max:7',
-            'deposit_booked_price' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
+            // 'color' => 'required|max:7',
+            'deposit_booked_price' => 'required_if:deposit_booked_online,1',
         ];
     }
 }

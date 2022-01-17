@@ -78,6 +78,9 @@ class ProductsApiController extends Controller
             $model->image = $fileName;
         }
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : '';
+        $requestAll['manage_stock'] = (isset($requestAll['manage_stock']) && $requestAll['manage_stock']) ? '1' : '0';
+        $requestAll['stock_quantity'] = (isset($requestAll['stock_quantity']) && $requestAll['stock_quantity']) ? $requestAll['stock_quantity'] : null;
+        $requestAll['low_stock_threshold'] = (isset($requestAll['low_stock_threshold']) && $requestAll['low_stock_threshold']) ? $requestAll['low_stock_threshold'] : null;
         $model->save();
         return $this->returnResponse($request, $model->id);
     }
