@@ -6,6 +6,8 @@ use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ServiceRequest;
 use App\Models\Api\AddOnServices;
+use App\Models\Api\Categories;
+use App\Models\Api\PriceTier;
 use App\Models\Api\Services;
 use App\Models\Api\ServicesPrice;
 use App\Models\Api\StaffServices;
@@ -222,7 +224,6 @@ class ServicesApiController extends Controller
         $field = ($request->field) ? array_merge(['id', 'salon_id', 'category_id'], explode(',', $request->field)) : $this->field;
         $sort = ($request->sort) ? $request->sort : "";
         $option = ($request->option) ? $request->option : "";
-        $not_id = ($request->not_id) ? $request->not_id : "";
 
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
@@ -328,11 +329,7 @@ class ServicesApiController extends Controller
                         }
                     })->where($where)->orderByRaw($orderby)->get();
                 } else {
-                    if ($not_id) {
-                        $model = Services::with($withArray)->select($field)->where($where)->whereNotIn('id', explode(',', $not_id))->orderByRaw($orderby)->get();
-                    } else {
-                        $model = Services::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
-                    }
+                    $model = Services::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
                 }
             }
             if ($model->count()) {
@@ -343,5 +340,47 @@ class ServicesApiController extends Controller
             }
         }
         return response()->json(['message' => __('messages.failed')], $this->errorStatus);
+    }
+
+    public function addonservices(Request $request)
+    {
+        $requestAll = $request->all();
+        $id = $request->id;
+        $isNotId = $request->isNotId;
+        $salon_id = $request->salon_id;
+        if ($salon_id) {
+            $add_on_services = Categories::with(['services' => function ($query) use ($isNotId, $salon_id) {
+                if ($isNotId) {
+                    $query->whereNotIn('id', explode(',', $isNotId));
+                }
+                $query->select('category_id', 'id', 'name')->where('salon_id', $salon_id);
+            }])->has('services')->select('id', 'name')->get()->toArray();
+            if ($add_on_services) {
+                $successData = $add_on_services;
+                return response()->json($successData, $this->successStatus);
+            }
+        }
+        return response()->json(['message' => __('messages.not_found')], $this->errorStatus);
+    }
+
+    public function staffservices(Request $request)
+    {
+        $requestAll = $request->all();
+        $id = $request->id;
+        $isNotId = $request->isNotId;
+        $salon_id = $request->salon_id;
+        if ($salon_id) {
+            $staffservices = PriceTier::with(['staff' => function ($query) use ($isNotId, $salon_id) {
+                if ($isNotId) {
+                    $query->whereNotIn('id', explode(',', $isNotId));
+                }
+                $query->select('price_tier_id', 'id', 'first_name', 'last_name', 'email', 'phone_number')->where('salon_id', $salon_id);
+            }])->has('staff')->select('id', 'name')->get()->toArray();
+            if ($staffservices) {
+                $successData = $staffservices;
+                return response()->json($successData, $this->successStatus);
+            }
+        }
+        return response()->json(['message' => __('messages.not_found')], $this->errorStatus);
     }
 }

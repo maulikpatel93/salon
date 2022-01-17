@@ -2,6 +2,7 @@
 
 namespace App\Models\Api;
 
+use App\Models\Api\AddOnServices;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -90,18 +91,19 @@ class Services extends Model
         return $this->belongsToMany(Voucher::class, 'voucher_services', 'service_id', 'voucher_id')->select('voucher_id', 'name');
     }
 
-    public function getIsNotIdAttribute($data)
+    public function getIsNotIdAttribute()
     {
-        echo '<pre>';
-        print_r($data);
-        echo '<pre>';
-        dd();
-
-        return $this->attributes['isNotId'] = '';
+        $isNotId = isset($_REQUEST['isNotId']) && $_REQUEST['isNotId'] ? $_REQUEST['isNotId'] : 0;
+        return $this->attributes['isNotId'] = $isNotId;
     }
 
     public function getIsServiceCheckedAttribute()
     {
-        return $this->attributes['isServiceChecked'] = ($this->created_at != $this->updated_at) ? false : true;
+        $isNotId = isset($_REQUEST['isNotId']) && $_REQUEST['isNotId'] ? $_REQUEST['isNotId'] : 0;
+        if ($isNotId) {
+            $AddOnServices = AddOnServices::where(['service_id' => $isNotId, 'add_on_service_id' => $this->id])->count();
+            return $this->attributes['isServiceChecked'] = $AddOnServices ? true : false;
+        }
+        return $this->attributes['isServiceChecked'] = false;
     }
 }

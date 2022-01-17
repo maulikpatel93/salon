@@ -79,6 +79,8 @@ Route::prefix('v1')->group(function () {
             Route::post('/store', [ServicesApiController::class, 'store'])->name('store');
             Route::post('/update/{id}', [ServicesApiController::class, 'update'])->name('update');
             Route::post('/delete/{id}', [ServicesApiController::class, 'delete'])->name('delete');
+            Route::post('/addonservices', [ServicesApiController::class, 'addonservices'])->name('addonservices');
+            Route::post('/staffservices', [ServicesApiController::class, 'staffservices'])->name('staffservices');
         });
 
         //Price tier
