@@ -64,7 +64,7 @@ class UsersController extends Controller
         $requestAll = $request->all();
         $email_username = explode('@', $requestAll['email']);
 
-        $requestAll['salon_id'] = (isset($requestAll['salon_id'])) ? $requestAll['salon_id'] : '';
+        $requestAll['salon_id'] = (isset($requestAll['salon_id'])) ? $requestAll['salon_id'] : null;
         $requestAll['email_verified'] = '1';
         $requestAll['email_verified_at'] = currentDateTime();
         $requestAll['phone_number_verified'] = '0';
