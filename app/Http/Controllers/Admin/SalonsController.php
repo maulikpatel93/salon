@@ -6,7 +6,9 @@ use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SalonRequest;
 use App\Models\Salons;
+use App\Models\Tax;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Itstructure\GridView\DataProviders\EloquentDataProvider;
 
@@ -61,6 +63,21 @@ class SalonsController extends Controller
         }
         $model = new Salons();
         if ($request->ajax() && $model->create($inputVal)) {
+            $lastInsertId = DB::getPdo()->lastInsertId();
+            $taxname = config('params.tax');
+            if ($taxname) {
+                foreach ($taxname as $tname) {
+                    $taxModel = Tax::where(['salon_id' => $lastInsertId, 'name' => $tname])->first();
+                    if (empty($taxModel)) {
+                        $taxModel = new Tax();
+                    }
+                    $taxModel->salon_id = $lastInsertId;
+                    $taxModel->name = $tname;
+                    $taxModel->description = null;
+                    $taxModel->percentage = null;
+                    $taxModel->save();
+                }
+            }
             $responseData['status'] = 200;
             $responseData['message'] = 'Success';
             $responseData['url'] = false;
@@ -96,6 +113,20 @@ class SalonsController extends Controller
             $inputVal['logo'] = $fileName;
         }
         if ($request->ajax() && $model->update($inputVal)) {
+            $taxname = config('params.tax');
+            if ($taxname) {
+                foreach ($taxname as $tname) {
+                    $taxModel = Tax::where(['salon_id' => $model->id, 'name' => $tname])->first();
+                    if (empty($taxModel)) {
+                        $taxModel = new Tax();
+                    }
+                    $taxModel->salon_id = $model->id;
+                    $taxModel->name = $tname;
+                    $taxModel->description = null;
+                    $taxModel->percentage = null;
+                    $taxModel->save();
+                }
+            }
             $responseData['status'] = 200;
             $responseData['message'] = 'Success';
             $responseData['url'] = false;

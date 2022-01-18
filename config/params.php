@@ -12,6 +12,7 @@ return [
         'Junior' => 'Junior',
         'Senior' => 'Senior',
     ],
+    'tax' => ['GST', 'QST', 'PST', 'HST'],
     'timezones' => array(
         'Pacific/Midway' => "(GMT-11:00) Midway Island",
         'US/Samoa' => "(GMT-11:00) Samoa",
