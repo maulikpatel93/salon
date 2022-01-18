@@ -123,12 +123,12 @@ class CreateSalonsTable extends Migration
             $table->id();
             $table->string('name', 100);
             $table->text('description');
-            $table->string('duration', 50)->comment('minutes');
-            $table->string('padding_time', 50)->comment('minutes');
-            $table->string('color', 10)->comment('color code #fcfcfcfc');
+            $table->string('duration', 50)->nullable()->comment('minutes');
+            $table->string('padding_time', 50)->nullable()->comment('minutes');
+            $table->string('color', 10)->nullable()->comment('color code #fcfcfcfc');
             $table->enum('service_booked_online', ['0', '1'])->default(1); // 1:Active, 0:Inactive
             $table->enum('deposit_booked_online', ['0', '1'])->default(0); // 1:Active, 0:Inactive
-            $table->decimal('deposit_booked_price', 10, 2);
+            $table->decimal('deposit_booked_price', 10, 2)->nullable();
             $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();

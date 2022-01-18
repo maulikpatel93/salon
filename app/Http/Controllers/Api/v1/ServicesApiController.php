@@ -24,6 +24,7 @@ class ServicesApiController extends Controller
         'id',
         'salon_id',
         'category_id',
+        'tax_id',
         'name',
         'description',
         'duration',
@@ -43,6 +44,12 @@ class ServicesApiController extends Controller
 
     //Categories Column name default ['*']
     protected $category_field = ['id', 'name'];
+
+    protected $tax_field = [
+        'id',
+        'name',
+        'percentage',
+    ];
 
     //Services_Price Column name default ['*']
     protected $serviceprice_field = [
@@ -96,20 +103,32 @@ class ServicesApiController extends Controller
         $service_price = ($request->service_price) ? json_decode($request->service_price, true) : [];
         $add_on_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
         $staff_services = ($request->staff_services) ? explode(",", $request->staff_services) : [];
-
+        // echo '<pre>';
+        // if ($service_price) {
+        //     foreach ($service_price as $key => $value) {
+        //         print_r($key);
+        //         print_r($value);
+        //     }
+        // }
+        // echo '<pre>';
+        // dd();
         $requestAll['is_active_at'] = currentDateTime();
+        $requestAll['service_booked_online'] = (isset($requestAll['service_booked_online']) && $requestAll['service_booked_online']) ? '1' : '0';
+        $requestAll['deposit_booked_online'] = (isset($requestAll['deposit_booked_online']) && $requestAll['deposit_booked_online']) ? '1' : '0';
+        $requestAll['deposit_booked_price'] = (isset($requestAll['deposit_booked_price']) && $requestAll['deposit_booked_price']) ? $requestAll['deposit_booked_price'] : '0';
+        $requestAll['color'] = (isset($requestAll['color']) && $requestAll['color']) ? $requestAll['color'] : '';
         $model = new Services;
         $model->fill($requestAll);
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : '';
         $model->save();
         if ($service_price) {
             foreach ($service_price as $key => $value) {
-                $servicesPriceModel = ServicesPrice::where(['service_id' => $model->id, 'name' => $value['name']])->first();
+                $servicesPriceModel = ServicesPrice::where(['service_id' => $model->id, 'name' => ucfirst($key)])->first();
                 if (empty($servicesPriceModel)) {
                     $servicesPriceModel = new ServicesPrice();
                 }
                 $servicesPriceModel->service_id = $model->id;
-                $servicesPriceModel->name = $value['name'];
+                $servicesPriceModel->name = ucfirst($key);
                 $servicesPriceModel->price = ($value['price']) ? $value['price'] : '0';
                 $servicesPriceModel->add_on_price = ($value['add_on_price']) ? $value['add_on_price'] : '0';
                 $servicesPriceModel->is_active_at = currentDateTime();
@@ -144,6 +163,11 @@ class ServicesApiController extends Controller
     public function update(ServiceRequest $request, $id)
     {
         $requestAll = $request->all();
+        $requestAll['service_booked_online'] = (isset($requestAll['service_booked_online']) && $requestAll['service_booked_online']) ? '1' : '0';
+        $requestAll['deposit_booked_online'] = (isset($requestAll['deposit_booked_online']) && $requestAll['deposit_booked_online']) ? '1' : '0';
+        $requestAll['deposit_booked_price'] = (isset($requestAll['deposit_booked_price']) && $requestAll['deposit_booked_price']) ? $requestAll['deposit_booked_price'] : '0';
+        $requestAll['color'] = (isset($requestAll['color']) && $requestAll['color']) ? $requestAll['color'] : '';
+
         $service_price = ($request->service_price) ? json_decode($request->service_price, true) : [];
         $add_on_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
         $staff_services = ($request->staff_services) ? explode(",", $request->staff_services) : [];
@@ -166,12 +190,12 @@ class ServicesApiController extends Controller
         $model->save();
         if ($service_price) {
             foreach ($service_price as $key => $value) {
-                $servicesPriceModel = ServicesPrice::where(['service_id' => $model->id, 'name' => $value['name']])->first();
+                $servicesPriceModel = ServicesPrice::where(['service_id' => $model->id, 'name' => ucfirst($key)])->first();
                 if (empty($servicesPriceModel)) {
                     $servicesPriceModel = new ServicesPrice();
                 }
                 $servicesPriceModel->service_id = $model->id;
-                $servicesPriceModel->name = $value['name'];
+                $servicesPriceModel->name = ucfirst($key);
                 $servicesPriceModel->price = ($value['price']) ? $value['price'] : '0';
                 $servicesPriceModel->add_on_price = ($value['add_on_price']) ? $value['add_on_price'] : '0';
                 $servicesPriceModel->is_active_at = currentDateTime();
@@ -221,7 +245,7 @@ class ServicesApiController extends Controller
     public function returnResponse($request, $id, $data = [])
     {
         $requestAll = $request->all();
-        $field = ($request->field) ? array_merge(['id', 'salon_id', 'category_id'], explode(',', $request->field)) : $this->field;
+        $field = ($request->field) ? array_merge(['id', 'salon_id', 'category_id', 'tax_id'], explode(',', $request->field)) : $this->field;
         $sort = ($request->sort) ? $request->sort : "";
         $option = ($request->option) ? $request->option : "";
 
@@ -241,6 +265,15 @@ class ServicesApiController extends Controller
             $category_field = [$request->category_field];
         } else if ($request->category_field) {
             $category_field = array_merge(['id'], explode(',', $request->category_field));
+        }
+
+        $tax_field = $this->tax_field;
+        if (isset($requestAll['tax_field']) && empty($requestAll['tax_field'])) {
+            $tax_field = false;
+        } else if ($request->tax_field == '*') {
+            $tax_field = [$request->tax_field];
+        } else if ($request->tax_field) {
+            $tax_field = array_merge(['id'], explode(',', $request->tax_field));
         }
 
         $serviceprice_field = $this->serviceprice_field;
@@ -267,6 +300,9 @@ class ServicesApiController extends Controller
         }
         if ($category_field) {
             $withArray[] = 'category:' . implode(',', $category_field);
+        }
+        if ($tax_field) {
+            $withArray[] = 'tax:' . implode(',', $tax_field);
         }
         if ($serviceprice_field) {
             $withArray[] = 'serviceprice:' . implode(',', $serviceprice_field);
