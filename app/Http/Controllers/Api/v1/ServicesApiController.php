@@ -102,16 +102,10 @@ class ServicesApiController extends Controller
         $requestAll = $request->all();
         $service_price = ($request->service_price) ? json_decode($request->service_price, true) : [];
         $add_on_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
+        $add_on_services = $add_on_services ? array_values(array_filter($add_on_services)) : [];
         $staff_services = ($request->staff_services) ? explode(",", $request->staff_services) : [];
-        // echo '<pre>';
-        // if ($service_price) {
-        //     foreach ($service_price as $key => $value) {
-        //         print_r($key);
-        //         print_r($value);
-        //     }
-        // }
-        // echo '<pre>';
-        // dd();
+        $staff_services = $add_on_services ? array_values(array_filter($staff_services)) : [];
+
         $requestAll['is_active_at'] = currentDateTime();
         $requestAll['service_booked_online'] = (isset($requestAll['service_booked_online']) && $requestAll['service_booked_online']) ? '1' : '0';
         $requestAll['deposit_booked_online'] = (isset($requestAll['deposit_booked_online']) && $requestAll['deposit_booked_online']) ? '1' : '0';
@@ -170,7 +164,9 @@ class ServicesApiController extends Controller
 
         $service_price = ($request->service_price) ? json_decode($request->service_price, true) : [];
         $add_on_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
+        $add_on_services = $add_on_services ? array_values(array_filter($add_on_services)) : [];
         $staff_services = ($request->staff_services) ? explode(",", $request->staff_services) : [];
+        $staff_services = $add_on_services ? array_values(array_filter($staff_services)) : [];
 
         $model = $this->findModel($id);
         $model->addonservices->map(function ($value) use ($add_on_services, $id) {
