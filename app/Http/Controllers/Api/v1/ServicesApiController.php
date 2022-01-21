@@ -386,8 +386,9 @@ class ServicesApiController extends Controller
                     $query->whereNotIn('id', explode(',', $isNotId));
                 }
                 $query->select('category_id', 'id', 'name')->where('salon_id', $salon_id);
-            }])->has('services')->select('id', 'name')->get()->toArray();
+            }])->has('services', '>', 0)->whereHas('services')->select('id', 'name')->get()->toArray();
             if ($add_on_services) {
+                $add_on_services = array_values(array_filter($add_on_services, function ($v) {return !empty($v['services']);}));
                 $successData = $add_on_services;
                 return response()->json($successData, $this->successStatus);
             }
