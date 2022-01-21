@@ -15,7 +15,7 @@ class Categories extends Model
      * @var string
      */
     protected $table = 'categories';
-
+    protected $appends = ['totalServices'];
     /**
      * The attributes that are mass assignable.
      *
@@ -44,6 +44,11 @@ class Categories extends Model
     protected $casts = [
         'is_active_at' => 'datetime',
     ];
+
+    public function getTotalServicesAttribute()
+    {
+        return $this->hasMany(Services::class, 'category_id', 'id')->count();
+    }
 
     public function salon()
     {

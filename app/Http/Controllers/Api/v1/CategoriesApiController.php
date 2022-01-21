@@ -170,7 +170,7 @@ class CategoriesApiController extends Controller
                         }
                     })->where($where)->orderByRaw($orderby)->get();
                 } else {
-                    $model = Categories::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                    $model = Categories::with($withArray)->withCount('services')->select($field)->where($where)->orderByRaw($orderby)->get();
                 }
             }
             if ($model->count()) {
