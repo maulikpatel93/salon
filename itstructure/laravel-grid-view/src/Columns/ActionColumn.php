@@ -102,7 +102,7 @@ class ActionColumn extends BaseColumn
             $value .= $actionObj->render($row, $bootstrapColWidth);
         }
 
-        return '<div class="text-center">' . $value . '</div>';
+        return '<div class="text-center d-flex justify-content-center">' . $value . '</div>';
     }
 
     /**

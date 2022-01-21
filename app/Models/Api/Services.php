@@ -78,12 +78,16 @@ class Services extends Model
 
     public function addonservices()
     {
-        return $this->hasMany(AddOnServices::class, 'service_id', 'id')->select('add_on_service_id');
+        // return $this->hasMany(AddOnServices::class, 'service_id', 'id')->select('add_on_service_id');
+        return $this->belongsToMany(Services::class, 'add_on_services', 'service_id', 'add_on_service_id');
+        // return $this->belongsToMany(AddOnServices::class)->withPivot('add_on_service_id');
+        // return $this->hasManyThrough(AddOnServices::class, Services::class, 'id', 'add_on_service_id');
     }
 
     public function staffservices()
     {
-        return $this->hasMany(StaffServices::class, 'service_id', 'id')->select('staff_id');
+        // return $this->hasMany(StaffServices::class, 'service_id', 'id')->select('staff_id');
+        return $this->belongsToMany(Staff::class, 'staff_services', 'service_id', 'staff_id');
     }
 
     public function voucherservice()

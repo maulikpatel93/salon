@@ -66,6 +66,12 @@ class ServicesApiController extends Controller
         'add_on_service_id',
     ];
 
+    protected $addOnStaff_field = [
+        'id',
+        'service_id',
+        'staff_id',
+    ];
+
     protected $service_price = [
         [
             'name' => 'General',
@@ -103,8 +109,8 @@ class ServicesApiController extends Controller
         $service_price = ($request->service_price) ? json_decode($request->service_price, true) : [];
         $add_on_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
         $add_on_services = $add_on_services ? array_values(array_filter($add_on_services)) : [];
-        $staff_services = ($request->staff_services) ? explode(",", $request->staff_services) : [];
-        $staff_services = $add_on_services ? array_values(array_filter($staff_services)) : [];
+        $staff_services = ($request->add_on_staff) ? explode(",", $request->add_on_staff) : [];
+        $staff_services = $staff_services ? array_values(array_filter($staff_services)) : [];
 
         $requestAll['is_active_at'] = currentDateTime();
         $requestAll['service_booked_online'] = (isset($requestAll['service_booked_online']) && $requestAll['service_booked_online']) ? '1' : '0';
@@ -165,19 +171,19 @@ class ServicesApiController extends Controller
         $service_price = ($request->service_price) ? json_decode($request->service_price, true) : [];
         $add_on_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
         $add_on_services = $add_on_services ? array_values(array_filter($add_on_services)) : [];
-        $staff_services = ($request->staff_services) ? explode(",", $request->staff_services) : [];
-        $staff_services = $add_on_services ? array_values(array_filter($staff_services)) : [];
+        $staff_services = ($request->add_on_staff) ? explode(",", $request->add_on_staff) : [];
+        $staff_services = $staff_services ? array_values(array_filter($staff_services)) : [];
 
         $model = $this->findModel($id);
         $model->addonservices->map(function ($value) use ($add_on_services, $id) {
             if ($add_on_services && !in_array($value->add_on_service_id, $add_on_services)) {
-                AddOnServices::where(['service_id' => $id, 'add_on_service_id' => $value->add_on_service_id])->delete();
+                AddOnServices::where(['service_id' => $id, 'add_on_service_id' => $value->id])->delete();
             }
             return;
         })->toArray();
         $model->staffservices->map(function ($value) use ($staff_services, $id) {
             if ($staff_services && !in_array($value->staff_id, $staff_services)) {
-                StaffServices::where(['service_id' => $id, 'staff_id' => $value->staff_id])->delete();
+                StaffServices::where(['service_id' => $id, 'staff_id' => $value->id])->delete();
             }
             return;
         })->toArray();
@@ -290,6 +296,15 @@ class ServicesApiController extends Controller
             $addOnService_field = array_merge(['id'], explode(',', $request->addOnService_field));
         }
 
+        $addOnStaff_field = $this->addOnStaff_field;
+        if (isset($requestAll['addOnStaff_field']) && empty($requestAll['addOnStaff_field'])) {
+            $addOnStaff_field = false;
+        } else if ($request->addOnStaff_field == '*') {
+            $addOnStaff_field = [$request->addOnStaff_field];
+        } else if ($request->addOnStaff_field) {
+            $addOnStaff_field = array_merge(['id'], explode(',', $request->addOnStaff_field));
+        }
+
         $withArray = [];
         if ($salon_field) {
             $withArray[] = 'salon:' . implode(',', $salon_field);
@@ -304,8 +319,15 @@ class ServicesApiController extends Controller
             $withArray[] = 'serviceprice:' . implode(',', $serviceprice_field);
         }
         if ($addOnService_field) {
-            $withArray[] = 'addonservices:' . implode(',', $addOnService_field);
+            // $withArray[] = 'addonservices:' . implode(',', $addOnService_field);
+            $withArray[] = 'addonservices:id,name';
         }
+
+        if ($addOnStaff_field) {
+            // $withArray[] = 'addonservices:' . implode(',', $addOnStaff_field);
+            $withArray[] = 'staffservices:id,first_name,last_name';
+        }
+
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
@@ -317,7 +339,9 @@ class ServicesApiController extends Controller
         if ($sort) {
             $sd = [];
             foreach ($sort as $key => $value) {
-                $sd[] = $key . ' ' . $value;
+                if (!in_array($key, ['category'])) {
+                    $sd[] = $key . ' ' . $value;
+                }
             }
             if ($sd) {
                 $orderby = implode(", ", $sd);
@@ -386,7 +410,7 @@ class ServicesApiController extends Controller
                     $query->whereNotIn('id', explode(',', $isNotId));
                 }
                 $query->select('category_id', 'id', 'name')->where('salon_id', $salon_id);
-            }])->has('services', '>', 0)->whereHas('services')->select('id', 'name')->get()->toArray();
+            }])->has('services')->select('id', 'name')->get()->toArray();
             if ($add_on_services) {
                 $add_on_services = array_values(array_filter($add_on_services, function ($v) {return !empty($v['services']);}));
                 $successData = $add_on_services;
@@ -396,21 +420,18 @@ class ServicesApiController extends Controller
         return response()->json(['message' => __('messages.not_found')], $this->errorStatus);
     }
 
-    public function staffservices(Request $request)
+    public function addonstaff(Request $request)
     {
         $requestAll = $request->all();
         $id = $request->id;
-        $isNotId = $request->isNotId;
         $salon_id = $request->salon_id;
         if ($salon_id) {
-            $staffservices = PriceTier::with(['staff' => function ($query) use ($isNotId, $salon_id) {
-                if ($isNotId) {
-                    $query->whereNotIn('id', explode(',', $isNotId));
-                }
-                $query->select('price_tier_id', 'id', 'first_name', 'last_name', 'email', 'phone_number')->where('salon_id', $salon_id);
+            $add_on_staff = PriceTier::with(['staff' => function ($query) use ($salon_id) {
+                $query->select('price_tier_id', 'id', 'first_name', 'last_name')->where('salon_id', $salon_id);
             }])->has('staff')->select('id', 'name')->get()->toArray();
-            if ($staffservices) {
-                $successData = $staffservices;
+            if ($add_on_staff) {
+                $add_on_staff = array_values(array_filter($add_on_staff, function ($v) {return !empty($v['staff']);}));
+                $successData = $add_on_staff;
                 return response()->json($successData, $this->successStatus);
             }
         }

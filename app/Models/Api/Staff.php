@@ -15,7 +15,7 @@ class Staff extends Model
      * @var string
      */
     protected $table = 'users';
-
+    protected $appends = ['isStaffChecked'];
     /**
      * The attributes that are mass assignable.
      *
@@ -79,5 +79,15 @@ class Staff extends Model
     public function staffworkinghours()
     {
         return $this->hasMany(StaffWorkingHours::class, 'staff_id', 'id');
+    }
+
+    public function getIsStaffCheckedAttribute()
+    {
+        $service_id = isset($_REQUEST['service_id']) && $_REQUEST['service_id'] ? $_REQUEST['service_id'] : 0;
+        if ($service_id) {
+            $AddOnStaff = StaffServices::where(['service_id' => $service_id, 'staff_id' => $this->id])->count();
+            return $this->attributes['isStaffChecked'] = $AddOnStaff ? true : false;
+        }
+        return $this->attributes['isStaffChecked'] = false;
     }
 }

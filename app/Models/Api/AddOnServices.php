@@ -47,9 +47,14 @@ class AddOnServices extends Model
 
     public function salon()
     {
-        // return $this->hasOne(Salons::class, 'salon_id', 'id');
         return $this->belongsTo(Salons::class);
     }
+
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
+    }
+
     public function category()
     {
         return $this->belongsTo(Categories::class, 'category_id', 'id');
