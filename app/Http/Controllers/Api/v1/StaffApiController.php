@@ -189,7 +189,7 @@ class StaffApiController extends Controller
     {
         $requestAll = $request->all();
         Staff::where('id', $id)->delete();
-        return response()->json(['status' => $this->successStatus, 'message' => 'success']);
+        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
     }
 
     protected function findModel($id)
@@ -204,6 +204,7 @@ class StaffApiController extends Controller
     {
         $requestAll = $request->all();
         $field = ($request->field) ? array_merge(['id', 'salon_id', 'price_tier_id'], explode(',', $request->field)) : $this->field;
+        $sort = ($request->sort) ? $request->sort : "";
 
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
@@ -258,23 +259,72 @@ class StaffApiController extends Controller
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
-        $where = ['is_active' => '1'];
+        $where = ['is_active' => '1', 'role_id' => 5, 'salon_id' => $request->salon_id];
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
-        if ($pagination == true) {
-            $model = Staff::with($withArray)->select($field)->where($where)->simplePaginate($limit);
-        } else {
-            $model = Staff::with($withArray)->select($field)->where($where)->get();
+        $whereLike = $request->q ? explode(' ', $request->q) : '';
+
+        $orderby = 'id desc';
+        if ($sort) {
+            $sd = [];
+            foreach ($sort as $key => $value) {
+                $sd[] = $key . ' ' . $value;
+            }
+            if ($sd) {
+                $orderby = implode(", ", $sd);
+            }
+
         }
-        if ($model->count()) {
+        if ($id) {
+            if ($request->result == 'result_array') {
+                $model = Staff::with($withArray)->select($field)->where($where)->whereNotNull('price_tier_id')->get()->makeHidden(['isStaffChecked', 'calendar_booking']);
+            } else {
+                $model = Staff::with($withArray)->select($field)->where($where)->whereNotNull('price_tier_id')->first()->makeHidden(['isStaffChecked', 'calendar_booking']);
+            }
             $successData = $model->toArray();
-            if ($successData) {
-                if ($pagination == true) {
-                    return response()->json(array_merge(['status' => $this->successStatus, 'message' => 'Success'], $successData));
+            return response()->json($successData, $this->successStatus);
+        } else {
+            if ($pagination == true) {
+                if ($whereLike) {
+                    $model = Staff::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                        if ($whereLike) {
+                            $query->where('first_name', "like", "%" . $whereLike[0] . "%");
+                            foreach ($whereLike as $row) {
+                                $query->orWhere('first_name', "like", "%" . $row . "%");
+                                $query->orWhere('last_name', "like", "%" . $row . "%");
+                            }
+                        }
+                    })->where($where)->whereNotNull('price_tier_id')->orderByRaw($orderby)->paginate($limit);
+                } else {
+                    $model = Staff::with($withArray)->select($field)->where($where)->whereNotNull('price_tier_id')->orderByRaw($orderby)->paginate($limit);
                 }
-                return response()->json(['status' => $this->successStatus, 'message' => 'Success', 'data' => $successData]);
+                $model->data = $model->makeHidden(['isStaffChecked', 'calendar_booking']);
+            } else {
+                if ($whereLike) {
+                    $model = Staff::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                        if ($whereLike) {
+                            $query->where('first_name', "like", "%" . $whereLike[0] . "%");
+                            foreach ($whereLike as $row) {
+                                $query->orWhere('first_name', "like", "%" . $row . "%");
+                                $query->orWhere('last_name', "like", "%" . $row . "%");
+                            }
+                        }
+                    })->where($where)->whereNotNull('price_tier_id')->orderByRaw($orderby)->get()->makeHidden(['isStaffChecked', 'calendar_booking']);
+                } else {
+                    $model = Staff::with($withArray)->select($field)->where($where)->whereNotNull('price_tier_id')->orderByRaw($orderby)->get()->makeHidden(['isStaffChecked', 'calendar_booking']);
+                }
+            }
+            if ($model->count()) {
+                $successData = $model->toArray();
+                if ($successData) {
+                    if ($pagination == true) {
+                        // return response()->json(array_merge(['status' => $this->successStatus, 'message' => 'Success'], $successData));
+                    }
+                    return response()->json($successData, $this->successStatus);
+                }
             }
         }
-        return response()->json(['status' => $this->errorStatus, 'message' => 'Failed']);
+
+        return response()->json(['message' => __('messages.failed')], $this->errorStatus);
     }
 }

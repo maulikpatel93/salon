@@ -349,14 +349,14 @@ class ServicesApiController extends Controller
         }
 
         if ($option) {
-            $successData = Services::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where($where)->get()->makeHidden(['isNewRecord', 'logo_url', 'products'])->toArray();
+            $successData = Services::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where($where)->whereNotNull('category_id')->get()->makeHidden(['isServiceChecked', 'isNotId'])->toArray();
             return response()->json($successData, $this->successStatus);
         }
         if ($id) {
             if ($request->result == 'result_array') {
-                $model = Services::with($withArray)->select($field)->where($where)->get();
+                $model = Services::with($withArray)->select($field)->where($where)->whereNotNull('category_id')->get()->makeHidden(['isServiceChecked', 'isNotId']);
             } else {
-                $model = Services::with($withArray)->select($field)->where($where)->first();
+                $model = Services::with($withArray)->select($field)->where($where)->whereNotNull('category_id')->first()->makeHidden(['isServiceChecked', 'isNotId']);
             }
             $successData = $model->toArray();
             return response()->json($successData, $this->successStatus);
@@ -372,8 +372,9 @@ class ServicesApiController extends Controller
                         }
                     })->where($where)->orderByRaw($orderby)->paginate($limit);
                 } else {
-                    $model = Services::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
+                    $model = Services::with($withArray)->select($field)->where($where)->whereNotNull('category_id')->orderByRaw($orderby)->paginate($limit);
                 }
+                $model->data = $model->makeHidden(['isServiceChecked', 'isNotId']);
             } else {
                 if ($whereLike) {
                     $model = Services::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
@@ -383,9 +384,9 @@ class ServicesApiController extends Controller
                                 $query->orWhere('name', "like", "%" . $row . "%");
                             }
                         }
-                    })->where($where)->orderByRaw($orderby)->get();
+                    })->where($where)->whereNotNull('category_id')->orderByRaw($orderby)->get()->makeHidden(['isServiceChecked', 'isNotId']);
                 } else {
-                    $model = Services::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                    $model = Services::with($withArray)->select($field)->where($where)->whereNotNull('category_id')->orderByRaw($orderby)->get()->makeHidden(['isServiceChecked', 'isNotId']);
                 }
             }
             if ($model->count()) {

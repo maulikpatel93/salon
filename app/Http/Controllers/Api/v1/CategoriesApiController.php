@@ -134,7 +134,7 @@ class CategoriesApiController extends Controller
         }
 
         if ($option) {
-            $successData = Categories::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where($where)->get()->makeHidden(['isNewRecord', 'logo_url', 'products'])->toArray();
+            $successData = Categories::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where($where)->get()->toArray();
             return response()->json($successData, $this->successStatus);
         }
         if ($id) {

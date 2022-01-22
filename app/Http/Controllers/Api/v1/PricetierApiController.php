@@ -71,7 +71,7 @@ class PricetierApiController extends Controller
     {
         $requestAll = $request->all();
         PriceTier::where('id', $id)->delete();
-        return response()->json(['status' => $this->successStatus, 'message' => 'success']);
+        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
     }
 
     protected function findModel($id)
@@ -86,6 +86,7 @@ class PricetierApiController extends Controller
     {
         $requestAll = $request->all();
         $field = ($request->field) ? array_merge(['id'], explode(',', $request->field)) : $this->field;
+        $sort = ($request->sort) ? $request->sort : "";
 
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
@@ -115,23 +116,64 @@ class PricetierApiController extends Controller
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
-        $where = ['is_active' => '1'];
+        $where = ['is_active' => '1', 'salon_id' => $request->salon_id];
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
-        if ($pagination == true) {
-            $model = PriceTier::with($withArray)->select($field)->where($where)->simplePaginate($limit);
-        } else {
-            $model = PriceTier::with($withArray)->select($field)->where($where)->get();
+        $whereLike = $request->q ? explode(' ', $request->q) : '';
+
+        $orderby = 'id desc';
+        if ($sort) {
+            $sd = [];
+            foreach ($sort as $key => $value) {
+                $sd[] = $key . ' ' . $value;
+            }
+            if ($sd) {
+                $orderby = implode(", ", $sd);
+            }
+
         }
-        if ($model->count()) {
+        if ($id) {
+            if ($request->result == 'result_array') {
+                $model = PriceTier::with($withArray)->select($field)->where($where)->get();
+            } else {
+                $model = PriceTier::with($withArray)->select($field)->where($where)->first();
+            }
             $successData = $model->toArray();
-            if ($successData) {
-                if ($pagination == true) {
-                    return response()->json(array_merge(['status' => $this->successStatus, 'message' => 'Success'], $successData));
+            return response()->json($successData, $this->successStatus);
+        } else {
+            if ($pagination == true) {
+                if ($whereLike) {
+                    $model = Staff::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                        if ($whereLike) {
+                            $query->where('name', "like", "%" . $whereLike[0] . "%");
+                        }
+                    })->where($where)->orderByRaw($orderby)->paginate($limit);
+                } else {
+                    $model = PriceTier::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
                 }
-                return response()->json(['status' => $this->successStatus, 'message' => 'Success', 'data' => $successData]);
+                // $model->data = $model;
+            } else {
+                if ($whereLike) {
+                    $model = PriceTier::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                        if ($whereLike) {
+                            $query->where('name', "like", "%" . $whereLike[0] . "%");
+                        }
+                    })->where($where)->orderByRaw($orderby)->get();
+                } else {
+                    $model = PriceTier::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                }
+            }
+            if ($model->count()) {
+                $successData = $model->toArray();
+                if ($successData) {
+                    if ($pagination == true) {
+                        // return response()->json(array_merge(['status' => $this->successStatus, 'message' => 'Success'], $successData));
+                    }
+                    return response()->json($successData, $this->successStatus);
+                }
             }
         }
-        return response()->json(['status' => $this->errorStatus, 'message' => 'Failed']);
+
+        return response()->json(['message' => __('messages.failed')], $this->errorStatus);
     }
 }
