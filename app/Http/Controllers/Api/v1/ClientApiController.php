@@ -62,7 +62,6 @@ class ClientApiController extends Controller
         $requestAll = $request->all();
         $requestAll['is_active_at'] = currentDateTime();
         $email_username = explode('@', $requestAll['email']);
-
         $requestAll['panel'] = 'Frontend';
         $requestAll['username'] = $email_username ? $email_username[0] : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
         $requestAll['password'] = Hash::make(Str::random(10));

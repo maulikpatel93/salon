@@ -87,6 +87,7 @@ class PricetierApiController extends Controller
         $requestAll = $request->all();
         $field = ($request->field) ? array_merge(['id'], explode(',', $request->field)) : $this->field;
         $sort = ($request->sort) ? $request->sort : "";
+        $option = ($request->option) ? $request->option : "";
 
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
@@ -131,6 +132,10 @@ class PricetierApiController extends Controller
                 $orderby = implode(", ", $sd);
             }
 
+        }
+        if ($option) {
+            $successData = PriceTier::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where($where)->get()->makeHidden(['staff'])->toArray();
+            return response()->json($successData, $this->successStatus);
         }
         if ($id) {
             if ($request->result == 'result_array') {

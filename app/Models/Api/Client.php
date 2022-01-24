@@ -27,6 +27,7 @@ class Client extends Model
     protected $fillable = [
         'role_id',
         'salon_id',
+        'panel',
         'profile_photo',
         'first_name',
         'last_name',

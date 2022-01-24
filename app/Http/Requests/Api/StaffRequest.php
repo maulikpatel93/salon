@@ -26,18 +26,19 @@ class StaffRequest extends FormRequest
         $id = $this->id;
         $salon_id = $this->salon_id;
         return [
+            'role_id' => 'required|integer',
             'salon_id' => 'required|integer',
             'price_tier_id' => 'required|integer',
             'first_name' => 'required|max:100',
             'last_name' => 'required|max:100',
-            'email' => 'required|email|unique:staff,email,' . $id . ',id,salon_id,' . $salon_id,
+            'email' => 'required|email|unique:users,email,' . $id . ',id,salon_id,' . $salon_id,
             'phone_number' => "required|regex:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/",
-            'profile_photo' => 'image|mimes:jpeg,png,jpg|max:2048',
-            'address' => 'required',
-            'street' => 'required|max:100',
-            'suburb' => 'required|max:50',
-            'state' => 'required|max:50',
-            'postcode' => 'required|max:10',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            // 'address' => 'required',
+            // 'street' => 'required|max:100',
+            // 'suburb' => 'required|max:50',
+            // 'state' => 'required|max:50',
+            // 'postcode' => 'required|max:10',
         ];
     }
 }

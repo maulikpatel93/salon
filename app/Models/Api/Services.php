@@ -3,6 +3,7 @@
 namespace App\Models\Api;
 
 use App\Models\Api\AddOnServices;
+use App\Models\Api\StaffServices;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -104,8 +105,12 @@ class Services extends Model
     public function getIsServiceCheckedAttribute()
     {
         $isNotId = isset($_REQUEST['isNotId']) && $_REQUEST['isNotId'] ? $_REQUEST['isNotId'] : 0;
+        $staff_id = isset($_REQUEST['staff_id']) && $_REQUEST['staff_id'] ? $_REQUEST['staff_id'] : 0;
         if ($isNotId) {
             $AddOnServices = AddOnServices::where(['service_id' => $isNotId, 'add_on_service_id' => $this->id])->count();
+            return $this->attributes['isServiceChecked'] = $AddOnServices ? true : false;
+        } elseif ($staff_id) {
+            $AddOnServices = StaffServices::where(['staff_id' => $staff_id, 'service_id' => $this->id])->count();
             return $this->attributes['isServiceChecked'] = $AddOnServices ? true : false;
         }
         return $this->attributes['isServiceChecked'] = false;

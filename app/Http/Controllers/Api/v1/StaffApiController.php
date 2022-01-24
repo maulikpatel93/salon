@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Api\v1;
 use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\StaffRequest;
+use App\Models\Api\Categories;
 use App\Models\Api\Staff;
 use App\Models\Api\StaffServices;
 use App\Models\Api\StaffWorkingHours;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class StaffApiController extends Controller
 {
@@ -23,6 +26,8 @@ class StaffApiController extends Controller
         'price_tier_id',
         'first_name',
         'last_name',
+        'email',
+        'phone_number',
         'profile_photo',
         'address',
         'street',
@@ -75,8 +80,13 @@ class StaffApiController extends Controller
     {
         $requestAll = $request->all();
         $requestAll['is_active_at'] = currentDateTime();
-        $staff_services = ($request->staff_services) ? explode(",", $request->staff_services) : [];
+        $email_username = explode('@', $requestAll['email']);
+        $requestAll['panel'] = 'Frontend';
+        $requestAll['username'] = $email_username ? $email_username[0] : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
+        $requestAll['password'] = Hash::make(Str::random(10));
         $staff_working_hours = ($request->staff_working_hours) ? json_decode($request->staff_working_hours, true) : [];
+        $staff_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
+        $staff_services = $staff_services ? array_values(array_filter($staff_services)) : [];
 
         $model = new Staff;
         $model->fill($requestAll);
@@ -129,24 +139,31 @@ class StaffApiController extends Controller
     public function update(StaffRequest $request, $id)
     {
         $requestAll = $request->all();
-        $staff_services = ($request->staff_services) ? explode(",", $request->staff_services) : [];
         $staff_working_hours = ($request->staff_working_hours) ? json_decode($request->staff_working_hours, true) : [];
+        $staff_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
+        $staff_services = $staff_services ? array_values(array_filter($staff_services)) : [];
 
         $model = $this->findModel($id);
         $model->staffservices->map(function ($value) use ($staff_services, $id) {
             if ($staff_services && !in_array($value->service_id, $staff_services)) {
-                StaffServices::where(['staff_id' => $id, 'service_id' => $value->service_id])->delete();
+                StaffServices::where(['staff_id' => $id, 'service_id' => $value->id])->delete();
             }
             return;
         })->toArray();
         $model->fill($requestAll);
         $file = $request->file('profile_photo');
+
         if ($file) {
             Storage::delete('/public/staff/' . $model->profile_photo);
             $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
             $filePath = $file->storeAs('staff', $fileName, 'public');
             $model->profile_photo = $fileName;
         }
+        echo '<pre>';
+        print_r($model);
+        echo '<pre>';
+        dd();
+
         $model->save();
         if ($staff_services) {
             foreach ($staff_services as $key => $value) {
@@ -250,7 +267,8 @@ class StaffApiController extends Controller
             $withArray[] = 'pricetier:' . implode(',', $price_tier_field);
         }
         if ($staff_service_field) {
-            $withArray[] = 'staffservices:' . implode(',', $staff_service_field);
+            // $withArray[] = 'staffservices:' . implode(',', $staff_service_field);
+            $withArray[] = 'staffservices:id,name';
         }
         if ($staff_working_hours_field) {
             $withArray[] = 'staffworkinghours:' . implode(',', $staff_working_hours_field);
@@ -279,7 +297,7 @@ class StaffApiController extends Controller
             if ($request->result == 'result_array') {
                 $model = Staff::with($withArray)->select($field)->where($where)->whereNotNull('price_tier_id')->get()->makeHidden(['isStaffChecked', 'calendar_booking']);
             } else {
-                $model = Staff::with($withArray)->select($field)->where($where)->whereNotNull('price_tier_id')->first()->makeHidden(['isStaffChecked', 'calendar_booking']);
+                $model = Staff::with($withArray)->select($field)->where($where)->whereNotNull('price_tier_id')->first();
             }
             $successData = $model->toArray();
             return response()->json($successData, $this->successStatus);
@@ -326,5 +344,23 @@ class StaffApiController extends Controller
         }
 
         return response()->json(['message' => __('messages.failed')], $this->errorStatus);
+    }
+
+    public function addonservices(Request $request)
+    {
+        $requestAll = $request->all();
+        $id = $request->id;
+        $salon_id = $request->salon_id;
+        if ($salon_id) {
+            $add_on_services = Categories::with(['services' => function ($query) use ($salon_id) {
+                $query->select('category_id', 'id', 'name')->where('salon_id', $salon_id);
+            }])->has('services')->select('id', 'name')->get()->toArray();
+            if ($add_on_services) {
+                $add_on_services = array_values(array_filter($add_on_services, function ($v) {return !empty($v['services']);}));
+                $successData = $add_on_services;
+                return response()->json($successData, $this->successStatus);
+            }
+        }
+        return response()->json(['message' => __('messages.not_found')], $this->errorStatus);
     }
 }

@@ -97,6 +97,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/store', [StaffApiController::class, 'store'])->name('store');
             Route::post('/update/{id}', [StaffApiController::class, 'update'])->name('update');
             Route::post('/delete/{id}', [StaffApiController::class, 'delete'])->name('delete');
+            Route::post('/addonservices', [StaffApiController::class, 'addonservices'])->name('addonservices');
         });
 
         //Roster

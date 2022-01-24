@@ -4,6 +4,7 @@ namespace App\Models\Api;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Staff extends Model
 {
@@ -15,14 +16,16 @@ class Staff extends Model
      * @var string
      */
     protected $table = 'users';
-    protected $appends = ['isStaffChecked'];
+    protected $appends = ['isStaffChecked', 'profile_photo_url'];
     /**
      * The attributes that are mass assignable.
      *
      * @var string[]
      */
     protected $fillable = [
+        'role_id',
         'salon_id',
+        'panel',
         'price_tier_id',
         'profile_photo',
         'first_name',
@@ -61,6 +64,12 @@ class Staff extends Model
         'is_active_at' => 'datetime',
     ];
 
+    public function getProfilePhotoUrlAttribute()
+    {
+        $profile_photo_url = asset('storage/staff');
+        return $this->attributes['profile_photo_url'] = $this->profile_photo && Storage::disk('public')->exists('staff/' . $this->profile_photo) ? $profile_photo_url . '/' . $this->profile_photo : "";
+    }
+
     public function salon()
     {
         return $this->belongsTo(Salons::class, 'salon_id', 'id');
@@ -73,7 +82,8 @@ class Staff extends Model
 
     public function staffservices()
     {
-        return $this->hasMany(StaffServices::class, 'staff_id', 'id')->select('service_id');
+        return $this->belongsToMany(Services::class, 'staff_services', 'staff_id', 'service_id');
+        // return $this->hasMany(StaffServices::class, 'staff_id', 'id')->select('service_id');
     }
 
     public function staffworkinghours()
