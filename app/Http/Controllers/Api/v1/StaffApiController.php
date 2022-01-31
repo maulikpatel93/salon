@@ -82,6 +82,9 @@ class StaffApiController extends Controller
         $requestAll['is_active_at'] = currentDateTime();
         $email_username = explode('@', $requestAll['email']);
         $requestAll['panel'] = 'Frontend';
+        $requestAll['role_id'] = 5;
+        $token = Str::random(config('params.auth_key_character'));
+        $requestAll['auth_key'] = hash('sha256', $token);
         $requestAll['username'] = $email_username ? $email_username[0] : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
         $requestAll['password'] = Hash::make(Str::random(10));
         $staff_working_hours = ($request->staff_working_hours) ? json_decode($request->staff_working_hours, true) : [];
@@ -139,11 +142,16 @@ class StaffApiController extends Controller
     public function update(StaffRequest $request, $id)
     {
         $requestAll = $request->all();
-        $staff_working_hours = ($request->staff_working_hours) ? json_decode($request->staff_working_hours, true) : [];
+        $staff_working_hours = ($request->working_hours) ? json_decode($request->working_hours, true) : [];
         $staff_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
         $staff_services = $staff_services ? array_values(array_filter($staff_services)) : [];
-
+        echo '<pre>';
+        print_r($staff_working_hours);
+        echo '<pre>';
+        dd();
         $model = $this->findModel($id);
+        $token = Str::random(config('params.auth_key_character'));
+        $model->auth_key = $model->auth_key ? $model->auth_key : hash('sha256', $token);
         $model->staffservices->map(function ($value) use ($staff_services, $id) {
             if ($staff_services && !in_array($value->service_id, $staff_services)) {
                 StaffServices::where(['staff_id' => $id, 'service_id' => $value->id])->delete();
@@ -159,11 +167,6 @@ class StaffApiController extends Controller
             $filePath = $file->storeAs('staff', $fileName, 'public');
             $model->profile_photo = $fileName;
         }
-        echo '<pre>';
-        print_r($model);
-        echo '<pre>';
-        dd();
-
         $model->save();
         if ($staff_services) {
             foreach ($staff_services as $key => $value) {

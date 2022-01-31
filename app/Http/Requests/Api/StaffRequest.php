@@ -32,6 +32,7 @@ class StaffRequest extends FormRequest
             'first_name' => 'required|max:100',
             'last_name' => 'required|max:100',
             'email' => 'required|email|unique:users,email,' . $id . ',id,salon_id,' . $salon_id,
+            // 'auth_key' => 'nullable|required|unique:users,auth_key,' . $id . ',id',
             'phone_number' => "required|regex:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/",
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             // 'address' => 'required',

@@ -34,6 +34,7 @@ class Staff extends Model
         'email',
         'email_verified',
         'email_verified_at',
+        'password',
         'phone_number',
         'phone_number_verified',
         'phone_number_verified_at',
