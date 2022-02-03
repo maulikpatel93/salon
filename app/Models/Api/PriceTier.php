@@ -15,7 +15,7 @@ class PriceTier extends Model
      * @var string
      */
     protected $table = 'price_tier';
-
+    protected $appends = ['totalStaff'];
     /**
      * The attributes that are mass assignable.
      *
@@ -44,6 +44,11 @@ class PriceTier extends Model
     protected $casts = [
         'is_active_at' => 'datetime',
     ];
+
+    public function getTotalStaffAttribute()
+    {
+        return $this->hasMany(Staff::class, 'price_tier_id', 'id')->count();
+    }
 
     public function salon()
     {
