@@ -54,6 +54,7 @@ class RosterApiController extends Controller
     {
         $requestAll = $request->all();
         $requestAll['is_active_at'] = currentDateTime();
+        $requestAll['away'] = isset($requestAll['away']) && $requestAll['away'] ? '1' : '0';
         $model = new Roster;
         $model->fill($requestAll);
         $model->save();
@@ -73,7 +74,7 @@ class RosterApiController extends Controller
     {
         $requestAll = $request->all();
         Roster::where('id', $id)->delete();
-        return response()->json(['status' => $this->successStatus, 'message' => 'success']);
+        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
     }
 
     protected function findModel($id)
@@ -106,6 +107,7 @@ class RosterApiController extends Controller
         } else if ($request->staff_field) {
             $staff_field = array_merge(['id', 'price_tier_id'], explode(',', $request->staff_field));
         }
+
         $withArray = [];
         if ($salon_field) {
             $withArray[] = 'salon:' . implode(',', $salon_field);
@@ -117,23 +119,62 @@ class RosterApiController extends Controller
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
-        $where = ['is_active' => '1'];
+        $where = ['is_active' => '1', 'salon_id' => $request->salon_id];
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
-        if ($pagination == true) {
-            $model = Roster::with($withArray)->select($field)->where($where)->simplePaginate($limit);
-        } else {
-            $model = Roster::with($withArray)->select($field)->where($where)->get();
-        }
-        if ($model->count()) {
+        $whereLike = $request->q ? explode(' ', $request->q) : '';
+
+        $orderby = 'id desc';
+        if ($id) {
+            if ($request->result == 'result_array') {
+                $model = Roster::with($withArray)->select($field)->where($where)->get();
+            } else {
+                $model = Roster::with($withArray)->select($field)->where($where)->first();
+            }
             $successData = $model->toArray();
-            if ($successData) {
-                if ($pagination == true) {
-                    return response()->json(array_merge(['status' => $this->successStatus, 'message' => 'Success'], $successData));
+            return response()->json($successData, $this->successStatus);
+        } else {
+            if ($pagination == true) {
+                if ($whereLike) {
+                    $model = Roster::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                        if ($whereLike) {
+                            $query->where('first_name', "like", "%" . $whereLike[0] . "%");
+                            foreach ($whereLike as $row) {
+                                $query->orWhere('first_name', "like", "%" . $row . "%");
+                                $query->orWhere('last_name', "like", "%" . $row . "%");
+                            }
+                        }
+                    })->where($where)->orderByRaw($orderby)->paginate($limit);
+                } else {
+                    $model = Roster::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
                 }
-                return response()->json(['status' => $this->successStatus, 'message' => 'Success', 'data' => $successData]);
+                $model->data = $model;
+            } else {
+                if ($whereLike) {
+                    $model = Roster::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                        if ($whereLike) {
+                            $query->where('first_name', "like", "%" . $whereLike[0] . "%");
+                            foreach ($whereLike as $row) {
+                                $query->orWhere('first_name', "like", "%" . $row . "%");
+                                $query->orWhere('last_name', "like", "%" . $row . "%");
+                            }
+                        }
+                    })->where($where)->orderByRaw($orderby)->get();
+                } else {
+                    $model = Roster::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                }
+            }
+            if ($model->count()) {
+                $successData = $model->toArray();
+                if ($successData) {
+                    if ($pagination == true) {
+                        // return response()->json(array_merge(['status' => $this->successStatus, 'message' => 'Success'], $successData));
+                    }
+                    return response()->json($successData, $this->successStatus);
+                }
             }
         }
-        return response()->json(['status' => $this->errorStatus, 'message' => 'Failed']);
+
+        return response()->json(['message' => __('messages.failed')], $this->errorStatus);
     }
 }

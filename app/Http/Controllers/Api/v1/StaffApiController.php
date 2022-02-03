@@ -63,6 +63,16 @@ class StaffApiController extends Controller
         'break_time',
     ];
 
+    protected $roster_field = [
+        'id',
+        'salon_id',
+        'staff_id',
+        'date',
+        'start_time',
+        'end_time',
+        'away',
+    ];
+
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -87,7 +97,8 @@ class StaffApiController extends Controller
         $requestAll['auth_key'] = hash('sha256', $token);
         $requestAll['username'] = $email_username ? $email_username[0] : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
         $requestAll['password'] = Hash::make(Str::random(10));
-        $staff_working_hours = ($request->staff_working_hours) ? json_decode($request->staff_working_hours, true) : [];
+        $requestAll['calendar_booking'] = (isset($requestAll['calendar_booking']) && $requestAll['calendar_booking']) ? '1' : '0';
+        $staff_working_hours = ($request->working_hours) ? json_decode($request->working_hours, true) : [];
         $staff_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
         $staff_services = $staff_services ? array_values(array_filter($staff_services)) : [];
 
@@ -130,7 +141,7 @@ class StaffApiController extends Controller
                     $StaffWorkingHoursModel->days = $value['days'];
                     $StaffWorkingHoursModel->start_time = isset($value['start_time']) ? $value['start_time'] : '';
                     $StaffWorkingHoursModel->end_time = isset($value['end_time']) ? $value['end_time'] : '';
-                    $StaffWorkingHoursModel->break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : '';
+                    $StaffWorkingHoursModel->break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : [];
                     $StaffWorkingHoursModel->is_active_at = currentDateTime();
                     $StaffWorkingHoursModel->save();
                 }
@@ -142,13 +153,12 @@ class StaffApiController extends Controller
     public function update(StaffRequest $request, $id)
     {
         $requestAll = $request->all();
+        $requestAll['calendar_booking'] = (isset($requestAll['calendar_booking']) && $requestAll['calendar_booking']) ? '1' : '0';
+
         $staff_working_hours = ($request->working_hours) ? json_decode($request->working_hours, true) : [];
         $staff_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
         $staff_services = $staff_services ? array_values(array_filter($staff_services)) : [];
-        echo '<pre>';
-        print_r($staff_working_hours);
-        echo '<pre>';
-        dd();
+
         $model = $this->findModel($id);
         $token = Str::random(config('params.auth_key_character'));
         $model->auth_key = $model->auth_key ? $model->auth_key : hash('sha256', $token);
@@ -197,7 +207,7 @@ class StaffApiController extends Controller
                     $StaffWorkingHoursModel->days = $value['days'];
                     $StaffWorkingHoursModel->start_time = isset($value['start_time']) ? $value['start_time'] : '';
                     $StaffWorkingHoursModel->end_time = isset($value['end_time']) ? $value['end_time'] : '';
-                    $StaffWorkingHoursModel->break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : '';
+                    $StaffWorkingHoursModel->break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : [];
                     $StaffWorkingHoursModel->save();
                 }
             }
@@ -225,6 +235,7 @@ class StaffApiController extends Controller
         $requestAll = $request->all();
         $field = ($request->field) ? array_merge(['id', 'salon_id', 'price_tier_id'], explode(',', $request->field)) : $this->field;
         $sort = ($request->sort) ? $request->sort : "";
+        $option = ($request->option) ? $request->option : "";
 
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
@@ -262,6 +273,15 @@ class StaffApiController extends Controller
             $staff_working_hours_field = array_merge(['id'], explode(',', $request->staff_working_hours_field));
         }
 
+        $roster_field = $this->roster_field;
+        if (isset($requestAll['roster_field']) && empty($requestAll['roster_field'])) {
+            $roster_field = false;
+        } else if ($request->roster_field == '*') {
+            $roster_field = [$request->roster_field];
+        } else if ($request->roster_field) {
+            $roster_field = array_merge(['id'], explode(',', $request->roster_field));
+        }
+
         $withArray = [];
         if ($salon_field) {
             $withArray[] = 'salon:' . implode(',', $salon_field);
@@ -275,6 +295,9 @@ class StaffApiController extends Controller
         }
         if ($staff_working_hours_field) {
             $withArray[] = 'staffworkinghours:' . implode(',', $staff_working_hours_field);
+        }
+        if ($roster_field) {
+            $withArray[] = 'rosterfield:' . implode(',', $roster_field);
         }
 
         $pagination = $request->pagination ? $request->pagination : false;
@@ -295,6 +318,10 @@ class StaffApiController extends Controller
                 $orderby = implode(", ", $sd);
             }
 
+        }
+        if ($option) {
+            $successData = Staff::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where($where)->get()->makeHidden(['isNewRecord'])->toArray();
+            return response()->json($successData, $this->successStatus);
         }
         if ($id) {
             if ($request->result == 'result_array') {
