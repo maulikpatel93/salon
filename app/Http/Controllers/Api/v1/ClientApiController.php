@@ -24,6 +24,7 @@ class ClientApiController extends Controller
         'last_name',
         'username',
         'email',
+        'profile_photo',
         'phone_number',
         'gender',
         'date_of_birth',
