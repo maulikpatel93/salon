@@ -114,6 +114,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/store', [ClientApiController::class, 'store'])->name('store');
             Route::post('/update/{id}', [ClientApiController::class, 'update'])->name('update');
             Route::post('/delete/{id}', [ClientApiController::class, 'delete'])->name('delete');
+            Route::post('/upload/{id}', [ClientApiController::class, 'upload'])->name('upload');
         });
 
         //Voucher

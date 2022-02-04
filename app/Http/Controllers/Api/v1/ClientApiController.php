@@ -117,6 +117,17 @@ class ClientApiController extends Controller
         throw new UnsecureException('The requested page does not exist.');
     }
 
+    public function upload(Request $request, $id)
+    {
+        $requestAll = $request->all();
+        echo '<pre>';
+        print_r($requestAll);
+        echo '<pre>';
+        dd();
+
+        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
+    }
+
     public function returnResponse($request, $id, $data = [])
     {
         $requestAll = $request->all();
