@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\v1\AuthApiController;
 use App\Http\Controllers\Api\v1\BusytimeApiController;
 use App\Http\Controllers\Api\v1\CategoriesApiController;
 use App\Http\Controllers\Api\v1\ClientApiController;
+use App\Http\Controllers\Api\v1\ClientPhotoApiController;
 use App\Http\Controllers\Api\v1\GuestApiController;
 use App\Http\Controllers\Api\v1\PricetierApiController;
 use App\Http\Controllers\Api\v1\ProductsApiController;
@@ -114,7 +115,14 @@ Route::prefix('v1')->group(function () {
             Route::post('/store', [ClientApiController::class, 'store'])->name('store');
             Route::post('/update/{id}', [ClientApiController::class, 'update'])->name('update');
             Route::post('/delete/{id}', [ClientApiController::class, 'delete'])->name('delete');
-            Route::post('/upload/{id}', [ClientApiController::class, 'upload'])->name('upload');
+        });
+
+        //Client
+        Route::prefix('clientphoto')->name('clientphoto.')->group(function () {
+            Route::post('/view', [ClientPhotoApiController::class, 'view'])->name('view');
+            Route::post('/store', [ClientPhotoApiController::class, 'store'])->name('store');
+            Route::post('/update/{id}', [ClientPhotoApiController::class, 'update'])->name('update');
+            Route::post('/delete/{id}', [ClientPhotoApiController::class, 'delete'])->name('delete');
         });
 
         //Voucher
