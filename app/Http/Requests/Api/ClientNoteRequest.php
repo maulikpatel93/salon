@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ClientDocumentRequest extends FormRequest
+class ClientNoteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,7 @@ class ClientDocumentRequest extends FormRequest
     public function rules()
     {
         return [
-            'document' => 'nullable|max:10000',
+            'note' => 'nullable|max:10000',
         ];
     }
 }

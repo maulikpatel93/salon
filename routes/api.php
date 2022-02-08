@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\v1\BusytimeApiController;
 use App\Http\Controllers\Api\v1\CategoriesApiController;
 use App\Http\Controllers\Api\v1\ClientApiController;
 use App\Http\Controllers\Api\v1\ClientDocumentApiController;
+use App\Http\Controllers\Api\v1\ClientNoteApiController;
 use App\Http\Controllers\Api\v1\ClientPhotoApiController;
 use App\Http\Controllers\Api\v1\GuestApiController;
 use App\Http\Controllers\Api\v1\PricetierApiController;
@@ -132,6 +133,14 @@ Route::prefix('v1')->group(function () {
             Route::post('/store', [ClientDocumentApiController::class, 'store'])->name('store');
             Route::post('/update/{id}', [ClientDocumentApiController::class, 'update'])->name('update');
             Route::post('/delete/{id}', [ClientDocumentApiController::class, 'delete'])->name('delete');
+        });
+
+        //Client document
+        Route::prefix('clientnote')->name('clientnote.')->group(function () {
+            Route::post('/view', [ClientNoteApiController::class, 'view'])->name('view');
+            Route::post('/store', [ClientNoteApiController::class, 'store'])->name('store');
+            Route::post('/update/{id}', [ClientNoteApiController::class, 'update'])->name('update');
+            Route::post('/delete/{id}', [ClientNoteApiController::class, 'delete'])->name('delete');
         });
 
         //Voucher

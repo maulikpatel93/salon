@@ -3,6 +3,8 @@
 use App\Models\Modules;
 use App\Models\Permissions;
 use App\Models\RoleAccess;
+use App\Models\Salons;
+use Carbon\Carbon;
 use Illuminate\Support\Route;
 use Illuminate\Support\Str;
 /**
@@ -274,5 +276,19 @@ if (!function_exists('ImageFullUrl')) {
     function ImageFullUrl($image_name, $path)
     {
         return url('storage/' . $path . '/' . $image_name);
+    }
+}
+
+if (!function_exists('UtcToLocal')) {
+    function UtcToLocal($date, $salon_id)
+    {
+        if ($date && $salon_id) {
+            $salons = Salons::select('timezone')->where('id', $salon_id)->first()->makeHidden(['isNewRecord'])->toArray();
+            if ($salons && isset($salons['timezone']) && $salons['timezone']) {
+                $dateformated = Carbon::parse($date)->timezone($salons['timezone'])->format('l jS F Y');
+                return $dateformated;
+            }
+        }
+        return "";
     }
 }

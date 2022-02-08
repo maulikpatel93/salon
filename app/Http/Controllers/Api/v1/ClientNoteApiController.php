@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\ClientDocumentRequest;
-use App\Models\Api\Clientdocument;
+use App\Http\Requests\Api\ClientNoteRequest;
+use App\Models\Api\Clientnote;
 use Illuminate\Http\Request;
 
-class ClientDocumentApiController extends Controller
+class ClientNoteApiController extends Controller
 {
     protected $successStatus = 200;
     protected $errorStatus = 422;
@@ -18,7 +18,7 @@ class ClientDocumentApiController extends Controller
         'id',
         'salon_id',
         'client_id',
-        'document',
+        'note',
         'updated_at',
     ];
 
@@ -41,55 +41,35 @@ class ClientDocumentApiController extends Controller
         return $this->returnResponse($request, $id);
     }
 
-    public function store(ClientDocumentRequest $request)
+    public function store(ClientNoteRequest $request)
     {
         $requestAll = $request->all();
-        $document = $request->document;
-        $salon_id = $request->salon_id;
-        $client_id = $request->client_id;
-        if ($document) {
-            foreach ($document as $file) {
-                if ($file) {
-                    $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-                    $filePath = $file->storeAs('client', $fileName, 'public');
-                    $model = new Clientdocument();
-                    $model->document = $fileName;
-                    $model->client_id = $client_id;
-                    $model->salon_id = $salon_id;
-                    $model->is_active_at = currentDateTime();
-                    $model->save();
-                    // Storage::delete('/public/client/' . $model->profile_photo);
-                    // $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-                    // $filePath = $file->storeAs('client', $fileName, 'public');
-                    // $model->profile_photo = $fileName;
-                }
-            }
-        }
-        return response()->json(['message' => __('message.success')], $this->successStatus);
-        // return $this->returnResponse($request, $model->id);
+        $requestAll['is_active_at'] = currentDateTime();
+        $model = new Clientnote;
+        $model->fill($requestAll);
+        $model->save();
+        return $this->returnResponse($request, $model->id);
     }
 
-    public function update(ClientDocumentRequest $request, $id)
+    public function update(ClientNoteRequest $request, $id)
     {
         $requestAll = $request->all();
         $model = $this->findModel($id);
-        // Clientdocument::where('client_id', $model->client_id)->update(['is_profile_photo' => '0']);
-        // $model->is_profile_photo = '1';
-        // $model->save();
-        // Client::where('id', $model->client_id)->update(['profile_photo' => $model->name]);
+        $model->fill($requestAll);
+        $model->save();
         return $this->returnResponse($request, $model->id);
     }
 
     public function delete(Request $request, $id)
     {
         $requestAll = $request->all();
-        Clientdocument::where(['id' => $id])->delete();
+        Clientnote::where(['id' => $id])->delete();
         return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
     }
 
     protected function findModel($id)
     {
-        if (($model = Clientdocument::find($id)) !== null) {
+        if (($model = Clientnote::find($id)) !== null) {
             return $model;
         }
         throw new UnsecureException('The requested page does not exist.');
@@ -134,32 +114,32 @@ class ClientDocumentApiController extends Controller
         }
         if ($id) {
             if ($request->result == 'result_array') {
-                $model = Clientdocument::with($withArray)->select($field)->where($where)->get();
+                $model = Clientnote::with($withArray)->select($field)->where($where)->get();
             } else {
-                $model = Clientdocument::with($withArray)->select($field)->where($where)->first();
+                $model = Clientnote::with($withArray)->select($field)->where($where)->first();
             }
             $successData = $model->toArray();
             return response()->json($successData, $this->successStatus);
         } else {
             if ($pagination == true) {
                 if ($whereLike) {
-                    $model = Clientdocument::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                    $model = Clientnote::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
                         if ($whereLike) {
-                            $query->where('document', "like", "%" . $whereLike[0] . "%");
+                            $query->where('note', "like", "%" . $whereLike[0] . "%");
                         }
                     })->where($where)->orderByRaw($orderby)->paginate($limit);
                 } else {
-                    $model = Clientdocument::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
+                    $model = Clientnote::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
                 }
             } else {
                 if ($whereLike) {
-                    $model = Clientdocument::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                    $model = Clientnote::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
                         if ($whereLike) {
-                            $query->where('document', "like", "%" . $whereLike[0] . "%");
+                            $query->where('note', "like", "%" . $whereLike[0] . "%");
                         }
                     })->where($where)->orderByRaw($orderby)->get();
                 } else {
-                    $model = Clientdocument::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                    $model = Clientnote::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
                 }
             }
             if ($model->count()) {

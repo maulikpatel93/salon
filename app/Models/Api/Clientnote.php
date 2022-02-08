@@ -4,9 +4,8 @@ namespace App\Models\Api;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
-class Clientdocument extends Model
+class Clientnote extends Model
 {
     use HasFactory;
 
@@ -15,9 +14,7 @@ class Clientdocument extends Model
      *
      * @var string
      */
-    protected $table = 'client_documents';
-
-    protected $appends = ['document_url'];
+    protected $table = 'client_notes';
 
     /**
      * The attributes that are mass assignable.
@@ -27,7 +24,7 @@ class Clientdocument extends Model
     protected $fillable = [
         'salon_id',
         'client_id',
-        'document',
+        'note',
         'is_active',
         'is_active_at',
     ];
@@ -48,12 +45,6 @@ class Clientdocument extends Model
     protected $casts = [
         'is_active_at' => 'datetime',
     ];
-
-    public function getDocumentUrlAttribute()
-    {
-        $photo_url = asset('storage/client');
-        return $this->attributes['document_url'] = $this->document && Storage::disk('public')->exists('client/' . $this->document) ? $photo_url . '/' . $this->document : "";
-    }
 
     public function getCreatedAtAttribute($value)
     {
