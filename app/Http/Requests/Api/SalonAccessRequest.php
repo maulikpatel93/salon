@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StaffWorkingHourRequest extends FormRequest
+class SalonAccessRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,12 +23,13 @@ class StaffWorkingHourRequest extends FormRequest
      */
     public function rules()
     {
+        $id = $this->id;
         return [
-            'salon_id' => 'required|integer',
-            'staff_id' => 'required|integer',
-            'days' => 'required|max:50',
-            'start_time' => 'required|max:50',
-            'end_time' => 'required|max:50',
+            'salon_id' => 'required',
+            'salon_permission_id' => 'required',
+            'staff_id' => 'required|max:150',
+            'type' => 'required',
+            'access' => 'required|max:150|unique:salon_access,salon_permission_id,' . $id,
         ];
     }
 }

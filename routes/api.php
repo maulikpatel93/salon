@@ -11,6 +11,8 @@ use App\Http\Controllers\Api\v1\GuestApiController;
 use App\Http\Controllers\Api\v1\PricetierApiController;
 use App\Http\Controllers\Api\v1\ProductsApiController;
 use App\Http\Controllers\Api\v1\RosterApiController;
+use App\Http\Controllers\Api\v1\SalonAccessApiController;
+use App\Http\Controllers\Api\v1\SalonPermissionApiController;
 use App\Http\Controllers\Api\v1\ServicesApiController;
 use App\Http\Controllers\Api\v1\StaffApiController;
 use App\Http\Controllers\Api\v1\SuppliersApiController;
@@ -166,6 +168,22 @@ Route::prefix('v1')->group(function () {
             Route::post('/store', [BusytimeApiController::class, 'store'])->name('store');
             Route::post('/update/{id}', [BusytimeApiController::class, 'update'])->name('update');
             Route::post('/delete/{id}', [BusytimeApiController::class, 'delete'])->name('delete');
+        });
+
+        //SalonPermission
+        Route::prefix('salonpermission')->name('salonpermission.')->group(function () {
+            Route::post('/view', [SalonPermissionApiController::class, 'view'])->name('view');
+            Route::post('/store', [SalonPermissionApiController::class, 'store'])->name('store');
+            Route::post('/update/{id}', [SalonPermissionApiController::class, 'update'])->name('update');
+            Route::post('/delete/{id}', [SalonPermissionApiController::class, 'delete'])->name('delete');
+        });
+
+        //SalonAccess
+        Route::prefix('salonaccess')->name('salonaccess.')->group(function () {
+            Route::post('/view', [SalonAccessApiController::class, 'view'])->name('view');
+            Route::post('/store', [SalonAccessApiController::class, 'store'])->name('store');
+            Route::post('/update/{id}', [SalonAccessApiController::class, 'update'])->name('update');
+            Route::post('/delete/{id}', [SalonAccessApiController::class, 'delete'])->name('delete');
         });
 
         //Tax

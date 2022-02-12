@@ -27,8 +27,8 @@ class RosterRequest extends FormRequest
             'salon_id' => 'required|integer',
             'staff_id' => 'required|integer',
             'date' => 'required',
-            'start_time' => 'required',
-            'end_time' => 'required',
+            'start_time' => 'date_format:H:i|required',
+            'end_time' => 'date_format:H:i|after:start_time|required',
         ];
     }
 }

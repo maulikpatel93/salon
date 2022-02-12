@@ -61,6 +61,7 @@ class StaffApiController extends Controller
         'start_time',
         'end_time',
         'break_time',
+        'dayoff',
     ];
 
     protected $roster_field = [
@@ -89,6 +90,13 @@ class StaffApiController extends Controller
     public function store(StaffRequest $request)
     {
         $requestAll = $request->all();
+        $timestamp = strtotime('next Sunday');
+        $days = array();
+        for ($i = 0; $i < 7; $i++) {
+            $days[] = strftime('%A', $timestamp);
+            $timestamp = strtotime('+1 day', $timestamp);
+        }
+
         $requestAll['is_active_at'] = currentDateTime();
         $email_username = explode('@', $requestAll['email']);
         $requestAll['panel'] = 'Frontend';
@@ -101,6 +109,39 @@ class StaffApiController extends Controller
         $staff_working_hours = ($request->working_hours) ? json_decode($request->working_hours, true) : [];
         $staff_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
         $staff_services = $staff_services ? array_values(array_filter($staff_services)) : [];
+
+        $working_hour_error = [];
+        if ($staff_working_hours) {
+            foreach ($staff_working_hours as $key => $value) {
+                if (isset($value['days']) && in_array($value['days'], $days)) {
+                    $start_time = isset($value['start_time']) ? strtotime($value['start_time']) : '';
+                    $end_time = isset($value['end_time']) ? strtotime($value['end_time']) : '';
+                    $break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : [];
+                    $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
+                    if ($start_time && $end_time && $start_time >= $end_time) {
+                        // $working_hour_error[$value['days']]["errors"] = __('messages.failed');
+                        $working_hour_error["working_hours"][$key] = ['start_time' => __('messages.endtime_greater_starttime')];
+                    }
+                    $break_time_error = [];
+                    if ($break_time) {
+                        foreach ($break_time as $bkey => $bvalue) {
+                            $break_title = isset($bvalue['break_title']) ? $bvalue['break_title'] : '';
+                            $break_start_time = isset($bvalue['break_start_time']) ? $bvalue['break_start_time'] : '';
+                            $break_end_time = isset($bvalue['break_end_time']) ? $bvalue['break_end_time'] : '';
+                            if ($break_start_time && $break_end_time && $break_start_time >= $break_end_time) {
+                                $break_time_error[$bkey] = ['break_start_time' => __('messages.endtime_greater_starttime'), 'break_end_time' => __('messages.endtime_greater_starttime')];
+                            }
+                        }
+                    }
+                    if ($break_time_error) {
+                        $working_hour_error["working_hours"][$key] = ['break_time' => $break_time_error];
+                    }
+                }
+            }
+        }
+        if ($working_hour_error) {
+            return response()->json(['errors' => $working_hour_error], $this->errorStatus);
+        }
 
         $model = new Staff;
         $model->fill($requestAll);
@@ -123,12 +164,6 @@ class StaffApiController extends Controller
             }
         }
 
-        $timestamp = strtotime('next Sunday');
-        $days = array();
-        for ($i = 0; $i < 7; $i++) {
-            $days[] = strftime('%A', $timestamp);
-            $timestamp = strtotime('+1 day', $timestamp);
-        }
         if ($staff_working_hours) {
             foreach ($staff_working_hours as $key => $value) {
                 if (isset($value['days']) && in_array($value['days'], $days)) {
@@ -136,12 +171,17 @@ class StaffApiController extends Controller
                     if (empty($StaffWorkingHoursModel)) {
                         $StaffWorkingHoursModel = new StaffWorkingHours;
                     }
+                    $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
+                    $start_time = isset($value['start_time']) ? $value['start_time'] : '';
+                    $end_time = isset($value['end_time']) ? $value['end_time'] : '';
+                    $break_time = isset($value['break_time']) ? $value['break_time'] : '';
                     $StaffWorkingHoursModel->salon_id = $model->salon_id;
                     $StaffWorkingHoursModel->staff_id = $model->id;
                     $StaffWorkingHoursModel->days = $value['days'];
-                    $StaffWorkingHoursModel->start_time = isset($value['start_time']) ? $value['start_time'] : '';
-                    $StaffWorkingHoursModel->end_time = isset($value['end_time']) ? $value['end_time'] : '';
-                    $StaffWorkingHoursModel->break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : [];
+                    $StaffWorkingHoursModel->start_time = $dayoff ? $start_time : "";
+                    $StaffWorkingHoursModel->end_time = $dayoff ? $end_time : "";
+                    $StaffWorkingHoursModel->break_time = $dayoff ? $break_time : [];
+                    $StaffWorkingHoursModel->dayoff = $dayoff;
                     $StaffWorkingHoursModel->is_active_at = currentDateTime();
                     $StaffWorkingHoursModel->save();
                 }
@@ -155,9 +195,56 @@ class StaffApiController extends Controller
         $requestAll = $request->all();
         $requestAll['calendar_booking'] = (isset($requestAll['calendar_booking']) && $requestAll['calendar_booking']) ? '1' : '0';
 
+        $timestamp = strtotime('next Sunday');
+        $days = array();
+        for ($i = 0; $i < 7; $i++) {
+            $days[] = strftime('%A', $timestamp);
+            $timestamp = strtotime('+1 day', $timestamp);
+        }
+
         $staff_working_hours = ($request->working_hours) ? json_decode($request->working_hours, true) : [];
         $staff_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
         $staff_services = $staff_services ? array_values(array_filter($staff_services)) : [];
+
+        $working_hour_error = [];
+        if ($staff_working_hours) {
+            foreach ($staff_working_hours as $key => $value) {
+                if (isset($value['days']) && in_array($value['days'], $days)) {
+                    $start_time = isset($value['start_time']) ? strtotime($value['start_time']) : '';
+                    $end_time = isset($value['end_time']) ? strtotime($value['end_time']) : '';
+                    $break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : [];
+                    $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
+                    if ($start_time && $end_time && $start_time >= $end_time) {
+                        // $working_hour_error[$value['days']]["errors"] = __('messages.failed');
+                        $working_hour_error["working_hours"][$key] = ['start_time' => __('messages.endtime_greater_starttime')];
+                    }
+                    $break_time_error = [];
+                    if ($break_time) {
+                        foreach ($break_time as $bkey => $bvalue) {
+                            $break_title = isset($bvalue['break_title']) ? $bvalue['break_title'] : '';
+                            $break_start_time = isset($bvalue['break_start_time']) ? $bvalue['break_start_time'] : '';
+                            $break_end_time = isset($bvalue['break_end_time']) ? $bvalue['break_end_time'] : '';
+                            // echo $break_start_time . ' ' . $start_time;
+                            if ($break_start_time && $break_end_time && $break_start_time >= $break_end_time) {
+                                // $working_hour_error[$value['days']]["errors"] = __('messages.failed');
+                                $break_time_error[$bkey] = ['break_start_time' => __('messages.endtime_greater_starttime'), 'break_end_time' => __('messages.endtime_greater_starttime')];
+                            }
+                            //  else if ($break_start_time && $start_time && $end_time && $break_start_time <= $start_time && $end_time >= $break_end_time) {
+                            //     $break_time_error[$bkey] = ['break_start_time' => __('messages.beetween_startendtime'), 'break_end_time' => __('messages.endtime_greater_starttime')];
+                            // }
+                            // echo $start_time . '<=' . $break_start_time . '<br>';
+                            // echo $end_time . '>=' . $break_end_time;
+                        }
+                    }
+                    if ($break_time_error) {
+                        $working_hour_error["working_hours"][$key] = ['break_time' => $break_time_error];
+                    }
+                }
+            }
+        }
+        if ($working_hour_error) {
+            return response()->json(['errors' => $working_hour_error], $this->errorStatus);
+        }
 
         $model = $this->findModel($id);
         $token = Str::random(config('params.auth_key_character'));
@@ -189,12 +276,7 @@ class StaffApiController extends Controller
                 $StaffServicesModel->save();
             }
         }
-        $timestamp = strtotime('next Sunday');
-        $days = array();
-        for ($i = 0; $i < 7; $i++) {
-            $days[] = strftime('%A', $timestamp);
-            $timestamp = strtotime('+1 day', $timestamp);
-        }
+
         if ($staff_working_hours) {
             foreach ($staff_working_hours as $key => $value) {
                 if (isset($value['days']) && in_array($value['days'], $days)) {
@@ -202,12 +284,17 @@ class StaffApiController extends Controller
                     if (empty($StaffWorkingHoursModel)) {
                         $StaffWorkingHoursModel = new StaffWorkingHours;
                     }
+                    $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
+                    $start_time = isset($value['start_time']) ? $value['start_time'] : '';
+                    $end_time = isset($value['end_time']) ? $value['end_time'] : '';
+                    $break_time = isset($value['break_time']) ? $value['break_time'] : '';
                     $StaffWorkingHoursModel->salon_id = $model->salon_id;
                     $StaffWorkingHoursModel->staff_id = $model->id;
                     $StaffWorkingHoursModel->days = $value['days'];
-                    $StaffWorkingHoursModel->start_time = isset($value['start_time']) ? $value['start_time'] : '';
-                    $StaffWorkingHoursModel->end_time = isset($value['end_time']) ? $value['end_time'] : '';
-                    $StaffWorkingHoursModel->break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : [];
+                    $StaffWorkingHoursModel->start_time = $dayoff ? $start_time : "";
+                    $StaffWorkingHoursModel->end_time = $dayoff ? $end_time : "";
+                    $StaffWorkingHoursModel->break_time = $dayoff ? $break_time : [];
+                    $StaffWorkingHoursModel->dayoff = $dayoff;
                     $StaffWorkingHoursModel->save();
                 }
             }
