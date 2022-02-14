@@ -480,4 +480,5 @@ class StaffApiController extends Controller
         }
         return response()->json(['message' => __('messages.not_found')], $this->errorStatus);
     }
+
 }

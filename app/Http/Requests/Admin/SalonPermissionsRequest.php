@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Api;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SalonPermissionRequest extends FormRequest
+class SalonPermissionsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,13 +23,20 @@ class SalonPermissionRequest extends FormRequest
      */
     public function rules()
     {
-        $id = $this->id;
-        $module = $this->module;
-        return [
-            'panel' => 'required',
+        $rules = [
             'salon_module_id' => 'required',
-            'title' => 'required|max:150',
-            'name' => 'required|max:150|unique:salon_permissions,name,' . $id . ',id,module,' . $module,
+            'panel' => 'required',
+            'title.*' => 'required',
+            'name.*' => 'required',
+        ];
+
+        return $rules;
+    }
+
+    public function messages()
+    {
+        return [
+            // 'email' => 'Please Select Role',
         ];
     }
 }

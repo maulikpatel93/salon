@@ -16,10 +16,28 @@ class SalonPermissionApiController extends Controller
 
     protected $field = [
         'id',
-        'type',
-        'module',
+        'panel',
+        'salon_module_id',
         'title',
         'name',
+        'controller',
+        'action',
+    ];
+
+    protected $salon_module_field = [
+        'id',
+        'panel',
+        'title',
+        'controller',
+        'action',
+        'icon',
+        'functionality',
+        'type',
+        'parent_menu_id',
+        'parent_submenu_id',
+        'menu_position',
+        'submenu_position',
+        'is_hiddden',
     ];
 
     public function __construct()
@@ -73,6 +91,19 @@ class SalonPermissionApiController extends Controller
         $requestAll = $request->all();
         $field = ($request->field) ? array_merge(['id'], explode(',', $request->field)) : $this->field;
 
+        $salon_module_field = $this->salon_module_field;
+        if (isset($requestAll['salon_module_field']) && empty($requestAll['salon_module_field'])) {
+            $salon_module_field = false;
+        } else if ($request->salon_module_field == '*') {
+            $salon_module_field = [$request->salon_module_field];
+        } else if ($request->salon_module_field) {
+            $salon_module_field = array_merge(['id'], explode(',', $request->salon_module_field));
+        }
+
+        // if ($salon_module_field) {
+        //     $withArray[] = 'salonmodule:' . implode(',', $salon_module_field);
+        // }
+
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
@@ -94,7 +125,7 @@ class SalonPermissionApiController extends Controller
         } else {
             if ($pagination == true) {
                 if ($whereLike) {
-                    $model = Staff::select($field)->where(function ($query) use ($whereLike) {
+                    $model = SalonPermission::select($field)->where(function ($query) use ($whereLike) {
                         if ($whereLike) {
                             $query->where('name', "like", "%" . $whereLike[0] . "%");
                         }

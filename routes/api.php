@@ -173,9 +173,6 @@ Route::prefix('v1')->group(function () {
         //SalonPermission
         Route::prefix('salonpermission')->name('salonpermission.')->group(function () {
             Route::post('/view', [SalonPermissionApiController::class, 'view'])->name('view');
-            Route::post('/store', [SalonPermissionApiController::class, 'store'])->name('store');
-            Route::post('/update/{id}', [SalonPermissionApiController::class, 'update'])->name('update');
-            Route::post('/delete/{id}', [SalonPermissionApiController::class, 'delete'])->name('delete');
         });
 
         //SalonAccess

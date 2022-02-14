@@ -15,6 +15,7 @@ class SalonPermission extends Model
      * @var string
      */
     protected $table = 'salon_permissions';
+    protected $appends = ['access'];
 
     public $timestamps = false;
     /**
@@ -23,8 +24,8 @@ class SalonPermission extends Model
      * @var string[]
      */
     protected $fillable = [
-        'type',
-        'module',
+        'panel',
+        'salon_module_id',
         'title',
         'name',
     ];
@@ -42,5 +43,20 @@ class SalonPermission extends Model
      * @var array
      */
     protected $casts = [];
+
+    // public function salonmodule()
+    // {
+    //     return $this->belongsTo(SalonAccess::class, 'salon_id', 'id');
+    // }
+
+    public function getAccessAttribute()
+    {
+        $staff_id = isset($_REQUEST['staff_id']) && $_REQUEST['staff_id'] ? $_REQUEST['staff_id'] : 0;
+        if ($staff_id) {
+            $access = SalonAccess::where(['staff_id' => $staff_id, 'salon_permission_id' => $this->id])->count();
+            return $this->attributes['access'] = $access ? true : false;
+        }
+        return $this->attributes['access'] = false;
+    }
 
 }

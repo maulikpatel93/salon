@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\EmailtemplatesController;
 use App\Http\Controllers\Admin\ModulesController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\RolesController;
+use App\Http\Controllers\Admin\SalonModulesController;
+use App\Http\Controllers\Admin\SalonPermissionsController;
 use App\Http\Controllers\Admin\SalonsController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UsersController;
@@ -210,6 +212,35 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/delete/{id}', [SalonsController::class, 'delete'])->name('delete')->middleware('checkpermission');
             Route::post('/isactive/{id}', [SalonsController::class, 'isactive'])->name('isactive')->middleware('checkpermission');
             Route::post('/applystatus', [SalonsController::class, 'applystatus'])->name('applystatus')->middleware('checkpermission');
+        });
+
+        //Modules
+        Route::prefix('salonmodules')->name('salonmodules.')->group(function () {
+            Route::get('/', [SalonModulesController::class, 'index'])->name('index')->middleware('checkpermission');
+            Route::post('/create', [SalonModulesController::class, 'create'])->name('create')->middleware('checkpermission');
+            Route::post('/store', [SalonModulesController::class, 'store'])->name('store')->middleware('checkpermission');
+            Route::post('/edit/{id}', [SalonModulesController::class, 'edit'])->name('edit')->middleware('checkpermission');
+            Route::post('/update/{id}', [SalonModulesController::class, 'update'])->name('update')->middleware('checkpermission');
+            Route::post('/view/{id}', [SalonModulesController::class, 'view'])->name('view')->middleware('checkpermission');
+            Route::get('/delete/{id}', [SalonModulesController::class, 'delete'])->name('delete')->middleware('checkpermission');
+            Route::post('/isactive/{id}', [SalonModulesController::class, 'isactive'])->name('isactive')->middleware('checkpermission');
+            Route::post('/applystatus', [SalonModulesController::class, 'applystatus'])->name('applystatus')->middleware('checkpermission');
+
+            //Dependent-Dropdown
+            Route::post('/childmenu', [SalonModulesController::class, 'childmenu'])->name('childmenu');
+        });
+
+        //Permissions
+        Route::prefix('salonpermissions')->name('salonpermissions.')->group(function () {
+            Route::get('/', [SalonPermissionsController::class, 'index'])->name('index')->middleware('checkpermission');
+            Route::post('/create', [SalonPermissionsController::class, 'create'])->name('create')->middleware('checkpermission');
+            Route::post('/store', [SalonPermissionsController::class, 'store'])->name('store')->middleware('checkpermission');
+            Route::post('/edit/{id}', [SalonPermissionsController::class, 'edit'])->name('edit')->middleware('checkpermission');
+            Route::post('/update/{id}', [SalonPermissionsController::class, 'update'])->name('update')->middleware('checkpermission');
+            Route::post('/view/{id}', [SalonPermissionsController::class, 'view'])->name('view')->middleware('checkpermission');
+            Route::get('/delete/{id}', [PermisSalonPermissionsControllersSalonPermissionsControllerionsController::class, 'delete'])->name('delete')->middleware('checkpermission');
+            Route::post('/isactive/{id}', [SalonPermissionsController::class, 'isactive'])->name('isactive')->middleware('checkpermission');
+            Route::post('/applystatus', [SalonPermissionsController::class, 'applystatus'])->name('applystatus')->middleware('checkpermission');
         });
     });
 });
