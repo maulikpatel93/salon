@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\v1\PricetierApiController;
 use App\Http\Controllers\Api\v1\ProductsApiController;
 use App\Http\Controllers\Api\v1\RosterApiController;
 use App\Http\Controllers\Api\v1\SalonAccessApiController;
+use App\Http\Controllers\Api\v1\SalonModulesApiController;
 use App\Http\Controllers\Api\v1\SalonPermissionApiController;
 use App\Http\Controllers\Api\v1\ServicesApiController;
 use App\Http\Controllers\Api\v1\StaffApiController;
@@ -173,6 +174,11 @@ Route::prefix('v1')->group(function () {
         //SalonPermission
         Route::prefix('salonpermission')->name('salonpermission.')->group(function () {
             Route::post('/view', [SalonPermissionApiController::class, 'view'])->name('view');
+        });
+
+        //SalonModule
+        Route::prefix('salonmodules')->name('salonmodules.')->group(function () {
+            Route::post('/view', [SalonModulesApiController::class, 'view'])->name('view');
         });
 
         //SalonAccess

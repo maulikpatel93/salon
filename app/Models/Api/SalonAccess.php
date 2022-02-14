@@ -24,9 +24,8 @@ class SalonAccess extends Model
      */
     protected $fillable = [
         'salon_id',
+        'role_id',
         'salon_permission_id',
-        'staff_id',
-        'type',
         'access',
     ];
 

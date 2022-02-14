@@ -100,9 +100,9 @@ class SalonPermissionApiController extends Controller
             $salon_module_field = array_merge(['id'], explode(',', $request->salon_module_field));
         }
 
-        // if ($salon_module_field) {
-        //     $withArray[] = 'salonmodule:' . implode(',', $salon_module_field);
-        // }
+        if ($salon_module_field) {
+            $withArray[] = 'salonmodule:' . implode(',', $salon_module_field);
+        }
 
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
@@ -116,33 +116,33 @@ class SalonPermissionApiController extends Controller
 
         if ($id) {
             if ($request->result == 'result_array') {
-                $model = SalonPermission::select($field)->where($where)->get();
+                $model = SalonPermission::with($withArray)->select($field)->where($where)->get();
             } else {
-                $model = SalonPermission::select($field)->where($where)->first();
+                $model = SalonPermission::with($withArray)->select($field)->where($where)->first();
             }
             $successData = $model->toArray();
             return response()->json($successData, $this->successStatus);
         } else {
             if ($pagination == true) {
                 if ($whereLike) {
-                    $model = SalonPermission::select($field)->where(function ($query) use ($whereLike) {
+                    $model = SalonPermission::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
                         if ($whereLike) {
                             $query->where('name', "like", "%" . $whereLike[0] . "%");
                         }
                     })->where($where)->orderByRaw($orderby)->paginate($limit);
                 } else {
-                    $model = SalonPermission::select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
+                    $model = SalonPermission::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
                 }
                 // $model->data = $model;
             } else {
                 if ($whereLike) {
-                    $model = SalonPermission::select($field)->where(function ($query) use ($whereLike) {
+                    $model = SalonPermission::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
                         if ($whereLike) {
                             $query->where('name', "like", "%" . $whereLike[0] . "%");
                         }
                     })->where($where)->orderByRaw($orderby)->get();
                 } else {
-                    $model = SalonPermission::select($field)->where($where)->orderByRaw($orderby)->get();
+                    $model = SalonPermission::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
                 }
             }
             if ($model->count()) {

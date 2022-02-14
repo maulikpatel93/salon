@@ -56,12 +56,11 @@ class CreateStaffAccessTable extends Migration
             $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
             $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
 
-            $table->unsignedBigInteger('salon_permission_id')->after('salon_id')->nullable()->comment('Type Of Salon');
+            $table->unsignedBigInteger('role_id')->after('salon_id')->nullable()->comment('Type Of Role');
+            $table->foreign('role_id')->references('id')->on('roles')->onUpdate('cascade')->onDelete('cascade');
+
+            $table->unsignedBigInteger('salon_permission_id')->after('role_id')->nullable()->comment('Type Of Salon Pemission');
             $table->foreign('salon_permission_id')->references('id')->on('salon_permissions')->onUpdate('cascade')->onDelete('cascade');
-
-            $table->unsignedBigInteger('staff_id')->after('salon_permission_id')->nullable()->comment('Type Of Staff');
-            $table->foreign('staff_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
-
         });
     }
 

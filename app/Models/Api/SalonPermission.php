@@ -44,16 +44,17 @@ class SalonPermission extends Model
      */
     protected $casts = [];
 
-    // public function salonmodule()
-    // {
-    //     return $this->belongsTo(SalonAccess::class, 'salon_id', 'id');
-    // }
+    public function salonmodule()
+    {
+        return $this->belongsTo(SalonModules::class, 'salon_module_id', 'id');
+    }
 
     public function getAccessAttribute()
     {
-        $staff_id = isset($_REQUEST['staff_id']) && $_REQUEST['staff_id'] ? $_REQUEST['staff_id'] : 0;
-        if ($staff_id) {
-            $access = SalonAccess::where(['staff_id' => $staff_id, 'salon_permission_id' => $this->id])->count();
+        $role_id = isset($_REQUEST['role_id']) && $_REQUEST['role_id'] ? $_REQUEST['role_id'] : 0;
+        $salon_id = isset($_REQUEST['salon_id']) && $_REQUEST['salon_id'] ? $_REQUEST['salon_id'] : 0;
+        if ($role_id && $salon_id) {
+            $access = SalonAccess::where(['salon_id' => $salon_id, 'role_id' => $role_id, 'salon_permission_id' => $this->id, 'access' => '1'])->count();
             return $this->attributes['access'] = $access ? true : false;
         }
         return $this->attributes['access'] = false;
