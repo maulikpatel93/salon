@@ -77,6 +77,7 @@
         });
         $(document).ready(function(){
             $('#salonform-business_phone_number').inputmask({mask: "999-999-9999"});
+            $('#EmailTemplateform-html').summernote();
             // $(":input").inputmask();
             // Inputmask().mask(document.querySelectorAll("input"));
         });

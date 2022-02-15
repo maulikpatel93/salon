@@ -50,6 +50,9 @@ Route::prefix('v1')->group(function () {
     Route::post('/salonregistration', [GuestApiController::class, 'salonregistration']);
     Route::post('/salons', [GuestApiController::class, 'salons']);
     Route::post('/register', [GuestApiController::class, 'register']);
+
+    Route::get("/sendmail", function () {return view("emailtemplates.template.mail");});
+
     Route::middleware(['auth:api'])->prefix('afterlogin')->group(function () {
         Route::post('/user', [AuthApiController::class, 'user']);
         Route::post('/logout', [GuestApiController::class, 'logout']);

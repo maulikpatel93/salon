@@ -102,10 +102,20 @@ class StaffApiController extends Controller
         $requestAll['panel'] = 'Frontend';
         $requestAll['role_id'] = 5;
         $token = Str::random(config('params.auth_key_character'));
+        $randompassword = Str::random(6);
         $requestAll['auth_key'] = hash('sha256', $token);
         $requestAll['username'] = $email_username ? $email_username[0] : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
-        $requestAll['password'] = Hash::make(Str::random(10));
+        $requestAll['password'] = Hash::make($randompassword);
         $requestAll['calendar_booking'] = (isset($requestAll['calendar_booking']) && $requestAll['calendar_booking']) ? '1' : '0';
+
+        if ($requestAll['email']) {
+            $field = array();
+            $field['{{password}}'] = $randompassword;
+            $sendmail = sendMail($requestAll['email'], 'send_password', $field);
+            if (empty($sendmail)) {
+                return response()->json(['email' => $requestAll['email'], 'message' => __('message.wrongmail')], $this->errorStatus);
+            }
+        }
         $staff_working_hours = ($request->working_hours) ? json_decode($request->working_hours, true) : [];
         $staff_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
         $staff_services = $staff_services ? array_values(array_filter($staff_services)) : [];

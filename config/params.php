@@ -13,6 +13,13 @@ return [
         'Senior' => 'Senior',
     ],
     'tax' => ['GST', 'QST', 'PST', 'HST'],
+    'site_name' => 'Beauty',
+    'site_url' => 'https://localhost:8000',
+    'site_address' => 'India',
+    'support_email' => 'programmer93.dynamicdreamz@gmail.com',
+    'copyright_text' => '© {year} Beauty. All rights reserved.',
+    'logo_img' => '/images/logo.png',
+    'logo_icon' => '/images/favicon.png.jpg',
     'timezones' => array(
         'Pacific/Midway' => "(GMT-11:00) Midway Island",
         'US/Samoa' => "(GMT-11:00) Samoa",

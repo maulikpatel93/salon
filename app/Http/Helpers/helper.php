@@ -1,12 +1,15 @@
 <?php
 
+use App\Models\Emailtemplates;
 use App\Models\Modules;
 use App\Models\Permissions;
 use App\Models\RoleAccess;
 use App\Models\Salons;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Route;
 use Illuminate\Support\Str;
+// use Mail;
 /**
  * Henerate UUID.
  *
@@ -288,6 +291,59 @@ if (!function_exists('UtcToLocal')) {
                 $dateformated = Carbon::parse($date)->timezone($salons['timezone'])->format('l jS F Y');
                 return $dateformated;
             }
+        }
+        return "";
+    }
+}
+
+if (!function_exists('sendMail')) {
+    function sendMail($email, $code, $field = array())
+    {
+        if ($email && $code) {
+            $EmailTemplates = Emailtemplates::where(['code' => $code])->first();
+            if (empty($EmailTemplates)) {
+                return false;
+            }
+
+            $action_url = URL::to(config('params.site_url'));
+            $name = "Beauty@info";
+
+            $logo = "<a href='" . $action_url . "'><img src='" . config('params.logo_img') . "' alt='Logo' style='width: 94px;'></a>";
+            $site_url = config('params.site_url');
+            $site_name = config('params.site_name');
+            $site_address = config('params.site_address');
+            $fromEmail = config('params.support_email');
+            $subject = $EmailTemplates->subject;
+            $toEmail = $email;
+            $copyright_text = str_replace('{year}', date('Y'), config('params.copyright_text'));
+
+            $message = $EmailTemplates->html;
+            $message = str_replace('{{logo}}', $logo, $message);
+            $message = str_replace('{{site_url}}', $site_url, $message);
+            $message = str_replace('{{site_name}}', $site_name, $message);
+            $message = str_replace('{{site_address}}', $site_address, $message);
+            $message = str_replace('{{copyright_text}}', $copyright_text, $message);
+            $message = str_replace('{{name}}', $name, $message);
+            $message = str_replace('{{action_url}}', $action_url, $message);
+
+            if ($field) {
+                foreach ($field as $key => $value) {
+                    $message = str_replace($key, $value, $message);
+                }
+            }
+            $data = array(
+                'body' => $message,
+            );
+            $sendemail = Mail::send(['html' => 'admin.emailtemplates.template.mail'], $data, function ($message) use ($toEmail, $fromEmail, $subject) {
+                // echo $toEmail . ' ' . $fromEmail . ' ' . $subject;
+                $message->to($toEmail)->subject($subject);
+                $message->from($fromEmail);
+            });
+            if (Mail::failures()) {
+                return false;
+            }
+
+            return true;
         }
         return "";
     }

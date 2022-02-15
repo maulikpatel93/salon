@@ -8,4 +8,5 @@ return [
     'not_found' => 'No Data Found',
     'endtime_greater_starttime' => "End date can't be before Start date",
     "beetween_startendtime" => "Break time between start time and end time",
+    "wrongmail" => "Your Email Id Is wrong. Please check and enter another email",
 ];

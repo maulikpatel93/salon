@@ -20,15 +20,15 @@ php artisan cache:clear
 php artisan route:cache
 php artisan config:cache
 
-Create Migrate table 
+Create Migrate table
 php artisan make:migration create_salon_companies_table
 
 Remove migrate
 php artisan migrate:rollback
 
-Create Seeder table 
-php artisan make:seeder RoleSeeder   New seeder FileCreate
-php artisan db:seed  databaseseeder file call
+Create Seeder table
+php artisan make:seeder RoleSeeder New seeder FileCreate
+php artisan db:seed databaseseeder file call
 php artisan db:seed --class=RoleSeeder
 
 DB import in class
@@ -134,11 +134,11 @@ php artisan storage:link
 "Itstructure\\GridView\\": "composer/itstructure/laravel-grid-view/src/"
 
 'name' => 'required',
-            'panel' => 'required',
+'panel' => 'required',
 
 
 
-SET  @num := 0;
+SET @num := 0;
 
 UPDATE your_table SET id = @num := (@num+1);
 
@@ -158,5 +158,10 @@ Server file buid in laravel
 
 1.Create .env file
 2.php artisan migrate
-3.php artisan db:seed  (Data insert in datatable)
+3.php artisan db:seed (Data insert in datatable)
 2.Api use command - php artisan passport:install
+
+
+Mail Send commnad
+
+php artisan make:mail classname
