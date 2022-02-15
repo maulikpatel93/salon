@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\SalonModulesRequest;
+use App\Models\Api\SalonAccess;
 use App\Models\Api\SalonModules;
 use Illuminate\Http\Request;
 
@@ -48,31 +48,6 @@ class SalonModulesApiController extends Controller
         return $this->returnResponse($request, $id);
     }
 
-    public function store(SalonModulesRequest $request)
-    {
-        $requestAll = $request->all();
-        $model = new SalonModules;
-        $model->fill($requestAll);
-        $model->save();
-        return $this->returnResponse($request, $model->id);
-    }
-
-    public function update(SalonModulesRequest $request, $id)
-    {
-        $requestAll = $request->all();
-        $model = $this->findModel($id);
-        $model->fill($requestAll);
-        $model->save();
-        return $this->returnResponse($request, $model->id);
-    }
-
-    public function delete(Request $request, $id)
-    {
-        $requestAll = $request->all();
-        SalonModules::where('id', $id)->delete();
-        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
-    }
-
     protected function findModel($id)
     {
         if (($model = SalonModules::find($id)) !== null) {
@@ -103,12 +78,12 @@ class SalonModulesApiController extends Controller
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
-        $where = ['type' => 'Menu'];
+        $where = [];
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
         $whereLike = $request->q ? explode(' ', $request->q) : '';
 
-        $orderby = 'id desc';
+        $orderby = 'id asc';
 
         if ($id) {
             if ($request->result == 'result_array') {
@@ -119,28 +94,12 @@ class SalonModulesApiController extends Controller
             $successData = $model->toArray();
             return response()->json($successData, $this->successStatus);
         } else {
-            if ($pagination == true) {
-                if ($whereLike) {
-                    $model = Staff::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
-                        if ($whereLike) {
-                            $query->where('name', "like", "%" . $whereLike[0] . "%");
-                        }
-                    })->where($where)->orderByRaw($orderby)->paginate($limit);
-                } else {
-                    $model = SalonModules::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
-                }
-                // $model->data = $model;
+            if ($request->salon_permission_field) {
+                $model = SalonModules::with($withArray)->has('salonpermission')->select($field)->where($where)->orderByRaw($orderby)->get();
             } else {
-                if ($whereLike) {
-                    $model = SalonModules::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
-                        if ($whereLike) {
-                            $query->where('name', "like", "%" . $whereLike[0] . "%");
-                        }
-                    })->where($where)->orderByRaw($orderby)->get();
-                } else {
-                    $model = SalonModules::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
-                }
+                $model = SalonModules::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
             }
+
             if ($model->count()) {
                 $successData = $model->toArray();
                 if ($successData) {
@@ -152,6 +111,36 @@ class SalonModulesApiController extends Controller
             }
         }
 
-        return response()->json(['message' => __('messages.failed')], $this->errorStatus);
+        return response()->json(['message' => __('message.success')], $this->successStatus);
+    }
+
+    public function accessupdate(Request $request)
+    {
+        $requestAll = $request->all();
+        $salon_permission_id = $request->salon_permission_id ? explode(",", $request->salon_permission_id) : "";
+        $salonmoduleaccess = $request->salonmoduleaccess ? explode(",", $request->salonmoduleaccess) : "";
+        $salon_id = $request->salon_id;
+        $role_id = $request->role_id;
+        if ($salon_permission_id) {
+            foreach ($salon_permission_id as $key => $value) {
+                $SalonAccess = SalonAccess::where(['salon_id' => $salon_id, 'role_id' => $role_id, 'salon_permission_id' => $value])->first();
+                if ($SalonAccess) {
+                    $SalonAccess->salon_id = $salon_id;
+                    $SalonAccess->role_id = $role_id;
+                    $SalonAccess->salon_permission_id = $value;
+                    $SalonAccess->access = (isset($salonmoduleaccess[$key]) && $salonmoduleaccess[$key]) ? '1' : '0';
+                    $SalonAccess->save();
+                } else {
+                    $SalonAccess = new SalonAccess;
+                    $SalonAccess->salon_id = $salon_id;
+                    $SalonAccess->role_id = $role_id;
+                    $SalonAccess->salon_permission_id = $value;
+                    $SalonAccess->access = (isset($salonmoduleaccess[$key]) && $salonmoduleaccess[$key]) ? '1' : '0';
+                    $SalonAccess->save();
+                }
+            }
+        }
+        return response()->json(['message' => __('messages.success')], $this->successStatus);
+
     }
 }

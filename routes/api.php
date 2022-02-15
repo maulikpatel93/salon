@@ -13,7 +13,6 @@ use App\Http\Controllers\Api\v1\ProductsApiController;
 use App\Http\Controllers\Api\v1\RosterApiController;
 use App\Http\Controllers\Api\v1\SalonAccessApiController;
 use App\Http\Controllers\Api\v1\SalonModulesApiController;
-use App\Http\Controllers\Api\v1\SalonPermissionApiController;
 use App\Http\Controllers\Api\v1\ServicesApiController;
 use App\Http\Controllers\Api\v1\StaffApiController;
 use App\Http\Controllers\Api\v1\SuppliersApiController;
@@ -171,14 +170,10 @@ Route::prefix('v1')->group(function () {
             Route::post('/delete/{id}', [BusytimeApiController::class, 'delete'])->name('delete');
         });
 
-        //SalonPermission
-        Route::prefix('salonpermission')->name('salonpermission.')->group(function () {
-            Route::post('/view', [SalonPermissionApiController::class, 'view'])->name('view');
-        });
-
         //SalonModule
-        Route::prefix('salonmodules')->name('salonmodules.')->group(function () {
+        Route::prefix('salonmodule')->name('salonmodule.')->group(function () {
             Route::post('/view', [SalonModulesApiController::class, 'view'])->name('view');
+            Route::post('/accessupdate', [SalonModulesApiController::class, 'accessupdate'])->name('accessupdate');
         });
 
         //SalonAccess
