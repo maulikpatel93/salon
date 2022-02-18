@@ -23,5 +23,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             TaxSeeder::class,
         ]);
+        $this->call(SalonModulesTableSeeder::class);
+        $this->call(SalonPermissionsTableSeeder::class);
+        $this->call(SalonAccessTableSeeder::class);
     }
 }
