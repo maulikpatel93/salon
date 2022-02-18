@@ -81,7 +81,7 @@ class SalonModulesApiController extends Controller
 
         $where = [];
         if ($type) {
-            $where['type'] = 'Menu';
+            $where['type'] = $type;
         }
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
