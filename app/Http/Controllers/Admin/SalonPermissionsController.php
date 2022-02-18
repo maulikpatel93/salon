@@ -53,12 +53,14 @@ class SalonPermissionsController extends Controller
             $name = $inputVal['name'];
             $controller = $inputVal['controller'];
             $action = $inputVal['action'];
+            $panel = $inputVal['panel'];
             if ($name) {
                 for ($i = 0; $i < count($name); $i++) {
                     $model = SalonPermissions::where(['name' => $name[$i], 'salon_module_id' => $inputVal['salon_module_id']])->count();
                     if (empty($model)) {
                         $model = new SalonPermissions();
                         $model->salon_module_id = $inputVal['salon_module_id'];
+                        $model->panel = $panel;
                         $model->title = $title[$i];
                         $model->name = $name[$i];
                         $model->controller = $controller[$i];

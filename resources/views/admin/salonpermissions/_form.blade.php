@@ -81,6 +81,22 @@ $defaultPermission = [
         ]) }}
     </div>
     <div class="mb-3">
+        {{ Form::label('title') }}
+        {{ Form::text('title', $model->title, [
+            'class' => 'form-control',
+            'id' => $formName . '-title',
+            'placeholder' => '',
+        ]) }}
+    </div>
+    <div class="mb-3">
+        {{ Form::label('name') }}
+        {{ Form::text('name', $model->name, [
+            'class' => 'form-control',
+            'id' => $formName . '-name',
+            'placeholder' => '',
+        ]) }}
+    </div>
+    <div class="mb-3">
         {{ Form::label('action') }}
         {{ Form::text('action', $model->action, [
             'class' => 'form-control',

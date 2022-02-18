@@ -24,6 +24,7 @@ class SalonModules extends Model
      */
     protected $fillable = [
         'title',
+        'panel',
         'controller',
         'action',
         'icon',

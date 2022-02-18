@@ -81,7 +81,7 @@ class GuestApiController extends Controller
             // 'email_verified' => 1,
         ];
         $credentials_4 = array_merge(['role_id' => 4], $credentials); // Salon role
-        $credentials_5 = array_merge(['role_id' => 6], $credentials); // Staff role
+        $credentials_5 = array_merge(['role_id' => 5], $credentials); // Staff role
         if (Auth::attempt($credentials_4)) {
             $user = Auth::user();
             $successData = [];

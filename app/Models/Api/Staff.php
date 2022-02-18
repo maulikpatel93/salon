@@ -25,6 +25,7 @@ class Staff extends Model
     protected $fillable = [
         'role_id',
         'salon_id',
+        'auth_key',
         'panel',
         'price_tier_id',
         'profile_photo',
