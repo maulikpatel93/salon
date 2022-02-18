@@ -65,6 +65,7 @@ class SalonPermissionsController extends Controller
                         $model->name = $name[$i];
                         $model->controller = $controller[$i];
                         $model->action = $action[$i];
+                        $model->is_active_at = currentDateTime();
                         $model->save();
                     }
                 }

@@ -32,6 +32,8 @@ class SalonPermissions extends Model
         'name',
         'controller',
         'action',
+        'is_active',
+        'is_active_at',
     ];
 
     /**
@@ -48,7 +50,7 @@ class SalonPermissions extends Model
      * @var array
      */
     protected $casts = [
-        // 'is_active_at' => 'datetime',
+        'is_active_at' => 'datetime',
     ];
 
     public function getIsNewRecordAttribute()

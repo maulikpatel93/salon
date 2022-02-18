@@ -39,6 +39,8 @@ class CreateStaffAccessTable extends Migration
             $table->string('name', 100)->comment('Ony use view / No any api call');
             $table->string('controller', 100)->comment('Not any api call url controller in laravel api');
             $table->string('action', 100)->comment('Not any api call or Url method in laravel api');
+            $table->enum('is_active', ['0', '1'])->default('1'); // 1:Active, 0:Inactive
+            $table->dateTime('is_active_at')->nullable();
         });
 
         Schema::table('salon_permissions', function (Blueprint $table) {
