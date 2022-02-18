@@ -60,6 +60,7 @@ class SalonModulesApiController extends Controller
     {
         $requestAll = $request->all();
         $field = ($request->field) ? array_merge(['id'], explode(',', $request->field)) : $this->field;
+        $type = $request->type;
 
         $salon_permission_field = $this->salon_permission_field;
         if (isset($requestAll['salon_permission_field']) && empty($requestAll['salon_permission_field'])) {
@@ -79,6 +80,9 @@ class SalonModulesApiController extends Controller
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
         $where = [];
+        if ($type) {
+            $where['type'] = 'Menu';
+        }
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
         $whereLike = $request->q ? explode(' ', $request->q) : '';
