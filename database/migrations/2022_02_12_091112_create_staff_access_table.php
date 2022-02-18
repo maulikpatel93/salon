@@ -34,7 +34,7 @@ class CreateStaffAccessTable extends Migration
 
         Schema::create('salon_permissions', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['Staff', 'Client', 'Common'])->default(null)->nullable();
+            $table->enum('panel', ['Staff', 'Client', 'Common'])->default(null)->nullable();
             $table->string('title', 200);
             $table->string('name', 100)->comment('Ony use view / No any api call');
             $table->string('controller', 100)->comment('Not any api call url controller in laravel api');
@@ -50,7 +50,6 @@ class CreateStaffAccessTable extends Migration
 
         Schema::create('salon_access', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['Staff', 'Client'])->default(null)->nullable();
             $table->enum('access', ['0', '1'])->default('0')->nullable();
         });
 
