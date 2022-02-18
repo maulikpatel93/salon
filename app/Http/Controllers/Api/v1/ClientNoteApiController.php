@@ -122,25 +122,9 @@ class ClientNoteApiController extends Controller
             return response()->json($successData, $this->successStatus);
         } else {
             if ($pagination == true) {
-                if ($whereLike) {
-                    $model = Clientnote::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
-                        if ($whereLike) {
-                            $query->where('note', "like", "%" . $whereLike[0] . "%");
-                        }
-                    })->where($where)->orderByRaw($orderby)->paginate($limit);
-                } else {
-                    $model = Clientnote::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
-                }
+                $model = Clientnote::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
             } else {
-                if ($whereLike) {
-                    $model = Clientnote::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
-                        if ($whereLike) {
-                            $query->where('note', "like", "%" . $whereLike[0] . "%");
-                        }
-                    })->where($where)->orderByRaw($orderby)->get();
-                } else {
-                    $model = Clientnote::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
-                }
+                $model = Clientnote::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
             }
             if ($model->count()) {
                 $successData = $model->toArray();
