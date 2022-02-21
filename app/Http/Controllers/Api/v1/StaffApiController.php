@@ -90,6 +90,8 @@ class StaffApiController extends Controller
     public function store(StaffRequest $request)
     {
         $requestAll = $request->all();
+        unset($requestAll['auth_key']);
+
         $timestamp = strtotime('next Sunday');
         $days = array();
         for ($i = 0; $i < 7; $i++) {
@@ -120,38 +122,38 @@ class StaffApiController extends Controller
         $staff_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
         $staff_services = $staff_services ? array_values(array_filter($staff_services)) : [];
 
-        $working_hour_error = [];
-        if ($staff_working_hours) {
-            foreach ($staff_working_hours as $key => $value) {
-                if (isset($value['days']) && in_array($value['days'], $days)) {
-                    $start_time = isset($value['start_time']) ? strtotime($value['start_time']) : '';
-                    $end_time = isset($value['end_time']) ? strtotime($value['end_time']) : '';
-                    $break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : [];
-                    $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
-                    if ($start_time && $end_time && $start_time >= $end_time) {
-                        // $working_hour_error[$value['days']]["errors"] = __('messages.failed');
-                        $working_hour_error["working_hours"][$key] = ['start_time' => __('messages.endtime_greater_starttime')];
-                    }
-                    $break_time_error = [];
-                    if ($break_time) {
-                        foreach ($break_time as $bkey => $bvalue) {
-                            $break_title = isset($bvalue['break_title']) ? $bvalue['break_title'] : '';
-                            $break_start_time = isset($bvalue['break_start_time']) ? $bvalue['break_start_time'] : '';
-                            $break_end_time = isset($bvalue['break_end_time']) ? $bvalue['break_end_time'] : '';
-                            if ($break_start_time && $break_end_time && $break_start_time >= $break_end_time) {
-                                $break_time_error[$bkey] = ['break_start_time' => __('messages.endtime_greater_starttime'), 'break_end_time' => __('messages.endtime_greater_starttime')];
-                            }
-                        }
-                    }
-                    if ($break_time_error) {
-                        $working_hour_error["working_hours"][$key] = ['break_time' => $break_time_error];
-                    }
-                }
-            }
-        }
-        if ($working_hour_error) {
-            return response()->json(['errors' => $working_hour_error], $this->errorStatus);
-        }
+        // $working_hour_error = [];
+        // if ($staff_working_hours) {
+        //     foreach ($staff_working_hours as $key => $value) {
+        //         if (isset($value['days']) && in_array($value['days'], $days)) {
+        //             $start_time = isset($value['start_time']) ? strtotime($value['start_time']) : '';
+        //             $end_time = isset($value['end_time']) ? strtotime($value['end_time']) : '';
+        //             $break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : [];
+        //             $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
+        //             if ($start_time && $end_time && $start_time >= $end_time) {
+        //                 // $working_hour_error[$value['days']]["errors"] = __('messages.failed');
+        //                 $working_hour_error["working_hours"][$key] = ['start_time' => __('messages.endtime_greater_starttime')];
+        //             }
+        //             $break_time_error = [];
+        //             if ($break_time) {
+        //                 foreach ($break_time as $bkey => $bvalue) {
+        //                     $break_title = isset($bvalue['break_title']) ? $bvalue['break_title'] : '';
+        //                     $break_start_time = isset($bvalue['break_start_time']) ? $bvalue['break_start_time'] : '';
+        //                     $break_end_time = isset($bvalue['break_end_time']) ? $bvalue['break_end_time'] : '';
+        //                     if ($break_start_time && $break_end_time && $break_start_time >= $break_end_time) {
+        //                         $break_time_error[$bkey] = ['break_start_time' => __('messages.endtime_greater_starttime'), 'break_end_time' => __('messages.endtime_greater_starttime')];
+        //                     }
+        //                 }
+        //             }
+        //             if ($break_time_error) {
+        //                 $working_hour_error["working_hours"][$key] = ['break_time' => $break_time_error];
+        //             }
+        //         }
+        //     }
+        // }
+        // if ($working_hour_error) {
+        //     return response()->json(['errors' => $working_hour_error], $this->errorStatus);
+        // }
 
         $model = new Staff;
         $model->fill($requestAll);
@@ -203,8 +205,9 @@ class StaffApiController extends Controller
     public function update(StaffRequest $request, $id)
     {
         $requestAll = $request->all();
-        $requestAll['calendar_booking'] = (isset($requestAll['calendar_booking']) && $requestAll['calendar_booking']) ? '1' : '0';
+        unset($requestAll['auth_key']);
 
+        $requestAll['calendar_booking'] = (isset($requestAll['calendar_booking']) && $requestAll['calendar_booking']) ? '1' : '0';
         $timestamp = strtotime('next Sunday');
         $days = array();
         for ($i = 0; $i < 7; $i++) {
@@ -216,49 +219,51 @@ class StaffApiController extends Controller
         $staff_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
         $staff_services = $staff_services ? array_values(array_filter($staff_services)) : [];
 
-        $working_hour_error = [];
-        if ($staff_working_hours) {
-            foreach ($staff_working_hours as $key => $value) {
-                if (isset($value['days']) && in_array($value['days'], $days)) {
-                    $start_time = isset($value['start_time']) ? strtotime($value['start_time']) : '';
-                    $end_time = isset($value['end_time']) ? strtotime($value['end_time']) : '';
-                    $break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : [];
-                    $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
-                    if ($start_time && $end_time && $start_time >= $end_time) {
-                        // $working_hour_error[$value['days']]["errors"] = __('messages.failed');
-                        $working_hour_error["working_hours"][$key] = ['start_time' => __('messages.endtime_greater_starttime')];
-                    }
-                    $break_time_error = [];
-                    if ($break_time) {
-                        foreach ($break_time as $bkey => $bvalue) {
-                            $break_title = isset($bvalue['break_title']) ? $bvalue['break_title'] : '';
-                            $break_start_time = isset($bvalue['break_start_time']) ? $bvalue['break_start_time'] : '';
-                            $break_end_time = isset($bvalue['break_end_time']) ? $bvalue['break_end_time'] : '';
-                            // echo $break_start_time . ' ' . $start_time;
-                            if ($break_start_time && $break_end_time && $break_start_time >= $break_end_time) {
-                                // $working_hour_error[$value['days']]["errors"] = __('messages.failed');
-                                $break_time_error[$bkey] = ['break_start_time' => __('messages.endtime_greater_starttime'), 'break_end_time' => __('messages.endtime_greater_starttime')];
-                            }
-                            //  else if ($break_start_time && $start_time && $end_time && $break_start_time <= $start_time && $end_time >= $break_end_time) {
-                            //     $break_time_error[$bkey] = ['break_start_time' => __('messages.beetween_startendtime'), 'break_end_time' => __('messages.endtime_greater_starttime')];
-                            // }
-                            // echo $start_time . '<=' . $break_start_time . '<br>';
-                            // echo $end_time . '>=' . $break_end_time;
-                        }
-                    }
-                    if ($break_time_error) {
-                        $working_hour_error["working_hours"][$key] = ['break_time' => $break_time_error];
-                    }
-                }
-            }
-        }
-        if ($working_hour_error) {
-            return response()->json(['errors' => $working_hour_error], $this->errorStatus);
-        }
+        // $working_hour_error = [];
+        // if ($staff_working_hours) {
+        //     foreach ($staff_working_hours as $key => $value) {
+        //         if (isset($value['days']) && in_array($value['days'], $days)) {
+        //             $start_time = isset($value['start_time']) ? strtotime($value['start_time']) : '';
+        //             $end_time = isset($value['end_time']) ? strtotime($value['end_time']) : '';
+        //             $break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : [];
+        //             $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
+        //             if ($start_time && $end_time && $start_time >= $end_time) {
+        //                 // $working_hour_error[$value['days']]["errors"] = __('messages.failed');
+        //                 $working_hour_error["working_hours"][$key] = ['start_time' => __('messages.endtime_greater_starttime')];
+        //             }
+        //             $break_time_error = [];
+        //             if ($break_time) {
+        //                 foreach ($break_time as $bkey => $bvalue) {
+        //                     $break_title = isset($bvalue['break_title']) ? $bvalue['break_title'] : '';
+        //                     $break_start_time = isset($bvalue['break_start_time']) ? $bvalue['break_start_time'] : '';
+        //                     $break_end_time = isset($bvalue['break_end_time']) ? $bvalue['break_end_time'] : '';
+        //                     // echo $break_start_time . ' ' . $start_time;
+        //                     if ($break_start_time && $break_end_time && $break_start_time >= $break_end_time) {
+        //                         // $working_hour_error[$value['days']]["errors"] = __('messages.failed');
+        //                         $break_time_error[$bkey] = ['break_start_time' => __('messages.endtime_greater_starttime'), 'break_end_time' => __('messages.endtime_greater_starttime')];
+        //                     }
+        //                     //  else if ($break_start_time && $start_time && $end_time && $break_start_time <= $start_time && $end_time >= $break_end_time) {
+        //                     //     $break_time_error[$bkey] = ['break_start_time' => __('messages.beetween_startendtime'), 'break_end_time' => __('messages.endtime_greater_starttime')];
+        //                     // }
+        //                     // echo $start_time . '<=' . $break_start_time . '<br>';
+        //                     // echo $end_time . '>=' . $break_end_time;
+        //                 }
+        //             }
+        //             if ($break_time_error) {
+        //                 $working_hour_error["working_hours"][$key] = ['break_time' => $break_time_error];
+        //             }
+        //         }
+        //     }
+        // }
+        // if ($working_hour_error) {
+        //     return response()->json(['errors' => $working_hour_error], $this->errorStatus);
+        // }
 
         $model = $this->findModel($id);
-        $token = Str::random(config('params.auth_key_character'));
-        $model->auth_key = $model->auth_key ? $model->auth_key : hash('sha256', $token);
+        if (empty($model->auth_key)) {
+            $token = Str::random(config('params.auth_key_character'));
+            $model->auth_key = hash('sha256', $token);
+        }
         $model->staffservices->map(function ($value) use ($staff_services, $id) {
             if ($staff_services && !in_array($value->service_id, $staff_services)) {
                 StaffServices::where(['staff_id' => $id, 'service_id' => $value->id])->delete();
