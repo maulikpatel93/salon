@@ -38,7 +38,7 @@ class CreateBusyTimeTable extends Migration
             $table->date('date')->nullable();
             $table->string('start_time', 50)->nullable();
             $table->string('end_time', 50)->nullable();
-            $table->string('duration', 50)->nullable();
+            $table->string('duration', 50)->nullable()->comment('Minutes');
             $table->decimal('cost', 10, 2)->nullable();
             $table->enum('repeats', ['Yes', 'No'])->default('No'); // 1:Active, 0:Inactive
             $table->text('booking_notes')->nullable();

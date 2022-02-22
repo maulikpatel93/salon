@@ -30,12 +30,10 @@ class AppointmentRequest extends FormRequest
             'staff_id' => 'required|integer',
             'date' => 'required',
             'start_time' => 'required',
-            'end_time' => 'required',
             'duration' => 'required',
             'cost' => 'required',
             'repeats' => 'required',
-            //'booking_notes' => 'required',
-            'status' => 'required',
+            'status' => 'nullable',
         ];
     }
 }

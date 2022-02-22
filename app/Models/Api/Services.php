@@ -74,7 +74,7 @@ class Services extends Model
 
     public function serviceprice()
     {
-        return $this->hasMany(ServicesPrice::class, 'service_id', 'id');
+        return $this->hasMany(ServicesPrice::class, 'service_id', 'id')->where('is_active', '=', '1');
     }
 
     public function addonservices()

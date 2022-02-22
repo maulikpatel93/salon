@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\AppointmentRequest;
 use App\Http\Requests\Api\AppointmentStatusRequest;
 use App\Models\Api\Appointment;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class AppointmentApiController extends Controller
@@ -23,7 +24,6 @@ class AppointmentApiController extends Controller
         'staff_id',
         'date',
         'start_time',
-        'end_time',
         'duration',
         'cost',
         'repeats',
@@ -86,6 +86,9 @@ class AppointmentApiController extends Controller
     {
         $requestAll = $request->all();
         $requestAll['is_active_at'] = currentDateTime();
+        $requestAll['status'] = 'Scheduled';
+        $requestAll['duration'] = HoursToMinutes($requestAll['duration']);
+        $requestAll['date'] = Carbon::parse($requestAll['date'])->format('Y-m-d');
         $model = new Appointment;
         $model->fill($requestAll);
         $model->save();

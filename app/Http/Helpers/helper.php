@@ -348,3 +348,28 @@ if (!function_exists('sendMail')) {
         return "";
     }
 }
+
+if (!function_exists('MinutesToHours')) {
+    function MinutesToHours($minutes)
+    {
+        if ($minutes) {
+            $hours = intdiv($minutes, 60) . ':' . ($minutes % 60);
+            return $hours;
+        }
+        return "";
+    }
+}
+
+if (!function_exists('HoursToMinutes')) {
+    function HoursToMinutes($hours)
+    {
+        if ($hours) {
+            $from = date('Y-m-d 00:00:00');
+            $to = date('Y-m-d ' . $hours . ':00');
+            $diff = strtotime($to) - strtotime($from);
+            $minutes = $diff / 60;
+            return (int) $minutes;
+        }
+        return "";
+    }
+}

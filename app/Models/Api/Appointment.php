@@ -28,7 +28,6 @@ class Appointment extends Model
         'staff_id',
         'date',
         'start_time',
-        'end_time',
         'duration',
         'cost',
         'repeats',
