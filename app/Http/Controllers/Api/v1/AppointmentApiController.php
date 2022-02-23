@@ -99,6 +99,10 @@ class AppointmentApiController extends Controller
     public function update(AppointmentRequest $request, $id)
     {
         $requestAll = $request->all();
+        $requestAll['status'] = $request->status ? "Confirmed" : "Scheduled";
+        $requestAll['duration'] = HoursToMinutes($requestAll['duration']);
+        $requestAll['date'] = Carbon::parse($requestAll['date'])->format('Y-m-d');
+
         $model = $this->findModel($id);
         $model->fill($requestAll);
         $model->save();
