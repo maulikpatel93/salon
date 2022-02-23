@@ -9,6 +9,7 @@ use App\Http\Requests\Api\AppointmentStatusRequest;
 use App\Models\Api\Appointment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AppointmentApiController extends Controller
 {
@@ -135,7 +136,7 @@ class AppointmentApiController extends Controller
         $sort = ($request->sort) ? $request->sort : "";
         $option = ($request->option) ? $request->option : "";
         $client_id = ($request->client_id) ? $request->client_id : "";
-
+        $filter = ($request->filter) ? json_decode($request->filter, true) : "";
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
             $salon_field = false;
@@ -193,11 +194,15 @@ class AppointmentApiController extends Controller
         if ($client_id) {
             $where['client_id'] = $client_id;
         }
+        if ($filter) {
+            if (isset($filter['status']) && $filter['status']) {
+                $where['status'] = $filter['status'];
+            }
+        }
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
-
         $whereLike = $request->q ? explode(' ', $request->q) : '';
 
-        $orderby = 'date desc';
+        $orderby = DB::raw('case when status= "Scheduled" then 1 when status= "Confirmed" then 2 when status= "Completed" then 3 when status= "Cancelled" then 4 end');
         if ($sort) {
             $sd = [];
             foreach ($sort as $key => $value) {
@@ -226,7 +231,7 @@ class AppointmentApiController extends Controller
             } else {
                 $model = Appointment::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
             }
-            if ($model->count()) {
+            if ($model->count() || (isset($filter['status']) && $filter['status'])) {
                 $successData = $model->toArray();
                 if ($successData) {
                     return response()->json($successData, $this->successStatus);

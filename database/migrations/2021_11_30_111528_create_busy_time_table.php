@@ -43,6 +43,7 @@ class CreateBusyTimeTable extends Migration
             $table->enum('repeats', ['Yes', 'No'])->default('No'); // 1:Active, 0:Inactive
             $table->text('booking_notes')->nullable();
             $table->enum('status', ['Scheduled', 'Confirmed', 'Completed', 'Cancelled'])->default(null)->nullable();
+            $table->string('status_manage', 100)->default(null)->nullable();
             $table->text('cancellation_reason')->nullable();
             $table->enum('reschedule', ['0', '1'])->default('0');
             $table->dateTime('reschedule_at')->nullable();
