@@ -90,6 +90,8 @@ class AppointmentApiController extends Controller
         $requestAll['status'] = 'Scheduled';
         $requestAll['duration'] = HoursToMinutes($requestAll['duration']);
         $requestAll['date'] = Carbon::parse($requestAll['date'])->format('Y-m-d');
+        $requestAll['end_time'] = Carbon::parse($requestAll['date'] . ' ' . $requestAll['start_time'])->addMinutes($requestAll['duration'])->format('H:i:s');
+
         $model = new Appointment;
         $model->fill($requestAll);
         $model->save();
@@ -102,6 +104,7 @@ class AppointmentApiController extends Controller
         $requestAll['status'] = $request->status ? "Confirmed" : "Scheduled";
         $requestAll['duration'] = HoursToMinutes($requestAll['duration']);
         $requestAll['date'] = Carbon::parse($requestAll['date'])->format('Y-m-d');
+        $requestAll['end_time'] = Carbon::parse($requestAll['date'] . ' ' . $requestAll['start_time'])->addMinutes($requestAll['duration'])->format('H:i:s');
 
         $model = $this->findModel($id);
         $model->fill($requestAll);
@@ -140,7 +143,9 @@ class AppointmentApiController extends Controller
         $sort = ($request->sort) ? $request->sort : "";
         $option = ($request->option) ? $request->option : "";
         $client_id = ($request->client_id) ? $request->client_id : "";
+        $date = ($request->date) ? Carbon::parse($request->date)->format('Y-m-d') : "";
         $filter = ($request->filter) ? json_decode($request->filter, true) : "";
+
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
             $salon_field = false;
@@ -197,6 +202,9 @@ class AppointmentApiController extends Controller
         $where = ['is_active' => '1', 'salon_id' => $request->salon_id];
         if ($client_id) {
             $where['client_id'] = $client_id;
+        }
+        if ($date) {
+            $where['date'] = $date;
         }
         if ($filter) {
             if (isset($filter['status']) && $filter['status']) {
