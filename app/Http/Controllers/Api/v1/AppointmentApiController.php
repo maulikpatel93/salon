@@ -48,6 +48,7 @@ class AppointmentApiController extends Controller
         'username',
         'email',
         'phone_number',
+        'profile_photo',
     ];
 
     protected $service_field = [
@@ -142,8 +143,13 @@ class AppointmentApiController extends Controller
         $field = ($request->field) ? array_merge(['id', 'salon_id', 'client_id', 'service_id', 'staff_id'], explode(',', $request->field)) : $this->field;
         $sort = ($request->sort) ? $request->sort : "";
         $option = ($request->option) ? $request->option : "";
+        //Start Calender View Client base
         $client_id = ($request->client_id) ? $request->client_id : "";
-        $date = ($request->date) ? Carbon::parse($request->date)->format('Y-m-d') : "";
+        $start_date = ($request->start_date) ? Carbon::parse($request->start_date)->format('Y-m-d') : "";
+        $end_date = ($request->end_date) ? Carbon::parse($request->end_date)->format('Y-m-d') : "";
+        $timezone = ($request->timezone) ? $request->timezone : "";
+        $type = ($request->type) ? $request->type : "";
+        //End Calender View Client base
         $filter = ($request->filter) ? json_decode($request->filter, true) : "";
 
         $salon_field = $this->salon_field;
@@ -203,8 +209,8 @@ class AppointmentApiController extends Controller
         if ($client_id) {
             $where['client_id'] = $client_id;
         }
-        if ($date) {
-            $where['date'] = $date;
+        if ($start_date && $type == "day") {
+            $where['date'] = $start_date;
         }
         if ($filter) {
             if (isset($filter['status']) && $filter['status']) {
@@ -241,7 +247,11 @@ class AppointmentApiController extends Controller
             if ($pagination == true) {
                 $model = Appointment::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
             } else {
-                $model = Appointment::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                if ($start_date && $end_date && $type == "week") {
+                    $model = Appointment::with($withArray)->select($field)->where($where)->whereBetween('date', [$start_date, $end_date])->orderByRaw($orderby)->get();
+                } else {
+                    $model = Appointment::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                }
             }
             if ($model->count() || (isset($filter['status']) && $filter['status'])) {
                 $successData = $model->toArray();
