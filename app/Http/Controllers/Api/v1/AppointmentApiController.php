@@ -25,6 +25,7 @@ class AppointmentApiController extends Controller
         'staff_id',
         'date',
         'start_time',
+        'end_time',
         'duration',
         'cost',
         'repeats',
