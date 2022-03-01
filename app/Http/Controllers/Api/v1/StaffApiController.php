@@ -190,8 +190,8 @@ class StaffApiController extends Controller
                     $StaffWorkingHoursModel->salon_id = $model->salon_id;
                     $StaffWorkingHoursModel->staff_id = $model->id;
                     $StaffWorkingHoursModel->days = $value['days'];
-                    $StaffWorkingHoursModel->start_time = $dayoff ? $start_time : "";
-                    $StaffWorkingHoursModel->end_time = $dayoff ? $end_time : "";
+                    $StaffWorkingHoursModel->start_time = $dayoff ? $start_time : null;
+                    $StaffWorkingHoursModel->end_time = $dayoff ? $end_time : null;
                     $StaffWorkingHoursModel->break_time = $dayoff ? $break_time : [];
                     $StaffWorkingHoursModel->dayoff = $dayoff;
                     $StaffWorkingHoursModel->is_active_at = currentDateTime();
@@ -306,8 +306,8 @@ class StaffApiController extends Controller
                     $StaffWorkingHoursModel->salon_id = $model->salon_id;
                     $StaffWorkingHoursModel->staff_id = $model->id;
                     $StaffWorkingHoursModel->days = $value['days'];
-                    $StaffWorkingHoursModel->start_time = $dayoff ? $start_time : "";
-                    $StaffWorkingHoursModel->end_time = $dayoff ? $end_time : "";
+                    $StaffWorkingHoursModel->start_time = $dayoff ? $start_time : null;
+                    $StaffWorkingHoursModel->end_time = $dayoff ? $end_time : null;
                     $StaffWorkingHoursModel->break_time = $dayoff ? $break_time : [];
                     $StaffWorkingHoursModel->dayoff = $dayoff;
                     $StaffWorkingHoursModel->save();
