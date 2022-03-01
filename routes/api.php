@@ -164,6 +164,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/update/{id}', [AppointmentApiController::class, 'update'])->name('update');
             Route::post('/delete/{id}', [AppointmentApiController::class, 'delete'])->name('delete');
             Route::post('/status/{id}', [AppointmentApiController::class, 'status'])->name('status');
+            Route::post('/reschedule/{id}', [AppointmentApiController::class, 'reschedule'])->name('reschedule');
         });
 
         //BusyTime

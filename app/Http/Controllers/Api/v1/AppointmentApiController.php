@@ -114,6 +114,21 @@ class AppointmentApiController extends Controller
         return $this->returnResponse($request, $model->id);
     }
 
+    public function reschedule(Request $request, $id)
+    {
+        $requestAll = $request->all();
+        $requestAll['date'] = Carbon::parse($requestAll['date'])->format('Y-m-d');
+        $requestAll['start_time'] = $requestAll['start_time'];
+        $requestAll['reschedule'] = '1';
+        $requestAll['reschedule_at'] = currentDateTime();
+
+        $model = $this->findModel($id);
+        $model->end_time = Carbon::parse($requestAll['date'] . ' ' . $requestAll['start_time'])->addMinutes($model->duration)->format('H:i:s');
+        $model->fill($requestAll);
+        $model->save();
+        return $this->returnResponse($request, $model->id);
+    }
+
     public function status(AppointmentStatusRequest $request, $id)
     {
         $requestAll = $request->all();
