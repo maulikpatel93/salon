@@ -160,7 +160,7 @@ class GuestApiController extends Controller
         $requestAll['role_id'] = 4;
         $requestAll['auth_key'] = hash('sha256', $token);
         $email_username = explode('@', $request->email);
-        $requestAll['username'] = $email_username ? $email_username[0] : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
+        $requestAll['username'] = $email_username ? $email_username[0] . random_int(101, 999) : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
         $requestAll['password'] = Hash::make($requestAll['password']);
         $model = new Users;
         $model->fill($requestAll);

@@ -106,7 +106,7 @@ class StaffApiController extends Controller
         $token = Str::random(config('params.auth_key_character'));
         $randompassword = Str::random(6);
         $requestAll['auth_key'] = hash('sha256', $token);
-        $requestAll['username'] = $email_username ? $email_username[0] : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
+        $requestAll['username'] = $email_username ? $email_username[0] . random_int(101, 999) : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
         $requestAll['password'] = Hash::make($randompassword);
         $requestAll['calendar_booking'] = (isset($requestAll['calendar_booking']) && $requestAll['calendar_booking']) ? '1' : '0';
 

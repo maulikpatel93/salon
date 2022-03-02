@@ -72,7 +72,7 @@ class UsersController extends Controller
         $requestAll['is_active_at'] = currentDateTime();
         $token = Str::random(config('params.auth_key_character'));
         $requestAll['auth_key'] = hash('sha256', $token);
-        $requestAll['username'] = $email_username ? $email_username[0] : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
+        $requestAll['username'] = $email_username ? $email_username[0] . random_int(101, 999) : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
         $model = new Users();
         if ($request->ajax() && $model->create($requestAll)) {
             $responseData['status'] = 200;

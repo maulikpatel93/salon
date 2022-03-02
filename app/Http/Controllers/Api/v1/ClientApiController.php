@@ -70,7 +70,7 @@ class ClientApiController extends Controller
         $token = Str::random(config('params.auth_key_character'));
         $randompassword = Str::random(6);
         $requestAll['auth_key'] = hash('sha256', $token);
-        $requestAll['username'] = $email_username ? $email_username[0] : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
+        $requestAll['username'] = $email_username ? $email_username[0] . random_int(101, 999) : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
         $requestAll['password'] = Hash::make(Str::random(10));
         $requestAll['send_sms_notification'] = (isset($requestAll['send_sms_notification']) && $requestAll['send_sms_notification']) ? '1' : '0';
         $requestAll['send_email_notification'] = (isset($requestAll['send_email_notification']) && $requestAll['send_email_notification']) ? '1' : '0';
