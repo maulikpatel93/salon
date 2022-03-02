@@ -444,7 +444,11 @@ class ServicesApiController extends Controller
         $requestAll = $request->all();
         $salon_id = $request->salon_id;
         $service_id = $request->service_id;
-        $service = Services::with('serviceprice:id,service_id,name,price,add_on_price')->where(['id' => $service_id, 'salon_id' => $salon_id])->first();
+
+        $withArray = [];
+        $withArray[] = 'serviceprice:id,service_id,name,price,add_on_price';
+        $withArray[] = 'staffservices:id,first_name,last_name';
+        $service = Services::with($withArray)->where(['id' => $service_id, 'salon_id' => $salon_id])->first();
         if ($service) {
             $service = $service->makeHidden(['is_active', 'is_active_at', 'created_at', 'updated_at', 'isNotId', 'isServiceChecked']);
             $service->duration = $service->duration;

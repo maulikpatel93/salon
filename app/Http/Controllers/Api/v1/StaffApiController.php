@@ -338,6 +338,7 @@ class StaffApiController extends Controller
         $field = ($request->field) ? array_merge(['id', 'salon_id', 'price_tier_id'], explode(',', $request->field)) : $this->field;
         $sort = ($request->sort) ? $request->sort : "";
         $option = ($request->option) ? $request->option : "";
+        $service_id = ($request->service_id) ? $request->service_id : "";
 
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
@@ -421,8 +422,13 @@ class StaffApiController extends Controller
             }
 
         }
+
         if ($option) {
-            $successData = Staff::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where($where)->get()->makeHidden(['isNewRecord'])->toArray();
+            if ($service_id) {
+                $successData = Staff::with($withArray)->join('staff_services', 'staff_services.staff_id', '=', 'users.id')->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where(['users.is_active' => '1', 'users.role_id' => 5, 'users.salon_id' => $request->salon_id])->where(['staff_services.service_id' => $service_id])->get()->makeHidden(['isNewRecord'])->toArray();
+            } else {
+                $successData = Staff::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->get()->makeHidden(['isNewRecord'])->toArray();
+            }
             return response()->json($successData, $this->successStatus);
         }
         if ($id) {

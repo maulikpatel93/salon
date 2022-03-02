@@ -161,6 +161,7 @@ class AppointmentApiController extends Controller
         $option = ($request->option) ? $request->option : "";
         //Start Calender View Client base
         $client_id = ($request->client_id) ? $request->client_id : "";
+        $staff_id = ($request->staff_id) ? $request->staff_id : "";
         $start_date = ($request->start_date) ? Carbon::parse($request->start_date)->format('Y-m-d') : "";
         $end_date = ($request->end_date) ? Carbon::parse($request->end_date)->format('Y-m-d') : "";
         $timezone = ($request->timezone) ? $request->timezone : "";
@@ -224,6 +225,9 @@ class AppointmentApiController extends Controller
         $where = ['is_active' => '1', 'salon_id' => $request->salon_id];
         if ($client_id) {
             $where['client_id'] = $client_id;
+        }
+        if ($staff_id) {
+            $where['staff_id'] = $staff_id;
         }
         if ($start_date && $type == "day") {
             $where['date'] = $start_date;
