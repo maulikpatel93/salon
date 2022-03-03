@@ -6,6 +6,7 @@ use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ServiceRequest;
 use App\Models\Api\AddOnServices;
+use App\Models\Api\Appointment;
 use App\Models\Api\Categories;
 use App\Models\Api\PriceTier;
 use App\Models\Api\Services;
@@ -18,6 +19,7 @@ class ServicesApiController extends Controller
     protected $successStatus = 200;
     protected $errorStatus = 422;
     protected $unauthorizedStatus = 401;
+    protected $warningStatus = 410;
 
     //Services Column name
     protected $field = [
@@ -163,6 +165,7 @@ class ServicesApiController extends Controller
     public function update(ServiceRequest $request, $id)
     {
         $requestAll = $request->all();
+        $pagetype = $request->pagetype;
         $requestAll['service_booked_online'] = (isset($requestAll['service_booked_online']) && $requestAll['service_booked_online']) ? '1' : '0';
         $requestAll['deposit_booked_online'] = (isset($requestAll['deposit_booked_online']) && $requestAll['deposit_booked_online']) ? '1' : '0';
         $requestAll['deposit_booked_price'] = (isset($requestAll['deposit_booked_price']) && $requestAll['deposit_booked_price']) ? $requestAll['deposit_booked_price'] : '0';
@@ -174,19 +177,45 @@ class ServicesApiController extends Controller
         $staff_services = ($request->add_on_staff) ? explode(",", $request->add_on_staff) : [];
         $staff_services = $staff_services ? array_values(array_filter($staff_services)) : [];
 
+        $appointmentMatch = collect([]);
         $model = $this->findModel($id);
         $model->addonservices->map(function ($value) use ($add_on_services, $id) {
-            if ($add_on_services && !in_array($value->add_on_service_id, $add_on_services)) {
+            if ($add_on_services && !in_array($value->id, $add_on_services)) {
                 AddOnServices::where(['service_id' => $id, 'add_on_service_id' => $value->id])->delete();
             }
             return;
         })->toArray();
-        $model->staffservices->map(function ($value) use ($staff_services, $id) {
-            if ($staff_services && !in_array($value->staff_id, $staff_services)) {
-                StaffServices::where(['service_id' => $id, 'staff_id' => $value->id])->delete();
+        $model->staffservices->map(function ($value) use ($staff_services, $id, $appointmentMatch) {
+            if (empty($staff_services)) {
+                $appointment = Appointment::where(['service_id' => $id, 'staff_id' => $value->id])->count();
+                if ($appointment > 0) {
+                    $appointmentstaffdata = [
+                        'staff' => ['id' => $value->id, 'first_name' => $value->first_name, 'last_name' => $value->last_name, 'email' => $value->email, 'phone_number' => $value->phone_number],
+                        'appointmentcount' => $appointment,
+                    ];
+                    $appointmentMatch->push($appointmentstaffdata);
+                } else {
+                    StaffServices::where(['service_id' => $id, 'staff_id' => $value->id])->delete();
+                }
+            }
+            if ($staff_services && !in_array($value->id, $staff_services)) {
+                $appointment = Appointment::where(['service_id' => $id, 'staff_id' => $value->id])->count();
+                if ($appointment > 0) {
+                    $appointmentstaffdata = [
+                        'staff' => ['id' => $value->id, 'first_name' => $value->first_name, 'last_name' => $value->last_name, 'email' => $value->email, 'phone_number' => $value->phone_number],
+                        'appointmentcount' => $appointment,
+                    ];
+                    $appointmentMatch->push($appointmentstaffdata);
+                } else {
+                    StaffServices::where(['service_id' => $id, 'staff_id' => $value->id])->delete();
+                }
             }
             return;
         })->toArray();
+        $appointmentMatchAll = $appointmentMatch->all();
+        if ($appointmentMatchAll && empty($pagetype)) {
+            return response()->json(['appointmentMatchAll' => $appointmentMatchAll, 'message' => __('message.success')], $this->warningStatus);
+        }
         $model->fill($requestAll);
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : $model->description;
         $model->save();
@@ -232,6 +261,10 @@ class ServicesApiController extends Controller
     public function delete(Request $request, $id)
     {
         $requestAll = $request->all();
+        $appointment = Appointment::where(['service_id' => $id])->count();
+        if ($appointment > 0) {
+            return response()->json(['appointment' => $appointment, 'message' => __('message.success')], $this->warningStatus);
+        }
         Services::where('id', $id)->delete();
         return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
     }

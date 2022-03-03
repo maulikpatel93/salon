@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\v1;
 use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\StaffRequest;
+use App\Models\Api\Appointment;
 use App\Models\Api\Categories;
 use App\Models\Api\Staff;
 use App\Models\Api\StaffServices;
@@ -19,6 +20,7 @@ class StaffApiController extends Controller
     protected $successStatus = 200;
     protected $errorStatus = 422;
     protected $unauthorizedStatus = 401;
+    protected $warningStatus = 410;
 
     protected $field = [
         'id',
@@ -206,7 +208,7 @@ class StaffApiController extends Controller
     {
         $requestAll = $request->all();
         unset($requestAll['auth_key']);
-
+        $pagetype = $request->pagetype;
         $requestAll['calendar_booking'] = (isset($requestAll['calendar_booking']) && $requestAll['calendar_booking']) ? '1' : '0';
         $timestamp = strtotime('next Sunday');
         $days = array();
@@ -258,21 +260,46 @@ class StaffApiController extends Controller
         // if ($working_hour_error) {
         //     return response()->json(['errors' => $working_hour_error], $this->errorStatus);
         // }
-
+        $appointmentMatch = collect([]);
         $model = $this->findModel($id);
         if (empty($model->auth_key)) {
             $token = Str::random(config('params.auth_key_character'));
             $model->auth_key = hash('sha256', $token);
         }
-        $model->staffservices->map(function ($value) use ($staff_services, $id) {
-            if ($staff_services && !in_array($value->service_id, $staff_services)) {
-                StaffServices::where(['staff_id' => $id, 'service_id' => $value->id])->delete();
+        $model->staffservices->map(function ($value) use ($staff_services, $id, $appointmentMatch) {
+            if (empty($staff_services)) {
+                $appointment = Appointment::where(['staff_id' => $id, 'service_id' => $value->id])->count();
+                if ($appointment > 0) {
+                    $appointmentstaffdata = [
+                        'service' => ['id' => $value->id, 'name' => $value->name],
+                        'appointmentcount' => $appointment,
+                    ];
+                    $appointmentMatch->push($appointmentstaffdata);
+                } else {
+                    StaffServices::where(['staff_id' => $id, 'service_id' => $value->id])->delete();
+                }
+            }
+            if ($staff_services && !in_array($value->id, $staff_services)) {
+                $appointment = Appointment::where(['staff_id' => $id, 'service_id' => $value->id])->count();
+                if ($appointment > 0) {
+                    $appointmentstaffdata = [
+                        'service' => ['id' => $value->id, 'name' => $value->name],
+                        'appointmentcount' => $appointment,
+                    ];
+                    $appointmentMatch->push($appointmentstaffdata);
+                } else {
+                    StaffServices::where(['staff_id' => $id, 'service_id' => $value->id])->delete();
+                }
             }
             return;
         })->toArray();
+        $appointmentMatchAll = $appointmentMatch->all();
+        if ($appointmentMatchAll && empty($pagetype)) {
+            return response()->json(['appointmentMatchAll' => $appointmentMatchAll, 'message' => __('message.success')], $this->warningStatus);
+        }
+
         $model->fill($requestAll);
         $file = $request->file('profile_photo');
-
         if ($file) {
             Storage::delete('/public/staff/' . $model->profile_photo);
             $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
@@ -320,6 +347,10 @@ class StaffApiController extends Controller
     public function delete(Request $request, $id)
     {
         $requestAll = $request->all();
+        $appointment = Appointment::where(['staff_id' => $id])->count();
+        if ($appointment > 0) {
+            return response()->json(['appointment' => $appointment, 'message' => __('message.success')], $this->warningStatus);
+        }
         Staff::where('id', $id)->delete();
         return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
     }
