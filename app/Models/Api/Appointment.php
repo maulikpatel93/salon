@@ -39,6 +39,7 @@ class Appointment extends Model
         'reschedule_at',
         'is_active',
         'is_active_at',
+        'status_manage',
     ];
 
     /**

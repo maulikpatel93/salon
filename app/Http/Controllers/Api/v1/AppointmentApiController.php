@@ -34,6 +34,7 @@ class AppointmentApiController extends Controller
         'cancellation_reason',
         'reschedule',
         'reschedule_at',
+        'status_manage',
     ];
 
     protected $salon_field = [
