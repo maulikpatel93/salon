@@ -89,7 +89,7 @@ class VoucherApiController extends Controller
         $requestAll = $request->all();
         $requestAll['used_online'] = isset($requestAll['used_online']) && $requestAll['used_online'] ? '1' : "0";
         $requestAll['limit_uses'] = isset($requestAll['limit_uses']) && $requestAll['limit_uses'] ? '1' : "0";
-        $voucher_services = ($request->voucher_services) ? explode(",", $request->voucher_services) : [];
+        $voucher_services = ($request->service_id) ? explode(",", $request->service_id) : [];
         $model = $this->findModel($id);
         $model->Voucherservices->map(function ($value) use ($voucher_services, $id) {
             if ($voucher_services && !in_array($value->id, $voucher_services)) {
