@@ -28,12 +28,11 @@ class VoucherRequest extends FormRequest
         $rules = [
             'salon_id' => 'required|integer',
             'code' => 'max:16|unique:voucher,code,' . $id,
-            'name' => 'required|max:150|unique:voucher,name,' . $id . ',id,salon_id,' . $salon_id,
+            'name' => 'required|max:255',
             'description' => 'required',
             'amount' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
             'valid' => 'required|integer',
             'limit_uses_value' => 'required_if:limit_uses,1',
-            'terms_and_conditions' => 'required',
         ];
         return $rules;
     }

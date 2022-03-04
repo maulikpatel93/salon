@@ -27,7 +27,6 @@ class VoucherApiController extends Controller
         'used_online',
         'limit_uses',
         'limit_uses_value',
-        'terms_and_conditions',
     ];
 
     protected $salon_field = [
@@ -65,7 +64,9 @@ class VoucherApiController extends Controller
         $requestAll = $request->all();
         $requestAll['is_active_at'] = currentDateTime();
         $requestAll['code'] = Str::random(6);
-        $voucher_services = ($request->voucher_services) ? json_decode($request->voucher_services, true) : [];
+        $requestAll['used_online'] = isset($requestAll['used_online']) && $requestAll['used_online'] ? '1' : "0";
+        $requestAll['limit_uses'] = isset($requestAll['limit_uses']) && $requestAll['limit_uses'] ? '1' : "0";
+        $voucher_services = ($request->service_id) ? explode(",", $request->service_id) : [];
         $model = new Voucher;
         $model->fill($requestAll);
         $model->save();
@@ -86,6 +87,8 @@ class VoucherApiController extends Controller
     public function update(VoucherRequest $request, $id)
     {
         $requestAll = $request->all();
+        $requestAll['used_online'] = isset($requestAll['used_online']) && $requestAll['used_online'] ? '1' : "0";
+        $requestAll['limit_uses'] = isset($requestAll['limit_uses']) && $requestAll['limit_uses'] ? '1' : "0";
         $voucher_services = ($request->voucher_services) ? explode(",", $request->voucher_services) : [];
         $model = $this->findModel($id);
         $model->Voucherservices->map(function ($value) use ($voucher_services, $id) {
@@ -114,7 +117,7 @@ class VoucherApiController extends Controller
     {
         $requestAll = $request->all();
         Voucher::where('id', $id)->delete();
-        return response()->json(['status' => $this->successStatus, 'message' => 'success']);
+        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
     }
 
     protected function findModel($id)
@@ -129,6 +132,8 @@ class VoucherApiController extends Controller
     {
         $requestAll = $request->all();
         $field = ($request->field) ? array_merge(['id', 'salon_id'], explode(',', $request->field)) : $this->field;
+        $sort = ($request->sort) ? $request->sort : "";
+        $option = ($request->option) ? $request->option : "";
 
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
@@ -166,23 +171,45 @@ class VoucherApiController extends Controller
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
-        $where = ['is_active' => '1'];
+        $where = ['is_active' => '1', 'salon_id' => $request->salon_id];
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
-        if ($pagination == true) {
-            $model = Voucher::with($withArray)->select($field)->where($where)->simplePaginate($limit);
-        } else {
-            $model = Voucher::with($withArray)->select($field)->where($where)->get();
-        }
-        if ($model->count()) {
-            $successData = $model->toArray();
-            if ($successData) {
-                if ($pagination == true) {
-                    return response()->json(array_merge(['status' => $this->successStatus, 'message' => 'Success'], $successData));
-                }
-                return response()->json(['status' => $this->successStatus, 'message' => 'Success', 'data' => $successData]);
+        $orderby = 'id desc';
+        if ($sort) {
+            $sd = [];
+            foreach ($sort as $key => $value) {
+                $sd[] = $key . ' ' . $value;
+            }
+            if ($sd) {
+                $orderby = implode(", ", $sd);
             }
         }
-        return response()->json(['status' => $this->errorStatus, 'message' => 'Failed']);
+
+        if ($option) {
+            $successData = Voucher::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where($where)->get()->toArray();
+            return response()->json($successData, $this->successStatus);
+        }
+        if ($id) {
+            if ($request->result == 'result_array') {
+                $model = Voucher::with($withArray)->select($field)->where($where)->get();
+            } else {
+                $model = Voucher::with($withArray)->select($field)->where($where)->first();
+            }
+            $successData = $model->toArray();
+            return response()->json($successData, $this->successStatus);
+        } else {
+            if ($pagination == true) {
+                $model = Voucher::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
+            } else {
+                $model = Voucher::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+            }
+            if ($model->count()) {
+                $successData = $model->toArray();
+                if ($successData) {
+                    return response()->json($successData, $this->successStatus);
+                }
+            }
+        }
+        return response()->json(['message' => __('messages.failed')], $this->errorStatus);
     }
 }

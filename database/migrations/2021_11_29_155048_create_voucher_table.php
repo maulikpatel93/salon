@@ -30,7 +30,7 @@ class CreateVoucherTable extends Migration
         });
         Schema::table('voucher', function (Blueprint $table) {
             $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
-            $table->foreign('salon_id')->references('id')->on('voucher')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
         });
         Schema::create('voucher_services', function (Blueprint $table) {
             $table->id();
