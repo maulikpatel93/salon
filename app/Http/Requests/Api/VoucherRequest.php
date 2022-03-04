@@ -33,6 +33,7 @@ class VoucherRequest extends FormRequest
             'amount' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
             'valid' => 'required|integer',
             'limit_uses_value' => 'required_if:limit_uses,1',
+            'terms_and_conditions' => 'required',
         ];
         return $rules;
     }

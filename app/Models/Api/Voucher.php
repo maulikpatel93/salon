@@ -31,6 +31,7 @@ class Voucher extends Model
         'used_online',
         'limit_uses',
         'limit_uses_value',
+        'terms_and_conditions',
         'is_active',
         'is_active_at',
     ];

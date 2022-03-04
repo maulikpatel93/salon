@@ -27,6 +27,7 @@ class VoucherApiController extends Controller
         'used_online',
         'limit_uses',
         'limit_uses_value',
+        'terms_and_conditions',
     ];
 
     protected $salon_field = [

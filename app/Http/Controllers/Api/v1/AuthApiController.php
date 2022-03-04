@@ -25,6 +25,7 @@ class AuthApiController extends Controller
         'business_address',
         'salon_type',
         'logo',
+        'logo_url',
         'timezone',
     ];
     /**

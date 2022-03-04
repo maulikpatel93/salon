@@ -15,7 +15,7 @@ class Salons extends Model
      * @var string
      */
     protected $table = 'salons';
-
+    protected $appends = ['logo_url'];
     /**
      * The attributes that are mass assignable.
      *
@@ -58,6 +58,12 @@ class Salons extends Model
         'business_phone_number_verified_at' => 'datetime',
         'is_active_at' => 'datetime',
     ];
+
+    public function getLogoUrlAttribute()
+    {
+        $profile_photo_url = asset('storage/salons');
+        return $this->attributes['logo_url'] = $this->logo && Storage::disk('public')->exists('salons/' . $this->logo) ? $profile_photo_url . '/' . $this->logo : "";
+    }
 
     public function suppliers()
     {
