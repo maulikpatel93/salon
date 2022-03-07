@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\AppointmentRequest;
 use App\Http\Requests\Api\AppointmentStatusRequest;
 use App\Models\Api\Appointment;
+use App\Models\Api\Busytime;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -108,6 +109,15 @@ class AppointmentApiController extends Controller
         $requestAll['duration'] = HoursToMinutes($requestAll['duration']);
         $requestAll['date'] = Carbon::parse($requestAll['date'])->format('Y-m-d');
         $requestAll['end_time'] = Carbon::parse($requestAll['date'] . ' ' . $requestAll['start_time'])->addMinutes($requestAll['duration'])->format('H:i:s');
+        $date = $requestAll['date'];
+        $start_time = $requestAll['start_time'];
+        $end_time = $requestAll['end_time'];
+        $Busytime = Busytime::where(["salon_id1" => $requestAll['salon_id'], "staff_id" => $requestAll['staff_id'], 'date' => $requestAll['date']])->whereBetween('start_time', [$start_time, $end_time])->get();
+        echo '<pre>';
+        // print_r($requestAll);
+        print_r($Busytime);
+        echo '<pre>';
+        dd();
 
         $model = $this->findModel($id);
         $model->fill($requestAll);
