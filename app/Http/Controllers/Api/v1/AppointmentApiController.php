@@ -268,7 +268,7 @@ class AppointmentApiController extends Controller
             if ($pagination == true) {
                 $model = Appointment::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
             } else {
-                if ($start_date && $end_date && $type == "week") {
+                if ($start_date && $end_date && $type === "week") {
                     $model = Appointment::with($withArray)->select($field)->where($where)->whereBetween('date', [$start_date, $end_date])->orderByRaw($orderby)->get();
                 } else {
                     $model = Appointment::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();

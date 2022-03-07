@@ -15,7 +15,7 @@ class Busytime extends Model
      * @var string
      */
     protected $table = 'busy_time';
-
+    protected $appends = ['listview'];
     /**
      * The attributes that are mass assignable.
      *
@@ -28,6 +28,9 @@ class Busytime extends Model
         'start_time',
         'end_time',
         'repeats',
+        'repeat_time',
+        'repeat_time_option',
+        'ending',
         'reason',
         'is_active',
         'is_active_at',
@@ -50,6 +53,11 @@ class Busytime extends Model
         'is_active_at' => 'datetime',
     ];
 
+    public function getListViewAttribute()
+    {
+        return $this->attributes['listview'] = 'BusyTime';
+    }
+
     public function salon()
     {
         return $this->belongsTo(Salons::class, 'salon_id', 'id');
@@ -57,6 +65,6 @@ class Busytime extends Model
 
     public function staff()
     {
-        return $this->belongsTo(Staff::class, 'staff_id', 'id');
+        return $this->belongsTo(Staff::class, 'staff_id', 'id')->where(["role_id" => 5]);
     }
 }

@@ -23,6 +23,9 @@ class BusytimeApiController extends Controller
         'start_time',
         'end_time',
         'repeats',
+        'repeat_time',
+        'repeat_time_option',
+        'ending',
         'reason',
     ];
 
@@ -37,6 +40,7 @@ class BusytimeApiController extends Controller
         'price_tier_id',
         'first_name',
         'last_name',
+        'email',
     ];
 
     public function __construct()
@@ -57,6 +61,7 @@ class BusytimeApiController extends Controller
         $requestAll = $request->all();
         $requestAll['is_active_at'] = currentDateTime();
         $requestAll['date'] = Carbon::parse($requestAll['date'])->format('Y-m-d');
+        $requestAll['ending'] = Carbon::parse($requestAll['ending'])->format('Y-m-d');
         $model = new Busytime;
         $model->fill($requestAll);
         $model->save();
@@ -66,6 +71,8 @@ class BusytimeApiController extends Controller
     public function update(BusytimeRequest $request, $id)
     {
         $requestAll = $request->all();
+        $requestAll['date'] = Carbon::parse($requestAll['date'])->format('Y-m-d');
+        $requestAll['ending'] = Carbon::parse($requestAll['ending'])->format('Y-m-d');
         $model = $this->findModel($id);
         $model->fill($requestAll);
         $model->save();
@@ -90,7 +97,7 @@ class BusytimeApiController extends Controller
     public function returnResponse($request, $id, $data = [])
     {
         $requestAll = $request->all();
-        $field = ($request->field) ? array_merge(['id'], explode(',', $request->field)) : $this->field;
+        $field = ($request->field) ? array_merge(['id', 'salon_id', 'staff_id'], explode(',', $request->field)) : $this->field;
         $sort = ($request->sort) ? $request->sort : "";
         $option = ($request->option) ? $request->option : "";
 
@@ -111,6 +118,7 @@ class BusytimeApiController extends Controller
         } else if ($request->staff_field) {
             $staff_field = array_merge(['id', 'price_tier_id'], explode(',', $request->staff_field));
         }
+
         $withArray = [];
         if ($salon_field) {
             $withArray[] = 'salon:' . implode(',', $salon_field);

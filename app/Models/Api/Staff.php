@@ -98,6 +98,11 @@ class Staff extends Model
         return $this->hasMany(Roster::class, 'staff_id', 'id');
     }
 
+    public function appointment()
+    {
+        return $this->hasMany(Appointment::class, 'staff_id', 'id');
+    }
+
     public function getIsStaffCheckedAttribute()
     {
         $service_id = isset($_REQUEST['service_id']) && $_REQUEST['service_id'] ? $_REQUEST['service_id'] : 0;

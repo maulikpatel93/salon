@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\v1;
 use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\PriceTierRequest;
+use App\Models\Api\Appointment;
 use App\Models\Api\PriceTier;
 use Illuminate\Http\Request;
 
@@ -13,6 +14,7 @@ class PricetierApiController extends Controller
     protected $successStatus = 200;
     protected $errorStatus = 422;
     protected $unauthorizedStatus = 401;
+    protected $warningStatus = 410;
 
     protected $field = [
         'id',
@@ -70,6 +72,14 @@ class PricetierApiController extends Controller
     public function delete(Request $request, $id)
     {
         $requestAll = $request->all();
+        $model = $this->findModel($id);
+        $staff_id = $model->staff->pluck('id')->toArray();
+        if ($staff_id) {
+            $appointment = Appointment::whereIn('staff_id', $staff_id)->count();
+            if ($appointment > 0) {
+                return response()->json(['appointment' => $appointment, 'message' => __('message.success')], $this->warningStatus);
+            }
+        }
         PriceTier::where('id', $id)->delete();
         return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
     }

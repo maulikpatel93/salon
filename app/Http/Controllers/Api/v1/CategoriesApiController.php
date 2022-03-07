@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\v1;
 use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\CategoryRequest;
+use App\Models\Api\Appointment;
 use App\Models\Api\Categories;
 use Illuminate\Http\Request;
 
@@ -13,6 +14,7 @@ class CategoriesApiController extends Controller
     protected $successStatus = 200;
     protected $errorStatus = 422;
     protected $unauthorizedStatus = 401;
+    protected $warningStatus = 410;
 
     protected $field = [
         'id',
@@ -69,6 +71,14 @@ class CategoriesApiController extends Controller
     public function delete(Request $request, $id)
     {
         $requestAll = $request->all();
+        $model = $this->findModel($id);
+        $service_id = $model->services->pluck('id')->toArray();
+        if ($service_id) {
+            $appointment = Appointment::whereIn('service_id', $service_id)->count();
+            if ($appointment > 0) {
+                return response()->json(['appointment' => $appointment, 'message' => __('message.success')], $this->warningStatus);
+            }
+        }
         Categories::where('id', $id)->delete();
         return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
     }

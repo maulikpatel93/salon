@@ -458,7 +458,7 @@ class StaffApiController extends Controller
             if ($service_id) {
                 $successData = Staff::with($withArray)->join('staff_services', 'staff_services.staff_id', '=', 'users.id')->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where(['users.is_active' => '1', 'users.role_id' => 5, 'users.salon_id' => $request->salon_id])->where(['staff_services.service_id' => $service_id])->get()->makeHidden(['isNewRecord'])->toArray();
             } else {
-                $successData = Staff::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->get()->makeHidden(['isNewRecord'])->toArray();
+                $successData = Staff::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where($where)->get()->makeHidden(['isNewRecord'])->toArray();
             }
             return response()->json($successData, $this->successStatus);
         }
@@ -522,8 +522,8 @@ class StaffApiController extends Controller
         $salon_id = $request->salon_id;
         if ($salon_id) {
             $add_on_services = Categories::with(['services' => function ($query) use ($salon_id) {
-                $query->select('category_id', 'id', 'name')->where('salon_id', $salon_id);
-            }])->has('services')->select('id', 'name')->get()->toArray();
+                $query->select('category_id', 'id', 'name')->where('salon_id', $salon_id)->where('is_active', '1');
+            }])->has('services')->select('id', 'name')->where('is_active', '1')->get()->toArray();
             if ($add_on_services) {
                 $add_on_services = array_values(array_filter($add_on_services, function ($v) {return !empty($v['services']);}));
                 $successData = $add_on_services;

@@ -441,10 +441,10 @@ class ServicesApiController extends Controller
         if ($salon_id) {
             $add_on_services = Categories::with(['services' => function ($query) use ($isNotId, $salon_id) {
                 if ($isNotId) {
-                    $query->whereNotIn('id', explode(',', $isNotId));
+                    $query->whereNotIn('id', explode(',', $isNotId))->where('is_active', '1');
                 }
                 $query->select('category_id', 'id', 'name')->where('salon_id', $salon_id);
-            }])->has('services')->select('id', 'name')->get()->toArray();
+            }])->has('services')->select('id', 'name')->where('is_active', '1')->get()->toArray();
             if ($add_on_services) {
                 $add_on_services = array_values(array_filter($add_on_services, function ($v) {return !empty($v['services']);}));
                 $successData = $add_on_services;
@@ -461,8 +461,8 @@ class ServicesApiController extends Controller
         $salon_id = $request->salon_id;
         if ($salon_id) {
             $add_on_staff = PriceTier::with(['staff' => function ($query) use ($salon_id) {
-                $query->select('price_tier_id', 'id', 'first_name', 'last_name')->where('salon_id', $salon_id);
-            }])->has('staff')->select('id', 'name')->get()->toArray();
+                $query->select('price_tier_id', 'id', 'first_name', 'last_name')->where('salon_id', $salon_id)->where('is_active', '1');
+            }])->has('staff')->select('id', 'name')->where('is_active', '1')->get()->toArray();
             if ($add_on_staff) {
                 $add_on_staff = array_values(array_filter($add_on_staff, function ($v) {return !empty($v['staff']);}));
                 $successData = $add_on_staff;
@@ -481,7 +481,7 @@ class ServicesApiController extends Controller
         $withArray = [];
         $withArray[] = 'serviceprice:id,service_id,name,price,add_on_price';
         $withArray[] = 'staffservices:id,first_name,last_name';
-        $service = Services::with($withArray)->where(['id' => $service_id, 'salon_id' => $salon_id])->first();
+        $service = Services::with($withArray)->where(['id' => $service_id, 'salon_id' => $salon_id])->where('is_active', '1')->first();
         if ($service) {
             $service = $service->makeHidden(['is_active', 'is_active_at', 'created_at', 'updated_at', 'isNotId', 'isServiceChecked']);
             $service->duration = $service->duration;

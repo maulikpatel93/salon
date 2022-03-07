@@ -15,7 +15,7 @@ class Appointment extends Model
      * @var string
      */
     protected $table = 'appointment';
-
+    protected $appends = ['listview'];
     /**
      * The attributes that are mass assignable.
      *
@@ -32,6 +32,9 @@ class Appointment extends Model
         'duration',
         'cost',
         'repeats',
+        'repeat_time',
+        'repeat_time_option',
+        'ending',
         'booking_notes',
         'status',
         'cancellation_reason',
@@ -59,6 +62,11 @@ class Appointment extends Model
         'is_active_at' => 'datetime',
     ];
 
+    public function getListViewAttribute()
+    {
+        return $this->attributes['listview'] = 'Appointment';
+    }
+
     public function salon()
     {
         return $this->belongsTo(Salons::class, 'salon_id', 'id');
@@ -66,7 +74,7 @@ class Appointment extends Model
 
     public function client()
     {
-        return $this->belongsTo(Client::class, 'client_id', 'id');
+        return $this->belongsTo(Client::class, 'client_id', 'id')->where(["role_id" => 6]);
     }
 
     public function service()
@@ -76,6 +84,6 @@ class Appointment extends Model
 
     public function staff()
     {
-        return $this->belongsTo(Staff::class, 'staff_id', 'id');
+        return $this->belongsTo(Staff::class, 'staff_id', 'id')->where(["role_id" => 5]);
     }
 }

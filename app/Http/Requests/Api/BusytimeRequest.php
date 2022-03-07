@@ -30,6 +30,9 @@ class BusytimeRequest extends FormRequest
             'start_time' => 'required',
             'end_time' => 'required',
             'repeats' => 'required',
+            'repeat_time' => 'required_if:repeats,Yes',
+            'repeat_time_option' => 'required_if:repeats,Yes',
+            'ending' => 'nullable',
             'reason' => 'required',
         ];
     }
