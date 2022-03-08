@@ -65,7 +65,7 @@ class ClientDocumentApiController extends Controller
                 }
             }
         }
-        return response()->json(['message' => __('message.success')], $this->successStatus);
+        return response()->json(['message' => __('messages.success')], $this->successStatus);
         // return $this->returnResponse($request, $model->id);
     }
 
@@ -84,7 +84,7 @@ class ClientDocumentApiController extends Controller
     {
         $requestAll = $request->all();
         Clientdocument::where(['id' => $id])->delete();
-        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
+        return response()->json(['id' => $id, 'message' => __('messages.success')], $this->successStatus);
     }
 
     protected function findModel($id)

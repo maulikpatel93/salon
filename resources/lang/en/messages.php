@@ -9,4 +9,6 @@ return [
     'endtime_greater_starttime' => "End date can't be before Start date",
     "beetween_startendtime" => "Break time between start time and end time",
     "wrongmail" => "Your Email Id Is wrong. Please check and enter another email",
+    "busytime_check_appointment" => "The staff is busy for the time being. Please change the time or staff for appointment booking.",
+    "busytime_check_appointment2" => "This time the staff appointment is already booked. For busy times please change the time or staff.",
 ];

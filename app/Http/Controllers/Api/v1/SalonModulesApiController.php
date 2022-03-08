@@ -115,7 +115,7 @@ class SalonModulesApiController extends Controller
             }
         }
 
-        return response()->json(['message' => __('message.success')], $this->successStatus);
+        return response()->json(['message' => __('messages.success')], $this->successStatus);
     }
 
     public function accessupdate(Request $request)

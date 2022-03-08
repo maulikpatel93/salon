@@ -67,7 +67,7 @@ class ClientPhotoApiController extends Controller
                 }
             }
         }
-        return response()->json(['message' => __('message.success')], $this->successStatus);
+        return response()->json(['message' => __('messages.success')], $this->successStatus);
         // return $this->returnResponse($request, $model->id);
     }
 
@@ -86,7 +86,7 @@ class ClientPhotoApiController extends Controller
     {
         $requestAll = $request->all();
         Clientphoto::where(['id' => $id])->delete();
-        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
+        return response()->json(['id' => $id, 'message' => __('messages.success')], $this->successStatus);
     }
 
     protected function findModel($id)

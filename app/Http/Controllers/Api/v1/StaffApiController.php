@@ -117,7 +117,7 @@ class StaffApiController extends Controller
             $field['{{password}}'] = $randompassword;
             $sendmail = sendMail($requestAll['email'], 'send_password', $field);
             if (empty($sendmail)) {
-                return response()->json(['email' => $requestAll['email'], 'message' => __('message.wrongmail')], $this->errorStatus);
+                return response()->json(['email' => $requestAll['email'], 'message' => __('messages.wrongmail')], $this->errorStatus);
             }
         }
         $staff_working_hours = ($request->working_hours) ? json_decode($request->working_hours, true) : [];
@@ -295,7 +295,7 @@ class StaffApiController extends Controller
         })->toArray();
         $appointmentMatchAll = $appointmentMatch->all();
         if ($appointmentMatchAll && empty($pagetype)) {
-            return response()->json(['appointmentMatchAll' => $appointmentMatchAll, 'message' => __('message.success')], $this->warningStatus);
+            return response()->json(['appointmentMatchAll' => $appointmentMatchAll, 'message' => __('messages.success')], $this->warningStatus);
         }
 
         $model->fill($requestAll);
@@ -349,10 +349,10 @@ class StaffApiController extends Controller
         $requestAll = $request->all();
         $appointment = Appointment::where(['staff_id' => $id])->count();
         if ($appointment > 0) {
-            return response()->json(['appointment' => $appointment, 'message' => __('message.success')], $this->warningStatus);
+            return response()->json(['appointment' => $appointment, 'message' => __('messages.success')], $this->warningStatus);
         }
         Staff::where('id', $id)->delete();
-        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
+        return response()->json(['id' => $id, 'message' => __('messages.success')], $this->successStatus);
     }
 
     protected function findModel($id)

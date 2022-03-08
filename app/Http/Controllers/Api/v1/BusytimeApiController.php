@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\v1;
 use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\BusytimeRequest;
+use App\Models\Api\Appointment;
 use App\Models\Api\Busytime;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -14,6 +15,7 @@ class BusytimeApiController extends Controller
     protected $successStatus = 200;
     protected $errorStatus = 422;
     protected $unauthorizedStatus = 401;
+    protected $warningStatus = 410;
 
     protected $field = [
         'id',
@@ -73,6 +75,13 @@ class BusytimeApiController extends Controller
         $requestAll = $request->all();
         $requestAll['date'] = Carbon::parse($requestAll['date'])->format('Y-m-d');
         $requestAll['ending'] = Carbon::parse($requestAll['ending'])->format('Y-m-d');
+        $date = $requestAll['date'];
+        $start_time = $requestAll['start_time'];
+        $end_time = $requestAll['end_time'];
+        $Appointment = Appointment::where(["salon_id" => $requestAll['salon_id'], "staff_id" => $requestAll['staff_id'], 'date' => $requestAll['date']])->whereBetween('start_time', [$start_time, $end_time])->count();
+        if ($Appointment > 0) {
+            return response()->json(__('messages.busytime_check_appointment2'), $this->warningStatus);
+        }
         $model = $this->findModel($id);
         $model->fill($requestAll);
         $model->save();
@@ -83,7 +92,7 @@ class BusytimeApiController extends Controller
     {
         $requestAll = $request->all();
         Busytime::where('id', $id)->delete();
-        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
+        return response()->json(['id' => $id, 'message' => __('messages.success')], $this->successStatus);
     }
 
     protected function findModel($id)

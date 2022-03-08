@@ -214,7 +214,7 @@ class ServicesApiController extends Controller
         })->toArray();
         $appointmentMatchAll = $appointmentMatch->all();
         if ($appointmentMatchAll && empty($pagetype)) {
-            return response()->json(['appointmentMatchAll' => $appointmentMatchAll, 'message' => __('message.success')], $this->warningStatus);
+            return response()->json(['appointmentMatchAll' => $appointmentMatchAll, 'message' => __('messages.success')], $this->warningStatus);
         }
         $model->fill($requestAll);
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : $model->description;
@@ -263,10 +263,10 @@ class ServicesApiController extends Controller
         $requestAll = $request->all();
         $appointment = Appointment::where(['service_id' => $id])->count();
         if ($appointment > 0) {
-            return response()->json(['appointment' => $appointment, 'message' => __('message.success')], $this->warningStatus);
+            return response()->json(['appointment' => $appointment, 'message' => __('messages.success')], $this->warningStatus);
         }
         Services::where('id', $id)->delete();
-        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
+        return response()->json(['id' => $id, 'message' => __('messages.success')], $this->successStatus);
     }
 
     protected function findModel($id)

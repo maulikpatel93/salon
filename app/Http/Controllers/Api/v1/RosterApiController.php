@@ -74,7 +74,7 @@ class RosterApiController extends Controller
     {
         $requestAll = $request->all();
         Roster::where('id', $id)->delete();
-        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
+        return response()->json(['id' => $id, 'message' => __('messages.success')], $this->successStatus);
     }
 
     protected function findModel($id)

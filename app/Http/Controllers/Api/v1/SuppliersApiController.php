@@ -95,7 +95,7 @@ class SuppliersApiController extends Controller
     {
         $requestAll = $request->all();
         Suppliers::where('id', $id)->delete();
-        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
+        return response()->json(['id' => $id, 'message' => __('messages.success')], $this->successStatus);
     }
 
     protected function findModel($id)

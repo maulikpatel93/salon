@@ -118,7 +118,7 @@ class ClientApiController extends Controller
     {
         $requestAll = $request->all();
         Client::where(['id' => $id, 'role_id' => 6])->delete();
-        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
+        return response()->json(['id' => $id, 'message' => __('messages.success')], $this->successStatus);
     }
 
     protected function findModel($id)

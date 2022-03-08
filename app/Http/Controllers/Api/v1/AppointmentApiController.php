@@ -17,6 +17,7 @@ class AppointmentApiController extends Controller
     protected $successStatus = 200;
     protected $errorStatus = 422;
     protected $unauthorizedStatus = 401;
+    protected $warningStatus = 410;
 
     protected $field = [
         'id',
@@ -95,7 +96,13 @@ class AppointmentApiController extends Controller
         $requestAll['duration'] = HoursToMinutes($requestAll['duration']);
         $requestAll['date'] = Carbon::parse($requestAll['date'])->format('Y-m-d');
         $requestAll['end_time'] = Carbon::parse($requestAll['date'] . ' ' . $requestAll['start_time'])->addMinutes($requestAll['duration'])->format('H:i:s');
-
+        $date = $requestAll['date'];
+        $start_time = $requestAll['start_time'];
+        $end_time = $requestAll['end_time'];
+        $Busytime = Busytime::where(["salon_id" => $requestAll['salon_id'], "staff_id" => $requestAll['staff_id'], 'date' => $requestAll['date']])->whereBetween('start_time', [$start_time, $end_time])->count();
+        if ($Busytime > 0) {
+            return response()->json(__('messages.busytime_check_appointment'), $this->warningStatus);
+        }
         $model = new Appointment;
         $model->fill($requestAll);
         $model->save();
@@ -112,13 +119,10 @@ class AppointmentApiController extends Controller
         $date = $requestAll['date'];
         $start_time = $requestAll['start_time'];
         $end_time = $requestAll['end_time'];
-        $Busytime = Busytime::where(["salon_id1" => $requestAll['salon_id'], "staff_id" => $requestAll['staff_id'], 'date' => $requestAll['date']])->whereBetween('start_time', [$start_time, $end_time])->get();
-        echo '<pre>';
-        // print_r($requestAll);
-        print_r($Busytime);
-        echo '<pre>';
-        dd();
-
+        $Busytime = Busytime::where(["salon_id" => $requestAll['salon_id'], "staff_id" => $requestAll['staff_id'], 'date' => $requestAll['date']])->whereBetween('start_time', [$start_time, $end_time])->count();
+        if ($Busytime > 0) {
+            return response()->json(__('messages.busytime_check_appointment'), $this->warningStatus);
+        }
         $model = $this->findModel($id);
         $model->fill($requestAll);
         $model->save();
@@ -153,7 +157,7 @@ class AppointmentApiController extends Controller
     {
         $requestAll = $request->all();
         Appointment::where('id', $id)->delete();
-        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
+        return response()->json(['id' => $id, 'message' => __('messages.success')], $this->successStatus);
     }
 
     protected function findModel($id)

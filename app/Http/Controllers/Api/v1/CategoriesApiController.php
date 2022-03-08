@@ -76,11 +76,11 @@ class CategoriesApiController extends Controller
         if ($service_id) {
             $appointment = Appointment::whereIn('service_id', $service_id)->count();
             if ($appointment > 0) {
-                return response()->json(['appointment' => $appointment, 'message' => __('message.success')], $this->warningStatus);
+                return response()->json(['appointment' => $appointment, 'message' => __('messages.success')], $this->warningStatus);
             }
         }
         Categories::where('id', $id)->delete();
-        return response()->json(['id' => $id, 'message' => __('message.success')], $this->successStatus);
+        return response()->json(['id' => $id, 'message' => __('messages.success')], $this->successStatus);
     }
 
     protected function findModel($id)
