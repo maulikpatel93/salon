@@ -8,7 +8,10 @@ use App\Http\Requests\Api\BusytimeRequest;
 use App\Models\Api\Appointment;
 use App\Models\Api\Busytime;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class BusytimeApiController extends Controller
 {
@@ -21,7 +24,7 @@ class BusytimeApiController extends Controller
         'id',
         'salon_id',
         'staff_id',
-        'date',
+        'dateof',
         'start_time',
         'end_time',
         'repeats',
@@ -62,8 +65,9 @@ class BusytimeApiController extends Controller
     {
         $requestAll = $request->all();
         $requestAll['is_active_at'] = currentDateTime();
-        $requestAll['date'] = Carbon::parse($requestAll['date'])->format('Y-m-d');
-        $requestAll['ending'] = Carbon::parse($requestAll['ending'])->format('Y-m-d');
+        $requestAll['dateof'] = Carbon::parse($requestAll['dateof'])->format('Y-m-d');
+        $requestAll['ending'] = isset($requestAll['ending']) ? Carbon::parse($requestAll['ending'])->format('Y-m-d') : null;
+
         $model = new Busytime;
         $model->fill($requestAll);
         $model->save();
@@ -73,12 +77,13 @@ class BusytimeApiController extends Controller
     public function update(BusytimeRequest $request, $id)
     {
         $requestAll = $request->all();
-        $requestAll['date'] = Carbon::parse($requestAll['date'])->format('Y-m-d');
-        $requestAll['ending'] = Carbon::parse($requestAll['ending'])->format('Y-m-d');
-        $date = $requestAll['date'];
+        $requestAll['dateof'] = Carbon::parse($requestAll['dateof'])->format('Y-m-d');
+        $requestAll['ending'] = isset($requestAll['ending']) ? Carbon::parse($requestAll['ending'])->format('Y-m-d') : null;
+
+        $dateof = $requestAll['dateof'];
         $start_time = $requestAll['start_time'];
         $end_time = $requestAll['end_time'];
-        $Appointment = Appointment::where(["salon_id" => $requestAll['salon_id'], "staff_id" => $requestAll['staff_id'], 'date' => $requestAll['date']])->whereBetween('start_time', [$start_time, $end_time])->count();
+        $Appointment = Appointment::where(["salon_id" => $requestAll['salon_id'], "staff_id" => $requestAll['staff_id'], 'dateof' => $requestAll['dateof']])->whereBetween('start_time', [$start_time, $end_time])->count();
         if ($Appointment > 0) {
             return response()->json(__('messages.busytime_check_appointment2'), $this->warningStatus);
         }
@@ -109,7 +114,16 @@ class BusytimeApiController extends Controller
         $field = ($request->field) ? array_merge(['id', 'salon_id', 'staff_id'], explode(',', $request->field)) : $this->field;
         $sort = ($request->sort) ? $request->sort : "";
         $option = ($request->option) ? $request->option : "";
-
+        //Start Calender View Client base
+        $client_id = ($request->client_id) ? $request->client_id : "";
+        $staff_id = ($request->staff_id) ? $request->staff_id : "";
+        $start_date = ($request->start_date) ? Carbon::parse($request->start_date)->format('Y-m-d') : "";
+        $end_date = ($request->end_date) ? Carbon::parse($request->end_date)->format('Y-m-d') : "";
+        $start_time = ($request->start_time) ? Carbon::parse($request->start_time)->format('H:i') : "";
+        $end_time = ($request->end_time) ? Carbon::parse($request->end_time)->format('H:i') : "";
+        $timezone = ($request->timezone) ? $request->timezone : "";
+        $type = ($request->type) ? $request->type : "";
+        //End Calender View Client base
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
             $salon_field = false;
@@ -140,6 +154,10 @@ class BusytimeApiController extends Controller
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
         $where = ['is_active' => '1', 'salon_id' => $request->salon_id];
+        if ($start_date && $type == "day") {
+            // $where['repeats'] = 'Yes';
+            // $where["DATE_FORMAT(date,'%w')"] = "DATE_FORMAT('" . $start_date . "','%w')";
+        }
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
         $whereLike = $request->q ? explode(' ', $request->q) : '';
@@ -171,9 +189,44 @@ class BusytimeApiController extends Controller
             if ($pagination == true) {
                 $model = Busytime::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
             } else {
-                $model = Busytime::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                $model = "";
+                if ($start_date && $end_date && $type === "week") {
+                    $collection = new Collection();
+                    $period = CarbonPeriod::create($start_date, $end_date);
+                    foreach ($period as $date) {
+                        $rangedate = $date->format('Y-m-d');
+                        $modelrange = Busytime::with($withArray)->select($field)->addSelect(DB::raw('"' . $rangedate . '" as showdate'))->where($where)->whereRaw("dateof <= '" . $rangedate . "' and
+                        (
+                            CASE repeats
+                            WHEN 'Yes' THEN
+                                (ending is null or ending >= '" . $rangedate . "') and
+                                (CASE repeat_time_option
+                                    WHEN 'Weekly' THEN (DATEDIFF(dateof, '" . $rangedate . "') % (repeat_time * 7) = 0)
+                                    WHEN 'Monthly' THEN (DATEDIFF(dateof, '" . $rangedate . "') % (repeat_time * 31) = 0)
+                                END)
+                            END
+                        )")->orderByRaw($orderby)->get();
+                        if ($modelrange->count() > 0) {
+                            $collection = $collection->merge($modelrange);
+                        }
+                    }
+                    $model = $collection;
+                } else if ($start_date && $type == "day") {
+                    // $model = Busytime::with($withArray)->select($field)->where("repeats='Yes' and DATE_FORMAT(date,'%w') = DATE_FORMAT('" . $start_date . "','%w') and (`start_time` BETWEEN '" . $start_time . "' AND '" . $end_time . "' || `end_time` BETWEEN '" . $start_time . "' AND '" . $end_time . "') and (ending >= '2022-04-05' || ending is null)")->orderByRaw($orderby)->get();
+                    $model = Busytime::with($withArray)->select($field)->addSelect(DB::raw('"' . $start_date . '" as showdate'))->where($where)->whereRaw("dateof <= '" . $start_date . "' and
+                    (
+                        CASE repeats
+                        WHEN 'Yes' THEN
+                            (ending is null or ending >= '" . $start_date . "') and
+                            (CASE repeat_time_option
+                                WHEN 'Weekly' THEN (DATEDIFF(dateof, '" . $start_date . "') % (repeat_time * 7) = 0)
+                                WHEN 'Monthly' THEN (DATEDIFF(dateof, '" . $start_date . "') % (repeat_time * 31) = 0)
+                            END)
+                        END
+                    )")->orderByRaw($orderby)->get();
+                }
             }
-            if ($model->count()) {
+            if ($model && $model->count()) {
                 $successData = $model->toArray();
                 if ($successData) {
                     return response()->json($successData, $this->successStatus);

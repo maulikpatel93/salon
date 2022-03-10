@@ -26,7 +26,7 @@ class BusytimeRequest extends FormRequest
         return [
             'salon_id' => 'required|integer',
             'staff_id' => 'required|integer',
-            'date' => 'required',
+            'dateof' => 'required',
             'start_time' => 'required',
             'end_time' => 'required',
             'repeats' => 'required',

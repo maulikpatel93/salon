@@ -4,6 +4,7 @@
 use App\Http\Controllers\Admin\CustompagesController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmailtemplatesController;
+use App\Http\Controllers\Admin\EventsController;
 use App\Http\Controllers\Admin\ModulesController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\RolesController;
@@ -242,6 +243,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/isactive/{id}', [SalonPermissionsController::class, 'isactive'])->name('isactive')->middleware('checkpermission');
             Route::post('/applystatus', [SalonPermissionsController::class, 'applystatus'])->name('applystatus')->middleware('checkpermission');
         });
+
+        Route::prefix('events')->name('events.')->group(function () {
+            Route::get('/', [EventsController::class, 'index'])->name('index');
+            Route::post('/create', [EventsController::class, 'create'])->name('create');
+        });
+
     });
 });
 

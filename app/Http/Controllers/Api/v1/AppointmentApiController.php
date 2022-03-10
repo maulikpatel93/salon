@@ -25,7 +25,7 @@ class AppointmentApiController extends Controller
         'client_id',
         'service_id',
         'staff_id',
-        'date',
+        'dateof',
         'start_time',
         'end_time',
         'duration',
@@ -94,12 +94,13 @@ class AppointmentApiController extends Controller
         $requestAll['is_active_at'] = currentDateTime();
         $requestAll['status'] = 'Scheduled';
         $requestAll['duration'] = HoursToMinutes($requestAll['duration']);
-        $requestAll['date'] = Carbon::parse($requestAll['date'])->format('Y-m-d');
-        $requestAll['end_time'] = Carbon::parse($requestAll['date'] . ' ' . $requestAll['start_time'])->addMinutes($requestAll['duration'])->format('H:i:s');
-        $date = $requestAll['date'];
+        $requestAll['dateof'] = Carbon::parse($requestAll['dateof'])->format('Y-m-d');
+        $requestAll['end_time'] = Carbon::parse($requestAll['dateof'] . ' ' . $requestAll['start_time'])->addMinutes($requestAll['duration'])->format('H:i:s');
+
+        $dateof = $requestAll['dateof'];
         $start_time = $requestAll['start_time'];
         $end_time = $requestAll['end_time'];
-        $Busytime = Busytime::where(["salon_id" => $requestAll['salon_id'], "staff_id" => $requestAll['staff_id'], 'date' => $requestAll['date']])->whereBetween('start_time', [$start_time, $end_time])->count();
+        $Busytime = Busytime::where(["salon_id" => $requestAll['salon_id'], "staff_id" => $requestAll['staff_id'], 'dateof' => $requestAll['dateof']])->whereBetween('start_time', [$start_time, $end_time])->count();
         if ($Busytime > 0) {
             return response()->json(__('messages.busytime_check_appointment'), $this->warningStatus);
         }
@@ -114,12 +115,12 @@ class AppointmentApiController extends Controller
         $requestAll = $request->all();
         $requestAll['status'] = $request->status ? "Confirmed" : "Scheduled";
         $requestAll['duration'] = HoursToMinutes($requestAll['duration']);
-        $requestAll['date'] = Carbon::parse($requestAll['date'])->format('Y-m-d');
-        $requestAll['end_time'] = Carbon::parse($requestAll['date'] . ' ' . $requestAll['start_time'])->addMinutes($requestAll['duration'])->format('H:i:s');
-        $date = $requestAll['date'];
+        $requestAll['dateof'] = Carbon::parse($requestAll['dateof'])->format('Y-m-d');
+        $requestAll['end_time'] = Carbon::parse($requestAll['dateof'] . ' ' . $requestAll['start_time'])->addMinutes($requestAll['duration'])->format('H:i:s');
+        $dateof = $requestAll['dateof'];
         $start_time = $requestAll['start_time'];
         $end_time = $requestAll['end_time'];
-        $Busytime = Busytime::where(["salon_id" => $requestAll['salon_id'], "staff_id" => $requestAll['staff_id'], 'date' => $requestAll['date']])->whereBetween('start_time', [$start_time, $end_time])->count();
+        $Busytime = Busytime::where(["salon_id" => $requestAll['salon_id'], "staff_id" => $requestAll['staff_id'], 'datdateofe' => $requestAll['dateof']])->whereBetween('start_time', [$start_time, $end_time])->count();
         if ($Busytime > 0) {
             return response()->json(__('messages.busytime_check_appointment'), $this->warningStatus);
         }
@@ -132,13 +133,13 @@ class AppointmentApiController extends Controller
     public function reschedule(Request $request, $id)
     {
         $requestAll = $request->all();
-        $requestAll['date'] = Carbon::parse($requestAll['date'])->format('Y-m-d');
+        $requestAll['dateof'] = Carbon::parse($requestAll['dateof'])->format('Y-m-d');
         $requestAll['start_time'] = $requestAll['start_time'];
         $requestAll['reschedule'] = '1';
         $requestAll['reschedule_at'] = currentDateTime();
 
         $model = $this->findModel($id);
-        $model->end_time = Carbon::parse($requestAll['date'] . ' ' . $requestAll['start_time'])->addMinutes($model->duration)->format('H:i:s');
+        $model->end_time = Carbon::parse($requestAll['dateof'] . ' ' . $requestAll['start_time'])->addMinutes($model->duration)->format('H:i:s');
         $model->fill($requestAll);
         $model->save();
         return $this->returnResponse($request, $model->id);
@@ -245,7 +246,7 @@ class AppointmentApiController extends Controller
             $where['staff_id'] = $staff_id;
         }
         if ($start_date && $type == "day") {
-            $where['date'] = $start_date;
+            $where['dateof'] = $start_date;
         }
         if ($filter) {
             if (isset($filter['status']) && $filter['status']) {
@@ -283,7 +284,7 @@ class AppointmentApiController extends Controller
                 $model = Appointment::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
             } else {
                 if ($start_date && $end_date && $type === "week") {
-                    $model = Appointment::with($withArray)->select($field)->where($where)->whereBetween('date', [$start_date, $end_date])->orderByRaw($orderby)->get();
+                    $model = Appointment::with($withArray)->select($field)->where($where)->whereBetween('dateof', [$start_date, $end_date])->orderByRaw($orderby)->get();
                 } else {
                     $model = Appointment::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
                 }
