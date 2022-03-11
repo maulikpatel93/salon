@@ -33,9 +33,9 @@ class AppointmentRequest extends FormRequest
             'duration' => 'required',
             'cost' => 'required',
             'repeats' => 'required',
-            // 'repeat_time' => 'required_if:repeats,Yes',
-            // 'repeat_time_option' => 'required_if:repeats,Yes',
-            // 'ending' => 'nullable',
+            'repeat_time' => 'required_if:repeats,Yes',
+            'repeat_time_option' => 'required_if:repeats,Yes',
+            'ending' => 'nullable',
             'status' => 'nullable',
         ];
     }

@@ -66,8 +66,34 @@ class BusytimeApiController extends Controller
         $requestAll = $request->all();
         $requestAll['is_active_at'] = currentDateTime();
         $requestAll['dateof'] = Carbon::parse($requestAll['dateof'])->format('Y-m-d');
-        $requestAll['ending'] = isset($requestAll['ending']) ? Carbon::parse($requestAll['ending'])->format('Y-m-d') : null;
-
+        if ($requestAll['repeats'] === "Yes") {
+            $requestAll['ending'] = isset($requestAll['ending']) ? Carbon::parse($requestAll['ending'])->format('Y-m-d') : null;
+        } else {
+            $requestAll['repeat_time'] = null;
+            $requestAll['repeat_time_option'] = null;
+            $requestAll['ending'] = null;
+        }
+        $dateof = $requestAll['dateof'];
+        $start_time = $requestAll['start_time'];
+        $end_time = $requestAll['end_time'];
+        $Appointment = Appointment::select(["dateof", "start_time", "end_time"])->addSelect(DB::raw('"' . $dateof . '" as showdate'))->where(['is_active' => '1', 'salon_id' => $request->salon_id, 'staff_id' => $request->staff_id])->whereRaw("
+        ((start_time between '" . $start_time . "' and '" . $end_time . "') or (end_time between '" . $start_time . "' and '" . $end_time . "')) and
+        (
+            CASE repeats
+            WHEN 'Yes' THEN
+                dateof <= '" . $dateof . "' and (ending is null or ending >= '" . $dateof . "') and
+                (CASE repeat_time_option
+                    WHEN 'Weekly' THEN (DATEDIFF(dateof, '" . $dateof . "') % (repeat_time * 7) = 0)
+                    WHEN 'Monthly' THEN (DATEDIFF(dateof, '" . $dateof . "') % (repeat_time * 31) = 0)
+                    ELSE repeat_time_option is null
+                END)
+            ELSE repeats = 'No' and dateof = '" . $dateof . "'
+            END
+        )")->get();
+        if ($Appointment->count() > 0) {
+            $alreadyBooked = $Appointment->toArray();
+            return response()->json(["booked" => $alreadyBooked, "message" => __('messages.busytime_check_appointment2')], $this->warningStatus);
+        }
         $model = new Busytime;
         $model->fill($requestAll);
         $model->save();
@@ -78,14 +104,33 @@ class BusytimeApiController extends Controller
     {
         $requestAll = $request->all();
         $requestAll['dateof'] = Carbon::parse($requestAll['dateof'])->format('Y-m-d');
-        $requestAll['ending'] = isset($requestAll['ending']) ? Carbon::parse($requestAll['ending'])->format('Y-m-d') : null;
-
+        if ($requestAll['repeats'] === "Yes") {
+            $requestAll['ending'] = isset($requestAll['ending']) ? Carbon::parse($requestAll['ending'])->format('Y-m-d') : null;
+        } else {
+            $requestAll['repeat_time'] = null;
+            $requestAll['repeat_time_option'] = null;
+            $requestAll['ending'] = null;
+        }
         $dateof = $requestAll['dateof'];
         $start_time = $requestAll['start_time'];
         $end_time = $requestAll['end_time'];
-        $Appointment = Appointment::where(["salon_id" => $requestAll['salon_id'], "staff_id" => $requestAll['staff_id'], 'dateof' => $requestAll['dateof']])->whereBetween('start_time', [$start_time, $end_time])->count();
-        if ($Appointment > 0) {
-            return response()->json(__('messages.busytime_check_appointment2'), $this->warningStatus);
+        $Appointment = Appointment::select(["dateof", "start_time", "end_time"])->addSelect(DB::raw('"' . $dateof . '" as showdate'))->where(['is_active' => '1', 'salon_id' => $request->salon_id, 'staff_id' => $request->staff_id])->whereRaw("
+        ((start_time between '" . $start_time . "' and '" . $end_time . "') or (end_time between '" . $start_time . "' and '" . $end_time . "')) and
+        (
+            CASE repeats
+            WHEN 'Yes' THEN
+                dateof <= '" . $dateof . "' and (ending is null or ending >= '" . $dateof . "') and
+                (CASE repeat_time_option
+                    WHEN 'Weekly' THEN (DATEDIFF(dateof, '" . $dateof . "') % (repeat_time * 7) = 0)
+                    WHEN 'Monthly' THEN (DATEDIFF(dateof, '" . $dateof . "') % (repeat_time * 31) = 0)
+                    ELSE repeat_time_option is null
+                END)
+            ELSE repeats = 'No' and dateof = '" . $dateof . "'
+            END
+        )")->get();
+        if ($Appointment->count() > 0) {
+            $alreadyBooked = $Appointment->toArray();
+            return response()->json(["booked" => $alreadyBooked, "message" => __('messages.busytime_check_appointment2')], $this->warningStatus);
         }
         $model = $this->findModel($id);
         $model->fill($requestAll);
@@ -195,15 +240,17 @@ class BusytimeApiController extends Controller
                     $period = CarbonPeriod::create($start_date, $end_date);
                     foreach ($period as $date) {
                         $rangedate = $date->format('Y-m-d');
-                        $modelrange = Busytime::with($withArray)->select($field)->addSelect(DB::raw('"' . $rangedate . '" as showdate'))->where($where)->whereRaw("dateof <= '" . $rangedate . "' and
+                        $modelrange = Busytime::with($withArray)->select($field)->addSelect(DB::raw('"' . $rangedate . '" as showdate'))->where($where)->whereRaw("
                         (
                             CASE repeats
                             WHEN 'Yes' THEN
-                                (ending is null or ending >= '" . $rangedate . "') and
+                                (dateof <= '" . $rangedate . "' and ending is null or ending >= '" . $rangedate . "') and
                                 (CASE repeat_time_option
                                     WHEN 'Weekly' THEN (DATEDIFF(dateof, '" . $rangedate . "') % (repeat_time * 7) = 0)
                                     WHEN 'Monthly' THEN (DATEDIFF(dateof, '" . $rangedate . "') % (repeat_time * 31) = 0)
+                                    ELSE repeat_time_option is null
                                 END)
+                            ELSE repeats = 'No' and dateof = '" . $rangedate . "'
                             END
                         )")->orderByRaw($orderby)->get();
                         if ($modelrange->count() > 0) {
@@ -213,15 +260,17 @@ class BusytimeApiController extends Controller
                     $model = $collection;
                 } else if ($start_date && $type == "day") {
                     // $model = Busytime::with($withArray)->select($field)->where("repeats='Yes' and DATE_FORMAT(date,'%w') = DATE_FORMAT('" . $start_date . "','%w') and (`start_time` BETWEEN '" . $start_time . "' AND '" . $end_time . "' || `end_time` BETWEEN '" . $start_time . "' AND '" . $end_time . "') and (ending >= '2022-04-05' || ending is null)")->orderByRaw($orderby)->get();
-                    $model = Busytime::with($withArray)->select($field)->addSelect(DB::raw('"' . $start_date . '" as showdate'))->where($where)->whereRaw("dateof <= '" . $start_date . "' and
+                    $model = Busytime::with($withArray)->select($field)->addSelect(DB::raw('"' . $start_date . '" as showdate'))->where($where)->whereRaw("
                     (
-                        CASE repeats
-                        WHEN 'Yes' THEN
-                            (ending is null or ending >= '" . $start_date . "') and
+                        CASE
+                        WHEN repeats='Yes' THEN
+                            dateof <= '" . $start_date . "' and (ending is null or ending >= '" . $start_date . "') and
                             (CASE repeat_time_option
                                 WHEN 'Weekly' THEN (DATEDIFF(dateof, '" . $start_date . "') % (repeat_time * 7) = 0)
                                 WHEN 'Monthly' THEN (DATEDIFF(dateof, '" . $start_date . "') % (repeat_time * 31) = 0)
+                                ELSE repeat_time_option is null
                             END)
+                        ELSE repeats = 'No' and dateof = '" . $start_date . "'
                         END
                     )")->orderByRaw($orderby)->get();
                 }
