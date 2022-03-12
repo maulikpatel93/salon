@@ -15,10 +15,13 @@ class CreateBusyTimeTable extends Migration
     {
         Schema::create('busy_time', function (Blueprint $table) {
             $table->id();
-            $table->date('date');
+            $table->date('dateof');
             $table->string('start_time', 50)->nullable();
             $table->string('end_time', 50)->nullable();
             $table->enum('repeats', ['Yes', 'No'])->default('No')->nullable(); // 1:Active, 0:Inactive
+            $table->integer('repeat_time', false, true)->nullable()->after('repeats');
+            $table->enum('repeat_time_option', ['Weekly', 'Monthly', 'Yearly'])->after('repeat_time')->default(null)->nullable();
+            $table->date('ending')->nullable()->after('repeat_time_option')->comment('Optional');
             $table->text('reason')->nullable();
             $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
@@ -35,12 +38,15 @@ class CreateBusyTimeTable extends Migration
 
         Schema::create('appointment', function (Blueprint $table) {
             $table->id();
-            $table->date('date')->nullable();
+            $table->date('dateof')->nullable();
             $table->string('start_time', 50)->nullable();
             $table->string('end_time', 50)->nullable();
             $table->string('duration', 50)->nullable()->comment('Minutes');
             $table->decimal('cost', 10, 2)->nullable();
             $table->enum('repeats', ['Yes', 'No'])->default('No'); // 1:Active, 0:Inactive
+            $table->integer('repeat_time', false, true)->nullable()->after('repeats');
+            $table->enum('repeat_time_option', ['Weekly', 'Monthly', 'Yearly'])->after('repeat_time')->default(null)->nullable();
+            $table->date('ending')->nullable()->after('repeat_time_option')->comment('Optional');
             $table->text('booking_notes')->nullable();
             $table->enum('status', ['Scheduled', 'Confirmed', 'Completed', 'Cancelled'])->default(null)->nullable();
             $table->string('status_manage', 100)->default(null)->nullable();
