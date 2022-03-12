@@ -48,21 +48,21 @@ class SalonsController extends Controller
 
     public function store(SalonRequest $request)
     {
-        $inputVal = $request->all();
-        $inputVal['business_email_verified'] = '1';
-        $inputVal['business_email_verified_at'] = currentDateTime();
-        $inputVal['business_phone_number_verified'] = '0';
-        // $inputVal['password'] = Hash::make($inputVal['password']);
-        $inputVal['is_active_at'] = currentDateTime();
-
+        $requestAll = $request->all();
+        $requestAll['business_email_verified'] = '1';
+        $requestAll['business_email_verified_at'] = currentDateTime();
+        $requestAll['business_phone_number_verified'] = '0';
+        // $requestAll['password'] = Hash::make($requestAll['password']);
+        $requestAll['is_active_at'] = currentDateTime();
+        $salon_working_hours = ($request->working_hours) ? json_decode($request->working_hours, true) : [];
         $file = $request->file('logo');
         if ($file) {
             $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
             $filePath = $file->storeAs('salons', $fileName, 'public');
-            $inputVal['logo'] = $fileName;
+            $requestAll['logo'] = $fileName;
         }
         $model = new Salons();
-        if ($request->ajax() && $model->create($inputVal)) {
+        if ($request->ajax() && $model->create($requestAll)) {
             $lastInsertId = DB::getPdo()->lastInsertId();
             $taxname = config('params.tax');
             if ($taxname) {
@@ -76,6 +76,29 @@ class SalonsController extends Controller
                     $taxModel->description = null;
                     $taxModel->percentage = null;
                     $taxModel->save();
+                }
+            }
+            if ($salon_working_hours) {
+                foreach ($salon_working_hours as $key => $value) {
+                    if (isset($value['days']) && in_array($value['days'], $days)) {
+                        $SalonWorkingHoursModel = SalonWorkingHours::where(['salon_id' => $model->id, 'days' => $value['days']])->first();
+                        if (empty($SalonWorkingHoursModel)) {
+                            $SalonWorkingHoursModel = new SalonWorkingHours;
+                        }
+                        $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
+                        $start_time = isset($value['start_time']) ? $value['start_time'] : '';
+                        $end_time = isset($value['end_time']) ? $value['end_time'] : '';
+                        $break_time = isset($value['break_time']) ? $value['break_time'] : '';
+                        $SalonWorkingHoursModel->salon_id = $model->salon_id;
+                        $SalonWorkingHoursModel->staff_id = $model->id;
+                        $SalonWorkingHoursModel->days = $value['days'];
+                        $SalonWorkingHoursModel->start_time = $dayoff ? $start_time : null;
+                        $SalonWorkingHoursModel->end_time = $dayoff ? $end_time : null;
+                        $SalonWorkingHoursModel->break_time = $dayoff ? $break_time : [];
+                        $SalonWorkingHoursModel->dayoff = $dayoff;
+                        $SalonWorkingHoursModel->is_active_at = currentDateTime();
+                        $SalonWorkingHoursModel->save();
+                    }
                 }
             }
             $responseData['status'] = 200;
@@ -95,24 +118,24 @@ class SalonsController extends Controller
     public function update(SalonRequest $request, $id)
     {
         // $validated = $request->validated();
-        $inputVal = $request->all();
-        $inputVal['controller'] = $inputVal['controller'] ?? '';
-        $inputVal['action'] = $inputVal['action'] ?? '';
-        $inputVal['business_email_verified'] = '1';
-        $inputVal['business_email_verified_at'] = currentDateTime();
-        $inputVal['business_phone_number_verified'] = '0';
-        $inputVal['is_active_at'] = currentDateTime();
-
+        $requestAll = $request->all();
+        $requestAll['controller'] = $requestAll['controller'] ?? '';
+        $requestAll['action'] = $requestAll['action'] ?? '';
+        $requestAll['business_email_verified'] = '1';
+        $requestAll['business_email_verified_at'] = currentDateTime();
+        $requestAll['business_phone_number_verified'] = '0';
+        $requestAll['is_active_at'] = currentDateTime();
+        $salon_working_hours = ($request->working_hours) ? json_decode($request->working_hours, true) : [];
         $model = $this->findModel(decode($id));
         $file = $request->file('logo');
-        $inputVal['logo'] = $model->logo;
+        $requestAll['logo'] = $model->logo;
         if ($file) {
             Storage::delete('/public/salons/' . $model->logo);
             $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
             $filePath = $file->storeAs('salons', $fileName, 'public');
-            $inputVal['logo'] = $fileName;
+            $requestAll['logo'] = $fileName;
         }
-        if ($request->ajax() && $model->update($inputVal)) {
+        if ($request->ajax() && $model->update($requestAll)) {
             $taxname = config('params.tax');
             if ($taxname) {
                 foreach ($taxname as $tname) {
@@ -125,6 +148,29 @@ class SalonsController extends Controller
                     $taxModel->description = null;
                     $taxModel->percentage = null;
                     $taxModel->save();
+                }
+            }
+            if ($salon_working_hours) {
+                foreach ($salon_working_hours as $key => $value) {
+                    if (isset($value['days']) && in_array($value['days'], $days)) {
+                        $SalonWorkingHoursModel = SalonWorkingHours::where(['salon_id' => $model->id, 'days' => $value['days']])->first();
+                        if (empty($SalonWorkingHoursModel)) {
+                            $SalonWorkingHoursModel = new SalonWorkingHours;
+                        }
+                        $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
+                        $start_time = isset($value['start_time']) ? $value['start_time'] : '';
+                        $end_time = isset($value['end_time']) ? $value['end_time'] : '';
+                        $break_time = isset($value['break_time']) ? $value['break_time'] : '';
+                        $SalonWorkingHoursModel->salon_id = $model->salon_id;
+                        $SalonWorkingHoursModel->staff_id = $model->id;
+                        $SalonWorkingHoursModel->days = $value['days'];
+                        $SalonWorkingHoursModel->start_time = $dayoff ? $start_time : null;
+                        $SalonWorkingHoursModel->end_time = $dayoff ? $end_time : null;
+                        $SalonWorkingHoursModel->break_time = $dayoff ? $break_time : [];
+                        $SalonWorkingHoursModel->dayoff = $dayoff;
+                        $SalonWorkingHoursModel->is_active_at = currentDateTime();
+                        $SalonWorkingHoursModel->save();
+                    }
                 }
             }
             $responseData['status'] = 200;

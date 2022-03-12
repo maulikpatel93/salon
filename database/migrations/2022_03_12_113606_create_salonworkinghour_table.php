@@ -19,6 +19,7 @@ class CreateSalonworkinghourTable extends Migration
             $table->string('start_time', 50)->nullable();
             $table->string('end_time', 50)->nullable();
             $table->text('break_time')->nullable();
+            $table->enum('dayoff', ['0', '1'])->default('1')->nullable()->comment('1-dayon and 0-dayoff');
             $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
@@ -31,6 +32,7 @@ class CreateSalonworkinghourTable extends Migration
 
         Schema::table('salons', function (Blueprint $table) {
             $table->string('approx_number_of_staff', 50)->nullable();
+            $table->dropColumn('owner_name');
         });
     }
 }
