@@ -9,7 +9,9 @@ use App\Http\Requests\Api\AppointmentStatusRequest;
 use App\Models\Api\Appointment;
 use App\Models\Api\Busytime;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class AppointmentApiController extends Controller
