@@ -14,6 +14,7 @@ class CreateBusytimeChangeTable extends Migration
     public function up()
     {
         Schema::table('busy_time', function (Blueprint $table) {
+            $table->renameColumn('date', 'dateof')->change()->nullable();
             $table->date('dateof')->change()->nullable();
             $table->integer('repeat_time', false, true)->nullable()->after('repeats')->comment('Week, Month');
             $table->enum('repeat_time_option', ['Weekly', 'Monthly', 'Yearly'])->after('repeat_time')->default(null)->nullable();
@@ -21,6 +22,7 @@ class CreateBusytimeChangeTable extends Migration
         });
 
         Schema::table('appointment', function (Blueprint $table) {
+            $table->renameColumn('date', 'dateof')->change()->nullable();
             $table->date('dateof')->change()->nullable();
             $table->integer('repeat_time', false, true)->nullable()->after('repeats')->comment('Week, Month');
             $table->enum('repeat_time_option', ['Weekly', 'Monthly', 'Yearly'])->after('repeat_time')->default(null)->nullable();
