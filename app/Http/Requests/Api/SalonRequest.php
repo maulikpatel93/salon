@@ -26,7 +26,6 @@ class SalonRequest extends FormRequest
         $id = decode($this->id);
         $rules = [
             'business_name' => 'required',
-            'owner_name' => 'required',
             'business_phone_number' => "required|regex:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/",
             'business_email' => 'required|email|unique:salons,business_email,' . $id,
             'business_address' => 'required',

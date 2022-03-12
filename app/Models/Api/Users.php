@@ -37,6 +37,7 @@ class Users extends Model
         'is_active',
         'is_active_at',
         'auth_key',
+        'remember_token',
     ];
 
     /**
@@ -46,7 +47,6 @@ class Users extends Model
      */
     protected $hidden = [
         'password',
-        'remember_token',
         'profile_photo',
     ];
 

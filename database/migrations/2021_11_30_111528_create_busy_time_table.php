@@ -19,7 +19,7 @@ class CreateBusyTimeTable extends Migration
             $table->string('start_time', 50)->nullable();
             $table->string('end_time', 50)->nullable();
             $table->enum('repeats', ['Yes', 'No'])->default('No')->nullable(); // 1:Active, 0:Inactive
-            $table->integer('repeat_time', false, true)->nullable()->after('repeats');
+            $table->integer('repeat_time', false, true)->nullable()->after('repeats')->comment('Week, Month');
             $table->enum('repeat_time_option', ['Weekly', 'Monthly', 'Yearly'])->after('repeat_time')->default(null)->nullable();
             $table->date('ending')->nullable()->after('repeat_time_option')->comment('Optional');
             $table->text('reason')->nullable();
@@ -44,7 +44,7 @@ class CreateBusyTimeTable extends Migration
             $table->string('duration', 50)->nullable()->comment('Minutes');
             $table->decimal('cost', 10, 2)->nullable();
             $table->enum('repeats', ['Yes', 'No'])->default('No'); // 1:Active, 0:Inactive
-            $table->integer('repeat_time', false, true)->nullable()->after('repeats');
+            $table->integer('repeat_time', false, true)->nullable()->after('repeats')->comment('Week, Month');
             $table->enum('repeat_time_option', ['Weekly', 'Monthly', 'Yearly'])->after('repeat_time')->default(null)->nullable();
             $table->date('ending')->nullable()->after('repeat_time_option')->comment('Optional');
             $table->text('booking_notes')->nullable();

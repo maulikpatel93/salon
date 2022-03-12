@@ -32,6 +32,7 @@ class Admin extends Authenticatable
         'role_id', // adding this
         'is_active',
         'email_verified',
+        'remember_token',
     ];
 
     /**

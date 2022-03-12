@@ -41,7 +41,6 @@ class GuestApiController extends Controller
     protected $salon_field = [
         'id',
         'business_name',
-        'owner_name',
         'business_email',
         'business_phone_number',
         'business_address',
@@ -74,6 +73,7 @@ class GuestApiController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 401);
         }
+        $remember = ($request->remember_me) ? true : false;
         $credentials = [
             'email' => $request->email,
             'password' => $request->password,
@@ -82,7 +82,7 @@ class GuestApiController extends Controller
         ];
         $credentials_4 = array_merge(['role_id' => 4], $credentials); // Salon role
         $credentials_5 = array_merge(['role_id' => 5], $credentials); // Staff role
-        if (Auth::attempt($credentials_4)) {
+        if (Auth::attempt($credentials_4, $remember)) {
             $user = Auth::user();
             $successData = [];
             $token = $user->createToken($user->id)->accessToken;
@@ -90,7 +90,7 @@ class GuestApiController extends Controller
             $successData['auth_key'] = $user->auth_key;
             $successData['id'] = $user->id;
             return response()->json($successData, $this->successStatus);
-        } else if (Auth::attempt($credentials_5)) {
+        } else if (Auth::attempt($credentials_5, $remember)) {
             $user = Auth::user();
             $successData = [];
             $token = $user->createToken($user->id)->accessToken;

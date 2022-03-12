@@ -118,7 +118,6 @@ if (!empty(checkaccess('delete', getControllerName()))) {
                     'attribute' => 'id'
                 ],
                 'business_name',
-                'owner_name',
                 'business_email',
                 'business_phone_number',
                 'business_address',

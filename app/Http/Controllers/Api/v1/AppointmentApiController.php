@@ -47,7 +47,6 @@ class AppointmentApiController extends Controller
     protected $salon_field = [
         'id',
         'business_name',
-        'owner_name',
     ];
 
     protected $client_field = [

@@ -1199,7 +1199,6 @@ CREATE TABLE `roster` (
 CREATE TABLE `salons` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `business_name` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `owner_name` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
   `business_email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `business_email_verified` enum('1','0') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
   `business_email_verified_at` timestamp NULL DEFAULT NULL,

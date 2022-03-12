@@ -42,7 +42,6 @@ class ClientApiController extends Controller
     protected $salon_field = [
         'id',
         'business_name',
-        'owner_name',
     ];
 
     public function __construct()

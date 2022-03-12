@@ -33,7 +33,6 @@ class VoucherApiController extends Controller
     protected $salon_field = [
         'id',
         'business_name',
-        'owner_name',
     ];
 
     protected $voucher_service_field = [

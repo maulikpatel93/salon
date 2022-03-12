@@ -35,14 +35,7 @@
         'accept'=>"image/*"
         ]) }}
     </div>
-    <div class="mb-3">
-        {{ Form::label('owner_name'); }}
-        {{ Form::text('owner_name', $model->owner_name, [
-        "class" => "form-control",
-        'id'=> $formName.'-owner_name',
-        'placeholder'=> '',
-        ]) }}
-    </div>
+   
     <div class="mb-3">
         {{ Form::label('business_email'); }}
         {{ Form::text('business_email', $model->business_email, [

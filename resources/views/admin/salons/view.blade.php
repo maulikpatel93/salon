@@ -19,7 +19,6 @@
     'showHead' => false,
     'rowFields' => [
         'business_name',
-        'owner_name',
         'business_email',
         'business_phone_number',
         'business_address',

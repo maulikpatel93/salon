@@ -60,7 +60,7 @@ class CreateStaffTable extends Migration
             $table->string('days', 50);
             $table->string('start_time', 50)->nullable();
             $table->string('end_time', 50)->nullable();
-            $table->text('break_time');
+            $table->text('break_time')->nullable();
             $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();

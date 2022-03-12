@@ -27,7 +27,6 @@ class RosterApiController extends Controller
     protected $salon_field = [
         'id',
         'business_name',
-        'owner_name',
     ];
 
     protected $staff_field = [

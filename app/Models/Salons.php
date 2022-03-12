@@ -24,7 +24,6 @@ class Salons extends Model
      */
     protected $fillable = [
         'business_name',
-        'owner_name',
         'business_email',
         'business_email_verified',
         'business_email_verified_at',

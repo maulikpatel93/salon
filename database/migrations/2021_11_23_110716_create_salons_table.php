@@ -16,7 +16,6 @@ class CreateSalonsTable extends Migration
         Schema::create('salons', function (Blueprint $table) {
             $table->id();
             $table->string('business_name', 150);
-            $table->string('owner_name', 150);
             $table->string('business_email', 100)->unique();
             $table->enum('business_email_verified', [1, 0])->default(0); // 1:Verify, 0:Inverify
             $table->timestamp('business_email_verified_at')->nullable();

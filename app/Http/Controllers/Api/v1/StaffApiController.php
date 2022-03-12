@@ -42,7 +42,6 @@ class StaffApiController extends Controller
     protected $salon_field = [
         'id',
         'business_name',
-        'owner_name',
     ];
 
     protected $price_tier_field = [

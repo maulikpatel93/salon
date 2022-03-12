@@ -19,7 +19,6 @@ class AuthApiController extends Controller
     protected $salon_field = [
         'id',
         'business_name',
-        'owner_name',
         'business_email',
         'business_phone_number',
         'business_address',

@@ -41,7 +41,6 @@ class ServicesApiController extends Controller
     protected $salon_field = [
         'id',
         'business_name',
-        'owner_name',
     ];
 
     //Categories Column name default ['*']
