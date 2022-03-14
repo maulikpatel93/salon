@@ -10,7 +10,9 @@ $salon_type = [
 ];
 $timezone = config('params.timezones');
 $working_hours = [['dayoff' => '', 'days' => 'Sunday', 'start_time' => '', 'end_time' => '', 'break_time' => []], ['dayoff' => '1', 'days' => 'Monday', 'start_time' => '', 'end_time' => '', 'break_time' => []], ['dayoff' => '1', 'days' => 'Tuesday', 'start_time' => '', 'end_time' => '', 'break_time' => []], ['dayoff' => '1', 'days' => 'Wednesday', 'start_time' => '', 'end_time' => '', 'break_time' => []], ['dayoff' => '1', 'days' => 'Thursday', 'start_time' => '', 'end_time' => '', 'break_time' => []], ['dayoff' => '1', 'days' => 'Friday', 'start_time' => '', 'end_time' => '', 'break_time' => []], ['dayoff' => '', 'days' => 'Saturday', 'start_time' => '', 'end_time' => '', 'break_time' => []]];
-
+if ($model->id) {
+    $working_hours = $model->working_hours->toArray();
+}
 @endphp
 {{ Form::open([
     'url' => $formRoute,
@@ -79,13 +81,30 @@ $working_hours = [['dayoff' => '', 'days' => 'Sunday', 'start_time' => '', 'end_
         'placeholder' => '--Select--',
     ]) }}
 </div>
+{{ Form::checkbox('working_hours[10][dayoff]', 1) }}
+{{ Form::hidden('days', 'Sunday', [
+    'class' => 'form-control',
+    'id' => $formName . '-working_hours-days-0',
+    'placeholder' => '',
+]) }}
+{{ Form::time('start_time', '', [
+    'class' => 'form-control',
+    'id' => $formName . '-working_hours-start_time-0',
+    'placeholder' => '',
+]) }}
+{{ Form::time('end_time', '', [
+    'class' => 'form-control',
+    'id' => $formName . '-working_hours-end_time-0',
+    'placeholder' => '',
+]) }}
 @if ($working_hours)
     <div class="mb-3 table-responsive">
         <table class="table">
             <tbody>
                 @foreach ($working_hours as $key => $value)
                     <tr>
-                        <td></td>
+                        <td>{{ Form::checkbox('working_hours[' . $key . '][dayoff]', 1, $value['dayoff'] ? true : false) }}
+                        </td>
                         <td>{{ $value['days'] }}
                             {{ Form::hidden('working_hours[' . $key . '][days]', $value['days'], [
                                 'class' => 'form-control',
@@ -93,13 +112,13 @@ $working_hours = [['dayoff' => '', 'days' => 'Sunday', 'start_time' => '', 'end_
                                 'placeholder' => '',
                             ]) }}
                         </td>
-                        <td>{{ Form::time('working_hours[' . $key . '][start_time]', '', [
+                        <td>{{ Form::time('working_hours[' . $key . '][start_time]', $value['start_time'], [
                             'class' => 'form-control',
                             'id' => $formName . '-working_hours-start_time-' . $key,
                             'placeholder' => '',
                         ]) }}
                         </td>
-                        <td>{{ Form::time('working_hours[' . $key . '][end_time]', '', [
+                        <td>{{ Form::time('working_hours[' . $key . '][end_time]', $value['end_time'], [
                             'class' => 'form-control',
                             'id' => $formName . '-working_hours-end_time-' . $key,
                             'placeholder' => '',

@@ -6,6 +6,7 @@ use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SalonRequest;
 use App\Models\Salons;
+use App\Models\SalonWorkingHours;
 use App\Models\Tax;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -54,7 +55,9 @@ class SalonsController extends Controller
         $requestAll['business_phone_number_verified'] = '0';
         // $requestAll['password'] = Hash::make($requestAll['password']);
         $requestAll['is_active_at'] = currentDateTime();
+
         $salon_working_hours = ($request->working_hours) ? json_decode($request->working_hours, true) : [];
+
         $file = $request->file('logo');
         if ($file) {
             $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
@@ -78,6 +81,15 @@ class SalonsController extends Controller
                     $taxModel->save();
                 }
             }
+            $days = [
+                'Sunday',
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday',
+                'Saturday',
+            ];
             if ($salon_working_hours) {
                 foreach ($salon_working_hours as $key => $value) {
                     if (isset($value['days']) && in_array($value['days'], $days)) {
@@ -88,9 +100,8 @@ class SalonsController extends Controller
                         $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
                         $start_time = isset($value['start_time']) ? $value['start_time'] : '';
                         $end_time = isset($value['end_time']) ? $value['end_time'] : '';
-                        $break_time = isset($value['break_time']) ? $value['break_time'] : '';
-                        $SalonWorkingHoursModel->salon_id = $model->salon_id;
-                        $SalonWorkingHoursModel->staff_id = $model->id;
+                        $break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : [];
+                        $SalonWorkingHoursModel->salon_id = $model->id;
                         $SalonWorkingHoursModel->days = $value['days'];
                         $SalonWorkingHoursModel->start_time = $dayoff ? $start_time : null;
                         $SalonWorkingHoursModel->end_time = $dayoff ? $end_time : null;
@@ -125,7 +136,7 @@ class SalonsController extends Controller
         $requestAll['business_email_verified_at'] = currentDateTime();
         $requestAll['business_phone_number_verified'] = '0';
         $requestAll['is_active_at'] = currentDateTime();
-        $salon_working_hours = ($request->working_hours) ? json_decode($request->working_hours, true) : [];
+        $salon_working_hours = $request->working_hours;
         $model = $this->findModel(decode($id));
         $file = $request->file('logo');
         $requestAll['logo'] = $model->logo;
@@ -150,6 +161,15 @@ class SalonsController extends Controller
                     $taxModel->save();
                 }
             }
+            $days = [
+                'Sunday',
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday',
+                'Saturday',
+            ];
             if ($salon_working_hours) {
                 foreach ($salon_working_hours as $key => $value) {
                     if (isset($value['days']) && in_array($value['days'], $days)) {
@@ -160,9 +180,8 @@ class SalonsController extends Controller
                         $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
                         $start_time = isset($value['start_time']) ? $value['start_time'] : '';
                         $end_time = isset($value['end_time']) ? $value['end_time'] : '';
-                        $break_time = isset($value['break_time']) ? $value['break_time'] : '';
-                        $SalonWorkingHoursModel->salon_id = $model->salon_id;
-                        $SalonWorkingHoursModel->staff_id = $model->id;
+                        $break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : [];
+                        $SalonWorkingHoursModel->salon_id = $model->id;
                         $SalonWorkingHoursModel->days = $value['days'];
                         $SalonWorkingHoursModel->start_time = $dayoff ? $start_time : null;
                         $SalonWorkingHoursModel->end_time = $dayoff ? $end_time : null;

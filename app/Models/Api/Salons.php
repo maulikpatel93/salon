@@ -80,4 +80,9 @@ class Salons extends Model
         return $this->hasMany(Categories::class, 'Category_id', 'id');
     }
 
+    public function working_hours()
+    {
+        return $this->hasMany(SalonWorkingHours::class, 'salon_id', 'id');
+    }
+
 }

@@ -63,4 +63,8 @@ class Salons extends Model
     {
         return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
     }
+    public function working_hours()
+    {
+        return $this->hasMany(SalonWorkingHours::class, 'salon_id', 'id');
+    }
 }

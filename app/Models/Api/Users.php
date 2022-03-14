@@ -85,6 +85,7 @@ class Users extends Model
 
     public function salon()
     {
-        return $this->hasOne(Salons::class, 'id', 'salon_id');
+        return $this->hasOne(Salons::class, 'id', 'salon_id')->with('working_hours');
+        // return $this->belongsTo(Salons::class, 'salon_id', 'id')->with('working_hours');
     }
 }
