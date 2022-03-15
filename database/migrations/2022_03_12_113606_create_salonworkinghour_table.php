@@ -31,7 +31,7 @@ class CreateSalonworkinghourTable extends Migration
         });
 
         Schema::table('salons', function (Blueprint $table) {
-            $table->string('approx_number_of_staff', 50)->nullable();
+            $table->string('number_of_staff', 50)->nullable();
             $table->dropColumn('owner_name');
         });
     }

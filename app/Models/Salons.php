@@ -38,6 +38,7 @@ class Salons extends Model
         'timezone',
         'is_active',
         'is_active_at',
+        'terms',
     ];
 
     /**

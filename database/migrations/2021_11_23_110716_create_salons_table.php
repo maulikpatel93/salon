@@ -27,6 +27,8 @@ class CreateSalonsTable extends Migration
             $table->enum('salon_type', ['Unisex', 'Ladies', 'Gents'])->default('Unisex'); // 1:Active, 0:Inactive
             $table->string('logo', 100)->nullable();
             $table->string('timezone', 100);
+            $table->string('numberofstaff', 50)->nullable();
+            $table->enum('terms', ['0', '1'])->after('timezone')->default('0'); // 1:Active, 0:Inactive
             $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
