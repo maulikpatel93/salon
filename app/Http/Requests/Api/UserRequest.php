@@ -33,7 +33,7 @@ class UserRequest extends FormRequest
             'phone_number' => "required|regex:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/",
             'role_id' => 'required',
             'salon_id' => 'required_if:role_id,4',
-            'profile_photo' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ];
         if ($id) {
             return $rules;

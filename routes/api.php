@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\v1\ProductsApiController;
 use App\Http\Controllers\Api\v1\RosterApiController;
 use App\Http\Controllers\Api\v1\SalonAccessApiController;
 use App\Http\Controllers\Api\v1\SalonModulesApiController;
+use App\Http\Controllers\Api\v1\SalonsApiController;
 use App\Http\Controllers\Api\v1\ServicesApiController;
 use App\Http\Controllers\Api\v1\StaffApiController;
 use App\Http\Controllers\Api\v1\SuppliersApiController;
@@ -40,18 +41,26 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::prefix('v1')->group(function () {
     Route::post('/index', [GuestApiController::class, 'index']);
-    Route::prefix('beforelogin')->group(function () {
-        Route::post('/login', [GuestApiController::class, 'login']);
-        Route::post('/salonregistration', [GuestApiController::class, 'salonregistration']);
-        Route::post('/salons', [GuestApiController::class, 'salons']);
-        Route::post('/register', [GuestApiController::class, 'register']);
-    });
+    // Route::prefix('beforelogin')->group(function () {
+    //     Route::post('/login', [GuestApiController::class, 'login']);
+    //     Route::post('/salonregistration', [GuestApiController::class, 'salonregistration']);
+    //     Route::post('/salons', [GuestApiController::class, 'salons']);
+    //     Route::post('/register', [GuestApiController::class, 'register']);
+    // });
     Route::post('/login', [GuestApiController::class, 'login']);
     Route::post('/salonregistration', [GuestApiController::class, 'salonregistration']);
     Route::post('/salons', [GuestApiController::class, 'salons']);
     Route::post('/register', [GuestApiController::class, 'register']);
 
     Route::get("/sendmail", function () {return view("emailtemplates.template.mail");});
+
+    Route::middleware(['guest:api'])->prefix('beforelogin')->group(function () {
+        Route::controller(SalonsApiController::class)->prefix('salons')->name('salons.')->group(function () {
+            Route::post('/checkexist', 'checkexist')->name('checkexist');
+            Route::post('/store', 'store')->name('store');
+            Route::post('/update/{id}', 'update')->name('update');
+        });
+    });
 
     Route::middleware(['auth:api'])->prefix('afterlogin')->group(function () {
         Route::post('/user', [AuthApiController::class, 'user']);

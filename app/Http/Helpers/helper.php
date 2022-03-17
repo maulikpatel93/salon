@@ -6,6 +6,8 @@ use App\Models\Permissions;
 use App\Models\RoleAccess;
 use App\Models\Salons;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Route;
 use Illuminate\Support\Str;
@@ -334,15 +336,18 @@ if (!function_exists('sendMail')) {
             $data = array(
                 'body' => $message,
             );
-            $sendemail = Mail::send(['html' => 'admin.emailtemplates.template.mail'], $data, function ($message) use ($toEmail, $fromEmail, $subject) {
-                // echo $toEmail . ' ' . $fromEmail . ' ' . $subject;
-                $message->to($toEmail)->subject($subject);
-                $message->from($fromEmail);
-            });
-            if (Mail::failures()) {
-                return false;
-            }
 
+            try {
+                $sendemail = Mail::send(['html' => 'admin.emailtemplates.template.mail'], $data, function ($message) use ($toEmail, $fromEmail, $subject) {
+                    // echo $toEmail . ' ' . $fromEmail . ' ' . $subject;
+                    $message->to($toEmail)->subject($subject);
+                    $message->from($fromEmail);
+                });
+            } catch (Exception $e) {
+                if (count(Mail::failures()) > 0) {
+                    return false;
+                }
+            }
             return true;
         }
         return "";

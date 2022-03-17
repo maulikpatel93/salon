@@ -14,8 +14,10 @@ use Illuminate\Support\Str;
 class ClientApiController extends Controller
 {
     protected $successStatus = 200;
+    protected $badrequestStatus = 400;
     protected $errorStatus = 422;
     protected $unauthorizedStatus = 401;
+    protected $warningStatus = 410;
 
     protected $field = [
         'id',

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Admin;
+namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -23,28 +23,11 @@ class SalonWorkingHoursRequest extends FormRequest
      */
     public function rules()
     {
-        $id = decode($this->id);
-
-        $rules = [
-            'salon_id' => 'required|integer',
+        return [
+            // 'salon_id' => 'required|integer',
             'days.*' => 'required',
             'start_time.*' => 'nullable|required_if:dayoff.*,1',
             'end_time.*' => 'nullable|required_if:dayoff.*,1|date_format:H:i|after:start_time.*',
-        ];
-        return $rules;
-    }
-
-    /**
-     * Get the error messages for the defined validation rules.
-     *
-     * @return array
-     */
-    public function messages()
-    {
-        return [
-            // 'working_hours.start_time.*.required' => 'Start time is required',
-            // 'working_hours.end_time.*.required' => 'End time is required',
-            'working_hours.*.end_time.after' => 'End time must be a date after start time',
         ];
     }
 }

@@ -26,13 +26,13 @@ class SalonRequest extends FormRequest
         $id = decode($this->id);
         $rules = [
             'business_name' => 'required',
-            'business_phone_number' => "required|regex:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/",
-            'business_email' => 'required|email|unique:salons,business_email,' . $id,
+            'business_phone_number' => "required|regex:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/|unique:salons,business_phone_number," . $id,
+            'business_email' => 'nullable|email|unique:salons,business_email,' . $id,
             'business_address' => 'required',
             'salon_type' => 'required',
-            'timezone' => 'required',
+            'timezone' => 'nullable',
             'terms' => 'required',
-            'logo' => 'image|mimes:jpeg,png,jpg,svg|max:2048',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
         ];
         return $rules;
     }

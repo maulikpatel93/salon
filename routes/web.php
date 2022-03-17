@@ -239,7 +239,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/edit/{id}', [SalonPermissionsController::class, 'edit'])->name('edit')->middleware('checkpermission');
             Route::post('/update/{id}', [SalonPermissionsController::class, 'update'])->name('update')->middleware('checkpermission');
             Route::post('/view/{id}', [SalonPermissionsController::class, 'view'])->name('view')->middleware('checkpermission');
-            Route::get('/delete/{id}', [PermisSalonPermissionsControllersSalonPermissionsControllerionsController::class, 'delete'])->name('delete')->middleware('checkpermission');
+            Route::get('/delete/{id}', [SalonPermissionsController::class, 'delete'])->name('delete')->middleware('checkpermission');
             Route::post('/isactive/{id}', [SalonPermissionsController::class, 'isactive'])->name('isactive')->middleware('checkpermission');
             Route::post('/applystatus', [SalonPermissionsController::class, 'applystatus'])->name('applystatus')->middleware('checkpermission');
         });
