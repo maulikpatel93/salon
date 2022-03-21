@@ -222,6 +222,8 @@ class SalonsApiController extends Controller
     {
         $requestAll = $request->all();
         $pagetype = $request->pagetype;
+        $email_verified = $request->email_verified;
+        $email = $request->email;
         if ($pagetype === "signupstep2") {
             $validator = Validator::make($requestAll, [
                 'email' => 'required|email|unique:users,email,id_to_ignore,id,role_id,4',
@@ -229,15 +231,15 @@ class SalonsApiController extends Controller
             if ($validator->fails()) {
                 return response()->json($validator->validate(), $this->errorStatus);
             }
-            if ($request->email) {
+            if (empty($email_verified) && $email) {
                 $email_otp = rand(1000, 9999);
                 // $user = Users::where('email', '=', $request->email)->update(['otp' => $otp]);
                 $field = array();
                 $field['{{otp}}'] = $email_otp;
-                // $sendmail = sendMail($request->email, 'email_verification', $field);
-                // if (empty($sendmail)) {
-                //     return response()->json(['email' => $requestAll['email'], 'message' => __('messages.wrongmail')], $this->errorStatus);
-                // }
+                $sendmail = sendMail($request->email, 'email_verification', $field);
+                if (empty($sendmail)) {
+                    return response()->json(['email' => $requestAll['email'], 'message' => __('messages.wrongmail')], $this->errorStatus);
+                }
                 return response()->json(['email_otp' => $email_otp, 'message' => __('messages.otp_send')], $this->errorStatus);
             }
         }
