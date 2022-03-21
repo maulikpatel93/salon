@@ -6,7 +6,6 @@ use App\Models\Permissions;
 use App\Models\RoleAccess;
 use App\Models\Salons;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Route;
@@ -162,7 +161,7 @@ if (!function_exists('checkDatabaseConnection')) {
             DB::connection()->reconnect();
 
             return true;
-        } catch (Exception $ex) {
+        } catch (\Exception$e) {
             return false;
         }
     }
@@ -343,7 +342,7 @@ if (!function_exists('sendMail')) {
                     $message->to($toEmail)->subject($subject);
                     $message->from($fromEmail);
                 });
-            } catch (Exception $e) {
+            } catch (\Exception$e) {
                 if (count(Mail::failures()) > 0) {
                     return false;
                 }
