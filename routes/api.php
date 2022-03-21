@@ -60,6 +60,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/store', 'store')->name('store');
             Route::post('/update/{id}', 'update')->name('update');
         });
+        Route::post('/forgotpassword', [GuestApiController::class, 'forgotpassword']);
     });
 
     Route::middleware(['auth:api'])->prefix('afterlogin')->group(function () {

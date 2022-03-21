@@ -30,7 +30,13 @@ class AuthServiceProvider extends ServiceProvider
             // Passport::loadKeysFrom(__DIR__ . '/../secrets/oauth');
         }
         ResetPassword::createUrlUsing(function ($user, string $token) {
-            return url('/') . '/admin/reset-password/' . $token;
+
+            if (in_array($user->role_id, [1, 2, 3])) {
+                return url('/') . '/admin/reset-password/' . $token;
+            } else {
+                return url('/') . '/web/reset-password/' . $token;
+            }
+
         });
     }
 }

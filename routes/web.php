@@ -51,6 +51,33 @@ Route::fallback(function () {
 //     // });
 // });
 
+Route::prefix('web')->name('web.')->group(function () {
+    Route::get('/reset-password/{token}', function ($token) {
+        return view('web.passwords.reset', ['token' => $token]);
+    })->name('password.reset');
+    Route::post('/reset-password', function (Request $request) {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:6|confirmed',
+        ]);
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                ])->setRememberToken(Str::random(60));
+
+                $user->save();
+
+                event(new PasswordReset($user));
+            }
+        );
+        return $status === Password::PASSWORD_RESET
+        ? view('web.resetpassword')
+        : back()->withErrors(['email' => [__($status)]]);
+    })->name('password.update');
+});
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['guest:admin', 'PreventBackHistory'])->group(function () {
         Route::get('/', function () {
@@ -86,9 +113,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
                     $user->forceFill([
                         'password' => Hash::make($password),
                     ])->setRememberToken(Str::random(60));
-
                     $user->save();
-
                     event(new PasswordReset($user));
                 }
             );

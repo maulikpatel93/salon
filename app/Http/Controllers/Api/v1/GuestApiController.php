@@ -10,6 +10,7 @@ use App\Models\Api\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -181,6 +182,26 @@ class GuestApiController extends Controller
                 $token->revoke();
             }
         }
-        return response()->json(['status' => $this->successStatus, 'message' => 'success']);
+        return response()->json(['message' => 'success'], $this->successStatus);
+    }
+
+    public function forgotpassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        $user = Users::where('email', $request->email)->whereIn('role_id', [4, 5, 6])->get();
+
+        if (count($user) > 0) {
+            $status = Password::sendResetLink(
+                $request->only('email')
+            );
+            if ($status) {
+                return $status === Password::RESET_LINK_SENT
+                ? response()->json(['status' => __($status), 'message' => 'success'], $this->successStatus)
+                : response()->json(['email' => __($status), 'message' => 'error'], $this->errorStatus);
+            }
+        } else {
+            return response()->json(['email' => __('passwords.user'), 'message' => 'error'], $this->errorStatus);
+        }
+
     }
 }
