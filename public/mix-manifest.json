@@ -47,6 +47,7 @@
     "/plugins/summernote/summernote.js.map": "/plugins/summernote/summernote.js.map",
     "/plugins/summernote/summernote.min.css": "/plugins/summernote/summernote.min.css",
     "/plugins/summernote/summernote.min.js": "/plugins/summernote/summernote.min.js",
+    "/plugins/inputmask/inputmask.es6.js": "/plugins/inputmask/inputmask.es6.js",
     "/plugins/inputmask/inputmask.js": "/plugins/inputmask/inputmask.js",
     "/plugins/inputmask/inputmask.min.js": "/plugins/inputmask/inputmask.min.js",
     "/plugins/inputmask/jquery.inputmask.js": "/plugins/inputmask/jquery.inputmask.js",

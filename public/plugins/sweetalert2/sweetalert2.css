@@ -282,7 +282,7 @@
   max-width: 100%;
   margin: 0;
   padding: 0.8em 1em 0;
-  color: #595959;
+  color: inherit;
   font-size: 1.875em;
   font-weight: 600;
   text-align: center;
@@ -384,7 +384,7 @@
   margin: 1em 0 0;
   padding: 1em 1em 0;
   border-top: 1px solid #eee;
-  color: #545454;
+  color: inherit;
   font-size: 1em;
 }
 
@@ -394,7 +394,6 @@
   bottom: 0;
   left: 0;
   grid-column: auto !important;
-  height: 0.25em;
   overflow: hidden;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
@@ -452,7 +451,7 @@
   margin: 1em 1.6em 0.3em;
   padding: 0;
   overflow: auto;
-  color: #545454;
+  color: inherit;
   font-size: 1.125em;
   font-weight: normal;
   line-height: normal;
@@ -467,7 +466,7 @@
 .swal2-select,
 .swal2-radio,
 .swal2-checkbox {
-  margin: 1em 2em 0;
+  margin: 1em 2em 3px;
 }
 
 .swal2-input,
@@ -509,7 +508,7 @@
 }
 
 .swal2-range {
-  margin: 1em 2em 0;
+  margin: 1em 2em 3px;
   background: #fff;
 }
 .swal2-range input {

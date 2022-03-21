@@ -1,4 +1,5 @@
 module.exports = {
+  singleQuote: true,
   env: {
     browser: true,
     commonjs: true,
