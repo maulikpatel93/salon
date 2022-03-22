@@ -76,6 +76,11 @@ mix.js("resources/js/app.js", "public/js")
         "node_modules/summernote/dist/",
         "public/plugins/summernote"
     )
+    //jsvalidation
+    .copyDirectory(
+        "resources/assets/jsvalidation/",
+        "public/plugins/jsvalidation"
+    )
     //input mask
     .copyDirectory("node_modules/inputmask/dist/", "public/plugins/inputmask")
     .copyDirectory("node_modules/select2/dist/", "public/plugins/select2")
