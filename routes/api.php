@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\v1\GuestApiController;
 use App\Http\Controllers\Api\v1\PricetierApiController;
 use App\Http\Controllers\Api\v1\ProductsApiController;
 use App\Http\Controllers\Api\v1\RosterApiController;
+use App\Http\Controllers\Api\v1\SaleApiController;
 use App\Http\Controllers\Api\v1\SalonAccessApiController;
 use App\Http\Controllers\Api\v1\SalonModulesApiController;
 use App\Http\Controllers\Api\v1\SalonsApiController;
@@ -202,6 +203,10 @@ Route::prefix('v1')->group(function () {
         //Tax
         Route::prefix('tax')->name('tax.')->group(function () {
             Route::post('/view', [TaxApiController::class, 'view'])->name('view');
+        });
+
+        Route::controller(SaleApiController::class)->prefix('sale')->name('sale.')->group(function () {
+            Route::post('/services', 'services')->name('services');
         });
     });
 });

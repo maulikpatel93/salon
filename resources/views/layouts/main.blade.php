@@ -30,7 +30,7 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('css/styles.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('plugins/sweetalert2/css/sweetalert2.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('plugins/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css">
     <!-- common script-->
     <script src="{{ asset('js/jquery.js') }}" type="text/javascript"></script>
@@ -257,7 +257,7 @@
     <script type="text/javascript" src="{{ asset('plugins/jsvalidation/jsvalidation.js')}}"></script>
     <script src="{{ asset('plugins/dependent-dropdown/js/dependent-dropdown.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('plugins/jquery-pjax/jquery.pjax.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('plugins/sweetalert2/js/sweetalert2.all.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('plugins/sweetalert2/sweetalert2.all.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('plugins/inputmask/jquery.inputmask.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('plugins/handlebars/handlebars.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('plugins/select2/js/select2.full.min.js') }}" type="text/javascript"></script>
