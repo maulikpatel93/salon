@@ -36,6 +36,11 @@ require('dotenv').config();
 //     .sass("resources/sass/styles.scss", "public/css");
 mix.js("resources/js/app.js", "public/js")
     .js("resources/js/jquery.js", "public/js")
+     //image
+     .copyDirectory(
+        "resources/assets/images/",
+        "public/images"
+    )
     //jquery-form
     .copy("vendor/jquery-form/form/dist/jquery.form.min.js", "public/js")
     //jquery-pjax
