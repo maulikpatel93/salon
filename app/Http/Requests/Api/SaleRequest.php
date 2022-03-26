@@ -27,7 +27,6 @@ class SaleRequest extends FormRequest
         $salon_id = $this->salon_id;
         return [
             'salon_id' => 'required|integer',
-            'name' => 'required|max:150|unique:tax,name,' . $id . ',id,salon_id,' . $salon_id,
         ];
     }
 }

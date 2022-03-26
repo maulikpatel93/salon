@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\SaleRequest;
 use App\Models\Api\Categories;
 use App\Models\Api\Products;
 use App\Models\Api\Services;
@@ -111,4 +112,17 @@ class SaleApiController extends Controller
         return response()->json(['message' => __('messages.not_found')], $this->errorStatus);
     }
 
+    public function store(SaleRequest $request)
+    {
+        $requestAll = $request->all();
+        echo '<pre>';
+        print_r($requestAll);
+        echo '<pre>';
+        dd();
+
+        // $model = new Roster;
+        // $model->fill($requestAll);
+        // $model->save();
+        return $this->returnResponse($request, $model->id);
+    }
 }

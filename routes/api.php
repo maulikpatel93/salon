@@ -208,6 +208,7 @@ Route::prefix('v1')->group(function () {
         Route::controller(SaleApiController::class)->prefix('sale')->name('sale.')->group(function () {
             Route::post('/services', 'services')->name('services');
             Route::post('/products', 'products')->name('products');
+            Route::post('/store', 'store')->name('store');
         });
     });
 });
