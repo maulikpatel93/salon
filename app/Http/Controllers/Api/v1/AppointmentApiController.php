@@ -183,8 +183,29 @@ class AppointmentApiController extends Controller
         $requestAll['start_time'] = $requestAll['start_time'];
         $requestAll['reschedule'] = '1';
         $requestAll['reschedule_at'] = currentDateTime();
+        $dateof = $requestAll['dateof'];
+        $start_time = $requestAll['start_time'];
+        // $end_time = $requestAll['end_time'];
 
         $model = $this->findModel($id);
+        $Busytime = Busytime::select(["dateof", "start_time", "end_time"])->addSelect(DB::raw('"' . $dateof . '" as showdate'))->where(['is_active' => '1', 'salon_id' => $model->salon_id, 'staff_id' => $model->staff_id])->whereRaw("
+        (start_time <= '" . $start_time . "' and end_time >='" . $start_time . "') and
+        (
+            CASE
+            WHEN repeats='Yes' THEN
+                dateof <= '" . $dateof . "' and (ending is null or ending >= '" . $dateof . "') and
+                (CASE repeat_time_option
+                    WHEN 'Weekly' THEN (DATEDIFF(dateof, '" . $dateof . "') % (repeat_time * 7) = 0)
+                    WHEN 'Monthly' THEN (DATEDIFF(dateof, '" . $dateof . "') % (repeat_time * 31) = 0)
+                    ELSE repeat_time_option is null
+                END)
+            ELSE repeats = 'No' and dateof = '" . $dateof . "'
+            END
+        )")->get();
+        if ($Busytime->count() > 0) {
+            $alreadyBooked = $Busytime->toArray();
+            return response()->json(["booked" => $alreadyBooked, "message" => __('messages.busytime_check_appointment')], $this->warningStatus);
+        }
         $model->end_time = Carbon::parse($requestAll['dateof'] . ' ' . $requestAll['start_time'])->addMinutes($model->duration)->format('H:i:s');
         $model->fill($requestAll);
         $model->save();
@@ -228,6 +249,7 @@ class AppointmentApiController extends Controller
         $end_date = ($request->end_date) ? Carbon::parse($request->end_date)->format('Y-m-d') : "";
         $timezone = ($request->timezone) ? $request->timezone : "";
         $type = ($request->type) ? $request->type : "";
+        $showdate = ($request->showdate) ? $request->showdate : "";
         //End Calender View Client base
         $filter = ($request->filter) ? json_decode($request->filter, true) : "";
 
@@ -280,7 +302,6 @@ class AppointmentApiController extends Controller
         if ($staff_field) {
             $withArray[] = 'staff:' . implode(',', $staff_field);
         }
-
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
@@ -316,9 +337,9 @@ class AppointmentApiController extends Controller
         }
         if ($id) {
             if ($request->result == 'result_array') {
-                $model = Appointment::with($withArray)->select($field)->where($where)->get();
+                $model = Appointment::with($withArray)->select($field)->addSelect(DB::raw('"' . $showdate . '" as showdate'))->where($where)->get();
             } else {
-                $model = Appointment::with($withArray)->select($field)->where($where)->first();
+                $model = Appointment::with($withArray)->select($field)->addSelect(DB::raw('"' . $showdate . '" as showdate'))->where($where)->first();
             }
             $successData = $model->toArray();
             return response()->json($successData, $this->successStatus);

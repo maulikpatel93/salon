@@ -168,6 +168,7 @@ class BusytimeApiController extends Controller
         $end_time = ($request->end_time) ? Carbon::parse($request->end_time)->format('H:i') : "";
         $timezone = ($request->timezone) ? $request->timezone : "";
         $type = ($request->type) ? $request->type : "";
+        $showdate = ($request->showdate) ? $request->showdate : "";
         //End Calender View Client base
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
@@ -224,9 +225,9 @@ class BusytimeApiController extends Controller
         }
         if ($id) {
             if ($request->result == 'result_array') {
-                $model = Busytime::with($withArray)->select($field)->where($where)->get();
+                $model = Busytime::with($withArray)->select($field)->addSelect(DB::raw('"' . $showdate . '" as showdate'))->where($where)->get();
             } else {
-                $model = Busytime::with($withArray)->select($field)->where($where)->first();
+                $model = Busytime::with($withArray)->select($field)->addSelect(DB::raw('"' . $showdate . '" as showdate'))->where($where)->first();
             }
             $successData = $model->toArray();
             return response()->json($successData, $this->successStatus);

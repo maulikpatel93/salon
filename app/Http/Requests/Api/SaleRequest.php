@@ -27,6 +27,11 @@ class SaleRequest extends FormRequest
         $salon_id = $this->salon_id;
         return [
             'salon_id' => 'required|integer',
+            'client_id' => 'required|integer',
+            'invoicedate' => 'nullable|date',
+            'paidtype' => 'nullable',
+            'totalprice' => 'nullable',
+            'status' => 'nullable',
         ];
     }
 }

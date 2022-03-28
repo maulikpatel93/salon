@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('sale', function (Blueprint $table) {
             $table->id();
-            $table->date('invoicedate')->nullable()->comment('Invoice Generated Date');
+            $table->date('invoicedate')->nullable()->comment('calendar event date');
             $table->decimal('totalprice', 10, 2)->nullable()->comment('Sale total price');
             $table->enum('paidtype', ['CreditCard', 'Cash', 'Voucher'])->default(null)->nullable()->comment('');
             $table->enum('status', ['Pending', 'Paid', 'Failed'])->default(null)->nullable();
@@ -26,13 +26,16 @@ return new class extends Migration
             $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
             $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
 
-            $table->unsignedBigInteger('client_id')->after('salon_id')->nullable()->comment('Type Of Salon');
+            $table->unsignedBigInteger('client_id')->after('salon_id')->nullable()->comment('Type Of Client');
             $table->foreign('client_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+
+            $table->unsignedBigInteger('appointment_id')->after('client_id')->nullable()->comment('Type Of Appointment');
+            $table->foreign('appointment_id')->references('id')->on('appointment')->onUpdate('cascade')->onDelete('cascade');
         });
 
         Schema::create('cart', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['1', '2', '3', '4', '5', '6'])->default(null)->nullable()->comment('1-Only Appointment, 2-Appointment With Service, 3-Appointment With Service And Product, 4-Only Services, 5-Only Products, 6-Service and Products');
+            $table->enum('type', ['Appointment', 'Service', 'Product'])->default(null)->nullable();
             $table->decimal('cost', 10, 2)->nullable()->comment('depend on type, Booked Appointment or Service or Product sale cost');
             $table->integer('qty', false, true)->nullable()->comment('only product use');
             $table->timestamps();
@@ -42,13 +45,10 @@ return new class extends Migration
             $table->unsignedBigInteger('sale_id')->after('id')->nullable()->comment('Type Of Sale');
             $table->foreign('sale_id')->references('id')->on('sale')->onUpdate('cascade')->onDelete('cascade');
 
-            $table->unsignedBigInteger('appointment_id')->after('sale_id')->nullable()->comment('Type Of Appointment');
-            $table->foreign('appointment_id')->references('id')->on('appointment')->onUpdate('cascade')->onDelete('cascade');
-
-            $table->unsignedBigInteger('service_id')->after('appointment_id')->nullable()->comment('Type Of Service');
+            $table->unsignedBigInteger('service_id')->after('sale_id')->nullable()->comment('Type Of Service');
             $table->foreign('service_id')->references('id')->on('services')->onUpdate('cascade')->onDelete('cascade');
 
-            $table->unsignedBigInteger('staff_id')->after('service_id')->nullable()->comment('Type Of Service');
+            $table->unsignedBigInteger('staff_id')->after('service_id')->nullable()->comment('Type Of Staff');
             $table->foreign('staff_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
 
             $table->unsignedBigInteger('product_id')->after('staff_id')->nullable()->comment('Type Of Product');

@@ -5,7 +5,7 @@ namespace App\Models\Api;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Sale extends Model
+class Cart extends Model
 {
     use HasFactory;
 
@@ -14,19 +14,21 @@ class Sale extends Model
      *
      * @var string
      */
-    protected $table = 'sale';
+    protected $table = 'cart';
     /**
      * The attributes that are mass assignable.
      *
      * @var string[]
      */
     protected $fillable = [
-        'salon_id',
-        'client_id',
-        'invoicedate',
-        'totalprice',
-        'paidtype',
-        'status',
+        'sale_id',
+        'appointment_id',
+        'service_id',
+        'staff_id',
+        'product_id',
+        'type',
+        'cost',
+        'qty',
     ];
 
     /**
@@ -43,6 +45,7 @@ class Sale extends Model
      * @var array
      */
     protected $casts = [
+        'is_active_at' => 'datetime',
     ];
 
     public function salon()

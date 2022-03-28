@@ -15,7 +15,7 @@ class Appointment extends Model
      * @var string
      */
     protected $table = 'appointment';
-    protected $appends = ['listview'];
+    protected $appends = ['listview', 'sale'];
     /**
      * The attributes that are mass assignable.
      *
@@ -66,7 +66,11 @@ class Appointment extends Model
     {
         return $this->attributes['listview'] = 'Appointment';
     }
-
+    public function getSaleAttribute()
+    {
+        $sale = Sale::where(['salon_id' => $this->salon_id, 'client_id' => $this->client_id, 'appointment_id' => $this->id, 'invoicedate' => $this->showdate])->first();
+        return $this->attributes['sale'] = $sale ? $sale->toArray() : [];
+    }
     public function salon()
     {
         return $this->belongsTo(Salons::class, 'salon_id', 'id');

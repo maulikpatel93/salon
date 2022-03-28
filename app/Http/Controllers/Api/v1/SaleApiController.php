@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\SaleRequest;
+use App\Models\Api\Appointment;
+use App\Models\Api\Cart;
 use App\Models\Api\Categories;
 use App\Models\Api\Products;
+use App\Models\Api\Sale;
 use App\Models\Api\Services;
 use Illuminate\Http\Request;
 
@@ -18,9 +21,11 @@ class SaleApiController extends Controller
     protected $field = [
         'id',
         'salon_id',
-        'name',
-        'description',
-        'percentage',
+        'client_id',
+        'invoicedate',
+        'totalprice',
+        'paidtype',
+        'status',
     ];
 
     protected $salon_field = [
@@ -115,14 +120,64 @@ class SaleApiController extends Controller
     public function store(SaleRequest $request)
     {
         $requestAll = $request->all();
-        echo '<pre>';
-        print_r($requestAll);
-        echo '<pre>';
-        dd();
-
-        // $model = new Roster;
-        // $model->fill($requestAll);
-        // $model->save();
-        return $this->returnResponse($request, $model->id);
+        $cart = $request->cart ? json_decode($request->cart, true) : [];
+        $salon_id = $request->salon_id;
+        $client_id = $request->client_id;
+        $appointment_id = $request->appointment_id;
+        $invoicedate = $request->invoicedate;
+        if ($appointment_id) {
+            $model = Sale::where(['salon_id' => $salon_id, 'client_id' => $client_id, 'appointment_id' => $appointment_id, 'invoicedate' => $invoicedate])->first();
+        }
+        $model = new Sale;
+        $model->salon_id = $salon_id;
+        $model->client_id = $client_id;
+        $model->appointment_id = $appointment_id;
+        $model->invoicedate = $invoicedate;
+        $model->totalprice = null;
+        $model->paidtype = $request->paidtype;
+        $model->status = 'Paid';
+        $model->save();
+        if ($model) {
+            if ($model->appointment_id) {
+                $appointment = Appointment::where('id', $model->appointment_id)->first();
+                if ($appointment) {
+                    $modelCart = new Cart;
+                    $modelCart->sale_id = $model->id;
+                    $modelCart->service_id = $appointment->service_id;
+                    $modelCart->staff_id = $appointment->staff_id;
+                    $modelCart->cost = $appointment->cost;
+                    $modelCart->type = "Appointment";
+                    $modelCart->save();
+                    Appointment::where(['id' => $appointment->id, 'repeats' => 'No'])->update(['status' => "Completed"]);
+                }
+            }
+            if ($cart) {
+                if (isset($cart['services']) && $cart['services']) {
+                    foreach ($cart['services'] as $value) {
+                        $modelCart = new Cart;
+                        $modelCart->sale_id = $model->id;
+                        $modelCart->service_id = $value['id'];
+                        $modelCart->staff_id = $value['staff_id'];
+                        $modelCart->cost = $value['gprice'];
+                        $modelCart->type = "Service";
+                        $modelCart->save();
+                    }
+                }
+                if (isset($cart['products']) && $cart['products']) {
+                    foreach ($cart['products'] as $value) {
+                        $modelCartProduct = new Cart;
+                        $modelCart->sale_id = $model->id;
+                        $modelCart->product_id = $value['id'];
+                        $modelCart->qty = $value['qty'];
+                        $modelCart->cost = $value['price'];
+                        $modelCart->type = "Product";
+                        $modelCart->save();
+                    }
+                }
+            }
+            $successData = $model->toArray();
+            return response()->json($successData, $this->successStatus);
+        }
+        return response()->json(['message' => __('messages.not_found')], $this->errorStatus);
     }
 }
