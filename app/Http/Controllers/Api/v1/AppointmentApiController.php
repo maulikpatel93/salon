@@ -250,6 +250,7 @@ class AppointmentApiController extends Controller
         $timezone = ($request->timezone) ? $request->timezone : "";
         $type = ($request->type) ? $request->type : "";
         $showdate = ($request->showdate) ? $request->showdate : "";
+
         //End Calender View Client base
         $filter = ($request->filter) ? json_decode($request->filter, true) : "";
 

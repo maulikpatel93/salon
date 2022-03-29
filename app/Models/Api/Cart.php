@@ -37,6 +37,11 @@ class Cart extends Model
      * @var array
      */
     protected $hidden = [
+        'sale_id',
+        'appointment_id',
+        'service_id',
+        'staff_id',
+        'product_id',
     ];
 
     /**

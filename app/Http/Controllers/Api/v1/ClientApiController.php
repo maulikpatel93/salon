@@ -56,7 +56,7 @@ class ClientApiController extends Controller
     {
         $requestAll = $request->all();
         $id = $request->id;
-        return $this->returnResponse($request, $id);
+        return $this->returnResponse('view', $request, $id);
     }
 
     public function store(ClientRequest $request)
@@ -86,7 +86,7 @@ class ClientApiController extends Controller
         }
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : '';
         $model->save();
-        return $this->returnResponse($request, $model->id);
+        return $this->returnResponse('store', $request, $model->id);
     }
 
     public function update(ClientRequest $request, $id)
@@ -112,7 +112,7 @@ class ClientApiController extends Controller
         }
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : $model->description;
         $model->save();
-        return $this->returnResponse($request, $model->id);
+        return $this->returnResponse('update', $request, $model->id);
     }
 
     public function delete(Request $request, $id)
@@ -130,7 +130,7 @@ class ClientApiController extends Controller
         throw new UnsecureException('The requested page does not exist.');
     }
 
-    public function returnResponse($request, $id, $data = [])
+    public function returnResponse($method, $request, $id, $data = [])
     {
         $requestAll = $request->all();
         $field = ($request->field) ? array_merge(['id', 'salon_id'], explode(',', $request->field)) : $this->field;
@@ -167,52 +167,48 @@ class ClientApiController extends Controller
             }
 
         }
+        $query = Client::with($withArray)->select($field)->where($where);
         if ($id) {
             if ($request->result == 'result_array') {
-                $model = Client::with($withArray)->select($field)->where($where)->get();
+                $model = $query->get();
             } else {
-                $model = Client::with($withArray)->select($field)->where($where)->first();
+                $model = $query->first();
             }
             $successData = $model->toArray();
             return response()->json($successData, $this->successStatus);
         } else {
             if ($pagination == true) {
                 if ($whereLike) {
-                    $model = Client::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                    $model = $query->where(function ($querylike) use ($whereLike) {
                         if ($whereLike) {
-                            $query->where('first_name', "like", "%" . $whereLike[0] . "%");
+                            $querylike->where('first_name', "like", "%" . $whereLike[0] . "%");
                             foreach ($whereLike as $row) {
-                                $query->orWhere('first_name', "like", "%" . $row . "%");
-                                $query->orWhere('last_name', "like", "%" . $row . "%");
+                                $querylike->orWhere('first_name', "like", "%" . $row . "%");
+                                $querylike->orWhere('last_name', "like", "%" . $row . "%");
                             }
                         }
-                    })->where($where)->orderByRaw($orderby)->paginate($limit);
+                    })->orderByRaw($orderby)->paginate($limit);
                 } else {
-                    $model = Client::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
+                    $model = $query->orderByRaw($orderby)->paginate($limit);
                 }
             } else {
                 if ($whereLike) {
-                    $model = Client::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                    $model = $query->where(function ($querylike) use ($whereLike) {
                         if ($whereLike) {
-                            $query->where('first_name', "like", "%" . $whereLike[0] . "%");
+                            $querylike->where('first_name', "like", "%" . $whereLike[0] . "%");
                             foreach ($whereLike as $row) {
-                                $query->orWhere('first_name', "like", "%" . $row . "%");
-                                $query->orWhere('last_name', "like", "%" . $row . "%");
+                                $querylike->orWhere('first_name', "like", "%" . $row . "%");
+                                $querylike->orWhere('last_name', "like", "%" . $row . "%");
                             }
                         }
-                    })->where($where)->orderByRaw($orderby)->get();
+                    })->orderByRaw($orderby)->get();
                 } else {
-                    $model = Client::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                    $model = $query->orderByRaw($orderby)->get();
                 }
             }
             if ($model->count()) {
                 $successData = $model->toArray();
-                if ($successData) {
-                    if ($pagination == true) {
-                        // return response()->json(array_merge(['status' => $this->successStatus, 'message' => 'Success'], $successData));
-                    }
-                    return response()->json($successData, $this->successStatus);
-                }
+                return response()->json($successData, $this->successStatus);
             }
         }
 

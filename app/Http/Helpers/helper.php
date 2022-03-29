@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Emailtemplates;
 use App\Models\Modules;
 use App\Models\Permissions;
 use App\Models\RoleAccess;
@@ -301,10 +300,10 @@ if (!function_exists('sendMail')) {
     function sendMail($email, $code, $field = array())
     {
         if ($email && $code) {
-            $EmailTemplates = Emailtemplates::where(['code' => $code])->first();
-            if (empty($EmailTemplates)) {
-                return false;
-            }
+            // $EmailTemplates = Emailtemplates::where(['code' => $code])->first();
+            // if (empty($EmailTemplates)) {
+            //     return false;
+            // }
 
             $action_url = URL::to(config('params.site_url'));
             $name = "Beauty@info";

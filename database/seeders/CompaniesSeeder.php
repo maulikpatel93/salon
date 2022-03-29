@@ -19,7 +19,6 @@ class CompaniesSeeder extends Seeder
         $facker = Faker::create();
         DB::table('salons')->insert([
             'business_name' => $facker->company(),
-            'owner_name' => $facker->name(),
             'business_phone_number' => $facker->phoneNumber(),
             'business_email' => $facker->email(),
             'business_email_verified' => '1',

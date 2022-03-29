@@ -33,14 +33,19 @@ class SaleApiController extends Controller
         'business_name',
     ];
 
-    protected $product_field = [];
+    protected $client_field = [
+        'id',
+        'first_name',
+        'last_name',
+        'email',
+        'phone_number',
+    ];
 
     public function __construct()
     {
         $this->middleware('auth:api');
         parent::__construct();
     }
-
     public function services(Request $request)
     {
         $requestAll = $request->all();
@@ -148,7 +153,7 @@ class SaleApiController extends Controller
                     $modelCart->cost = $appointment->cost;
                     $modelCart->type = "Appointment";
                     $modelCart->save();
-                    Appointment::where(['id' => $appointment->id, 'repeats' => 'No'])->update(['status' => "Completed"]);
+                    // Appointment::where(['id' => $appointment->id, 'repeats' => 'No'])->update(['status' => "Completed"]);
                 }
             }
             if ($cart) {
@@ -180,4 +185,80 @@ class SaleApiController extends Controller
         }
         return response()->json(['message' => __('messages.not_found')], $this->errorStatus);
     }
+
+    public function view(Request $request)
+    {
+        $requestAll = $request->all();
+        $id = $request->id;
+        return $this->returnResponse($request, $id);
+    }
+
+    public function returnResponse($request, $id, $data = [])
+    {
+        $requestAll = $request->all();
+        $field = ($request->field) ? array_merge(['id'], explode(',', $request->field)) : $this->field;
+
+        $salon_field = $this->salon_field;
+        if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
+            $salon_field = false;
+        } else if ($request->salon_field == '*') {
+            $salon_field = [$request->salon_field];
+        } else if ($request->salon_field) {
+            $salon_field = array_merge(['id'], explode(',', $request->salon_field));
+        }
+
+        $client_field = $this->client_field;
+        if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
+            $client_field = false;
+        } else if ($request->client_field == '*') {
+            $client_field = [$request->client_field];
+        } else if ($request->client_field) {
+            $client_field = array_merge(['id'], explode(',', $request->client_field));
+        }
+
+        $withArray = [];
+        if ($salon_field) {
+            $withArray[] = 'salon:' . implode(',', $salon_field);
+        }
+        if ($client_field) {
+            $withArray[] = 'client:' . implode(',', $client_field);
+        }
+        $withArray[] = 'cart';
+
+        $pagination = $request->pagination ? $request->pagination : false;
+        $limit = $request->limit ? $request->limit : config('params.apiPerPage');
+
+        $where = ['salon_id' => $request->salon_id];
+        $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
+
+        $orderby = 'id desc';
+        if ($id) {
+            if ($request->result == 'result_array') {
+                $model = Sale::with($withArray)->select($field)->where($where)->get();
+            } else {
+                $model = Sale::with($withArray)->select($field)->where($where)->first();
+            }
+            $successData = $model->toArray();
+            return response()->json($successData, $this->successStatus);
+        } else {
+            if ($pagination == true) {
+                $model = Sale::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
+                $model->data = $model;
+            } else {
+                $model = Sale::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+            }
+            if ($model->count()) {
+                $successData = $model->toArray();
+                if ($successData) {
+                    if ($pagination == true) {
+                        // return response()->json(array_merge(['status' => $this->successStatus, 'message' => 'Success'], $successData));
+                    }
+                    return response()->json($successData, $this->successStatus);
+                }
+            }
+        }
+
+        return response()->json(['message' => __('messages.failed')], $this->errorStatus);
+    }
+
 }

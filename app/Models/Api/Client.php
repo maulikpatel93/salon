@@ -17,7 +17,7 @@ class Client extends Model
      */
     protected $table = 'users';
 
-    protected $appends = ['isNewRecord', 'profile_photo_url'];
+    protected $appends = ['profile_photo_url'];
 
     /**
      * The attributes that are mass assignable.
@@ -60,6 +60,8 @@ class Client extends Model
      * @var array
      */
     protected $hidden = [
+        'role_id',
+        'salon_id',
     ];
 
     /**
@@ -70,11 +72,6 @@ class Client extends Model
     protected $casts = [
         'is_active_at' => 'datetime',
     ];
-
-    public function getIsNewRecordAttribute()
-    {
-        return $this->attributes['isNewRecord'] = ($this->created_at != $this->updated_at) ? false : true;
-    }
 
     public function getProfilePhotoUrlAttribute()
     {

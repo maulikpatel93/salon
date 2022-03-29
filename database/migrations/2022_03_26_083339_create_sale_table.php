@@ -16,8 +16,10 @@ return new class extends Migration
         Schema::create('sale', function (Blueprint $table) {
             $table->id();
             $table->date('invoicedate')->nullable()->comment('calendar event date');
+            $table->enum('paidby', ['CreditCard', 'Cash', 'Voucher'])->default(null)->nullable()->comment('');
+            $table->enum('is_stripe', ['0', '1'])->default(null)->nullable()->comment('stripe payment flag');
             $table->decimal('totalprice', 10, 2)->nullable()->comment('Sale total price');
-            $table->enum('paidtype', ['CreditCard', 'Cash', 'Voucher'])->default(null)->nullable()->comment('');
+            $table->decimal('voucherprice', 10, 2)->nullable()->comment('Voucher price');
             $table->enum('status', ['Pending', 'Paid', 'Failed'])->default(null)->nullable();
             $table->timestamps();
         });
@@ -31,6 +33,9 @@ return new class extends Migration
 
             $table->unsignedBigInteger('appointment_id')->after('client_id')->nullable()->comment('Type Of Appointment');
             $table->foreign('appointment_id')->references('id')->on('appointment')->onUpdate('cascade')->onDelete('cascade');
+
+            $table->unsignedBigInteger('voucher_id')->after('appointment_id')->nullable()->comment('Type Of Voucher');
+            $table->foreign('voucher_id')->references('id')->on('voucher')->onUpdate('cascade')->onDelete('cascade');
         });
 
         Schema::create('cart', function (Blueprint $table) {

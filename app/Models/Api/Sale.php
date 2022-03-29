@@ -35,6 +35,8 @@ class Sale extends Model
      * @var array
      */
     protected $hidden = [
+        'salon_id',
+        'client_id',
     ];
 
     /**
@@ -47,6 +49,17 @@ class Sale extends Model
 
     public function salon()
     {
-        return $this->belongsTo(Salons::class, 'salon_id', 'id');
+        return $this->hasOne(Salons::class, 'id', 'salon_id');
     }
+
+    public function client()
+    {
+        return $this->hasOne(Client::class, 'id', 'client_id');
+    }
+
+    public function cart()
+    {
+        return $this->hasMany(Cart::class, 'sale_id', 'id');
+    }
+
 }
