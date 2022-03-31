@@ -23,7 +23,7 @@ class ServicesPrice extends Model
      */
     protected $fillable = [
         'service_id',
-        'name',
+        'price_tier_id',
         'price',
         'add_on_price',
         'is_active',
@@ -36,6 +36,8 @@ class ServicesPrice extends Model
      * @var array
      */
     protected $hidden = [
+        'service_id',
+        'price_tier_id',
     ];
 
     /**
@@ -49,6 +51,11 @@ class ServicesPrice extends Model
 
     public function service()
     {
-        return $this->belongsTo(Services::class, 'service_id', 'id');
+        return $this->hasone(Services::class, 'id', 'service_id');
+    }
+
+    public function pricetier()
+    {
+        return $this->hasone(PriceTier::class, 'id', 'price_tier_id');
     }
 }

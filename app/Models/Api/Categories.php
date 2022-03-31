@@ -34,6 +34,7 @@ class Categories extends Model
      * @var array
      */
     protected $hidden = [
+        'salon_id',
     ];
 
     /**

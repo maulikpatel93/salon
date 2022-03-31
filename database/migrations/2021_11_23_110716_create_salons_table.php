@@ -28,8 +28,8 @@ class CreateSalonsTable extends Migration
             $table->string('logo', 100)->nullable();
             $table->string('timezone', 100);
             $table->string('numberofstaff', 50)->nullable();
-            $table->enum('terms', ['0', '1'])->default('0'); // 1:Active, 0:Inactive
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('terms')->default(1); // 1:Active, 0:Inactive
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
@@ -39,7 +39,7 @@ class CreateSalonsTable extends Migration
             $table->string('name', 100);
             $table->text('description')->nullable();
             $table->decimal('percentage')->nullable()->comment('percentage %');
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
@@ -69,7 +69,7 @@ class CreateSalonsTable extends Migration
             $table->string('state', 100)->nullable();
             $table->string('postcode', 10)->nullable();
             $table->text('description')->nullable();
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
@@ -87,10 +87,10 @@ class CreateSalonsTable extends Migration
             $table->text('description');
             $table->decimal('cost_price', 10, 2);
             $table->decimal('retail_price', 10, 2);
-            $table->enum('manage_stock', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('manage_stock')->default(1); // 1:Active, 0:Inactive
             $table->integer('stock_quantity', false, true)->nullable();
             $table->integer('low_stock_threshold', false, true)->nullable();
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
@@ -110,7 +110,7 @@ class CreateSalonsTable extends Migration
             $table->id();
             $table->string('name', 150);
             $table->text('description');
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
@@ -127,10 +127,10 @@ class CreateSalonsTable extends Migration
             $table->string('duration', 50)->nullable()->comment('minutes');
             $table->string('padding_time', 50)->nullable()->comment('minutes');
             $table->string('color', 10)->nullable()->comment('color code #fcfcfcfc');
-            $table->enum('service_booked_online', ['0', '1'])->default(1); // 1:Active, 0:Inactive
-            $table->enum('deposit_booked_online', ['0', '1'])->default(0); // 1:Active, 0:Inactive
+            $table->boolean('service_booked_online')->default(1); // 1:Active, 0:Inactive
+            $table->boolean('deposit_booked_online')->default(0); // 1:Active, 0:Inactive
             $table->decimal('deposit_booked_price', 10, 2)->nullable();
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
@@ -150,7 +150,7 @@ class CreateSalonsTable extends Migration
             $table->id();
             $table->string('name', 100);
             $table->text('description');
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
@@ -164,7 +164,7 @@ class CreateSalonsTable extends Migration
             $table->id();
             $table->decimal('price', 10, 2)->nullable();
             $table->decimal('add_on_price', 10, 2)->nullable();
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
@@ -183,8 +183,8 @@ class CreateSalonsTable extends Migration
             $table->time('start_time')->nullable();
             $table->time('end_time')->nullable();
             $table->text('break_time')->nullable();
-            $table->enum('dayoff', ['0', '1'])->default('1')->nullable()->comment('1-dayon and 0-dayoff');
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('dayoff')->default(1)->nullable()->comment('1-dayon and 0-dayoff');
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
@@ -215,8 +215,8 @@ class CreateSalonsTable extends Migration
             $table->date('dateof')->nullable();
             $table->time('start_time')->nullable();
             $table->time('end_time')->nullable();
-            $table->enum('away', ['0', '1'])->default(1); // 1:Active, 0:Inactive
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('away')->default(1); // 1:Active, 0:Inactive
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
@@ -249,11 +249,11 @@ class CreateSalonsTable extends Migration
             $table->text('description')->nullable();
             $table->decimal('amount', 10, 2)->nullable();
             $table->integer('valid', false, true)->comment('Valid for Months');
-            $table->enum('used_online', ['0', '1'])->default(0)->nullable(); // 1:Active, 0:Inactive
-            $table->enum('limit_uses', ['0', '1'])->default(1)->nullable(); // 1:Active, 0:Inactive
+            $table->boolean('used_online')->default(0)->nullable(); // 1:Active, 0:Inactive
+            $table->boolean('limit_uses')->default(1)->nullable(); // 1:Active, 0:Inactive
             $table->integer('limit_uses_value', false, true)->nullable();
             $table->text('terms_and_conditions')->nullable();
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
@@ -283,7 +283,7 @@ class CreateSalonsTable extends Migration
             $table->enum('repeat_time_option', ['Weekly', 'Monthly', 'Yearly'])->default(null)->nullable();
             $table->date('ending')->nullable()->comment('Optional');
             $table->text('reason')->nullable();
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
@@ -311,9 +311,9 @@ class CreateSalonsTable extends Migration
             $table->enum('status', ['Scheduled', 'Confirmed', 'Completed', 'Cancelled'])->default(null)->nullable();
             $table->string('status_manage', 100)->default(null)->nullable();
             $table->text('cancellation_reason')->nullable();
-            $table->enum('reschedule', ['0', '1'])->default('0');
+            $table->boolean('reschedule')->default(0);
             $table->dateTime('reschedule_at')->nullable();
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
@@ -335,8 +335,8 @@ class CreateSalonsTable extends Migration
         Schema::create('client_photos', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
-            $table->enum('is_profile_photo', ['0', '1'])->default(0)->nullable();
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('is_profile_photo')->default(0)->nullable();
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
@@ -353,7 +353,7 @@ class CreateSalonsTable extends Migration
             $table->id();
             $table->text('note');
             $table->dateTime('datetime')->nullable();
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
@@ -370,7 +370,7 @@ class CreateSalonsTable extends Migration
             $table->id();
             $table->text('document');
             $table->dateTime('datetime')->nullable();
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
@@ -389,8 +389,8 @@ class CreateSalonsTable extends Migration
             $table->time('start_time')->nullable();
             $table->time('end_time')->nullable();
             $table->text('break_time')->nullable();
-            $table->enum('dayoff', ['0', '1'])->default('1')->nullable()->comment('1-dayon and 0-dayoff');
-            $table->enum('is_active', ['0', '1'])->default(1); // 1:Active, 0:Inactive
+            $table->boolean('dayoff')->default(1)->nullable()->comment('1-dayon and 0-dayoff');
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });

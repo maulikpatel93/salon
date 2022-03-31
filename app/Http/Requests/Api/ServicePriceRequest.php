@@ -27,7 +27,7 @@ class ServicePriceRequest extends FormRequest
         $service_id = $this->service_id;
         return [
             'service_id' => 'required|integer',
-            'name' => 'required|max:150|unique:services,name,' . $id . ',id,service_id,' . $service_id,
+            'price_tier_id' => 'required|integer',
             'price' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
             'add_on_price' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
         ];

@@ -19,7 +19,7 @@ class RosterApiController extends Controller
         'id',
         'salon_id',
         'staff_id',
-        'date',
+        'dateof',
         'start_time',
         'end_time',
         'away',

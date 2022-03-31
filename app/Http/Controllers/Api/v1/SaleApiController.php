@@ -58,13 +58,13 @@ class SaleApiController extends Controller
             if ($service_id) {
                 $withArray = [
                     'staffservices:id,first_name,last_name,email',
-                    'serviceprice:id,service_id,name,price,add_on_price',
+                    'serviceprice:id,service_id,price_tier_id,price,add_on_price',
                     'tax:id,name,percentage',
                 ];
                 $services = Services::with($withArray)->select(['id', 'tax_id', 'name'])->where('id', $service_id)->whereNotNull('category_id')->first()->makeHidden(['isServiceChecked', 'isNotId', 'tax_id']);
             } else {
                 $services = Categories::with(['services' => function ($query) use ($salon_id, $whereLike) {
-                    $query->with(['serviceprice:id,service_id,name,price,add_on_price'])->select('category_id', 'id', 'name', 'duration')->where('salon_id', $salon_id)->where('is_active', '1')->where(function ($squery) use ($whereLike) {
+                    $query->with(['serviceprice:id,service_id,price_tier_id,price,add_on_price'])->select('category_id', 'id', 'name', 'duration')->where('salon_id', $salon_id)->where('is_active', '1')->where(function ($squery) use ($whereLike) {
                         $squery->where('name', "like", "%" . $whereLike . "%");
                     });
                 }])->has('services')->select('id', 'name')->where('is_active', '1')->paginate($limit);

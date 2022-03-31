@@ -26,7 +26,7 @@ class RosterRequest extends FormRequest
         return [
             'salon_id' => 'required|integer',
             'staff_id' => 'required|integer',
-            'date' => 'required',
+            'dateof' => 'required',
             'start_time' => 'date_format:H:i|required',
             'end_time' => 'date_format:H:i|after:start_time|required',
         ];

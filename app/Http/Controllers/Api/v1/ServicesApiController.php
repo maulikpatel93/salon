@@ -11,8 +11,10 @@ use App\Models\Api\Categories;
 use App\Models\Api\PriceTier;
 use App\Models\Api\Services;
 use App\Models\Api\ServicesPrice;
+use App\Models\Api\Staff;
 use App\Models\Api\StaffServices;
 use Illuminate\Http\Request;
+use Validator;
 
 class ServicesApiController extends Controller
 {
@@ -57,7 +59,7 @@ class ServicesApiController extends Controller
     protected $serviceprice_field = [
         'id',
         'service_id',
-        'name',
+        'price_tier_id',
         'price',
         'add_on_price',
     ];
@@ -119,47 +121,76 @@ class ServicesApiController extends Controller
         $requestAll['deposit_booked_online'] = (isset($requestAll['deposit_booked_online']) && $requestAll['deposit_booked_online']) ? '1' : '0';
         $requestAll['deposit_booked_price'] = (isset($requestAll['deposit_booked_price']) && $requestAll['deposit_booked_price']) ? $requestAll['deposit_booked_price'] : '0';
         $requestAll['color'] = (isset($requestAll['color']) && $requestAll['color']) ? $requestAll['color'] : '';
-        $model = new Services;
-        $model->fill($requestAll);
-        $model->description = isset($requestAll['description']) ? $requestAll['description'] : '';
-        $model->save();
-        if ($service_price) {
-            foreach ($service_price as $key => $value) {
-                $servicesPriceModel = ServicesPrice::where(['service_id' => $model->id, 'name' => ucfirst($key)])->first();
-                if (empty($servicesPriceModel)) {
-                    $servicesPriceModel = new ServicesPrice();
+
+        $messages = [
+            '*.price_tier_id.required' => "The price_tier field is required.",
+            '*.price.required' => "The price field is required.",
+
+        ];
+        $validator = Validator::make($service_price, [
+            '*.price_tier_id' => 'required',
+            '*.price' => 'required',
+        ], $messages);
+
+        if ($validator->passes()) {
+            $model = new Services;
+            $model->fill($requestAll);
+            $model->description = isset($requestAll['description']) ? $requestAll['description'] : '';
+            $model->save();
+            if ($service_price) {
+                foreach ($service_price as $key => $value) {
+                    if (isset($value['price_tier_id']) && $value['price_tier_id']) {
+                        $servicesPriceModel = ServicesPrice::where(['service_id' => $model->id, 'price_tier_id' => $value['price_tier_id']])->first();
+                        if (empty($servicesPriceModel)) {
+                            $servicesPriceModel = new ServicesPrice();
+                        }
+                        $servicesPriceModel->service_id = $model->id;
+                        $servicesPriceModel->price_tier_id = $value['price_tier_id'];
+                        $servicesPriceModel->price = ($value['price']) ? $value['price'] : '0';
+                        $servicesPriceModel->add_on_price = ($value['add_on_price']) ? $value['add_on_price'] : '0';
+                        $servicesPriceModel->is_active_at = currentDateTime();
+                        $servicesPriceModel->save();
+                    }
                 }
-                $servicesPriceModel->service_id = $model->id;
-                $servicesPriceModel->name = ucfirst($key);
-                $servicesPriceModel->price = ($value['price']) ? $value['price'] : '0';
-                $servicesPriceModel->add_on_price = ($value['add_on_price']) ? $value['add_on_price'] : '0';
-                $servicesPriceModel->is_active_at = currentDateTime();
-                $servicesPriceModel->save();
             }
-        }
-        if ($add_on_services) {
-            foreach ($add_on_services as $key => $value) {
-                $AddOnServicesModel = AddOnServices::where(['service_id' => $model->id, 'add_on_service_id' => $value])->first();
-                if (empty($AddOnServicesModel)) {
-                    $AddOnServicesModel = new AddOnServices;
+            if ($add_on_services) {
+                foreach ($add_on_services as $key => $value) {
+                    $AddOnServicesModel = AddOnServices::where(['service_id' => $model->id, 'add_on_service_id' => $value])->first();
+                    if (empty($AddOnServicesModel)) {
+                        $AddOnServicesModel = new AddOnServices;
+                    }
+                    $AddOnServicesModel->service_id = $model->id;
+                    $AddOnServicesModel->add_on_service_id = $value;
+                    $AddOnServicesModel->save();
                 }
-                $AddOnServicesModel->service_id = $model->id;
-                $AddOnServicesModel->add_on_service_id = $value;
-                $AddOnServicesModel->save();
             }
-        }
-        if ($staff_services) {
-            foreach ($staff_services as $key => $value) {
-                $StaffServicesModel = StaffServices::where(['service_id' => $model->id, 'staff_id' => $value])->first();
-                if (empty($StaffServicesModel)) {
-                    $StaffServicesModel = new StaffServices;
+            if ($staff_services) {
+                foreach ($staff_services as $key => $value) {
+                    $StaffServicesModel = StaffServices::where(['service_id' => $model->id, 'staff_id' => $value])->first();
+                    if (empty($StaffServicesModel)) {
+                        $StaffServicesModel = new StaffServices;
+                    }
+                    $StaffServicesModel->service_id = $model->id;
+                    $StaffServicesModel->staff_id = $value;
+                    $StaffServicesModel->save();
                 }
-                $StaffServicesModel->service_id = $model->id;
-                $StaffServicesModel->staff_id = $value;
-                $StaffServicesModel->save();
             }
+            return $this->returnResponse($request, $model->id);
+        } else {
+            $messages = $validator->messages();
+            $keys = array_keys($messages->toArray());
+            $values = array_values($messages->toArray());
+            $errors = [];
+
+            if ($keys) {
+                for ($i = 0; $i < count($keys); $i++) {
+                    $valueArray = explode(".", $keys[$i]);
+                    $valid = [];
+                    $errors['service_price'][$valueArray[0]][$valueArray[1]] = $values[$i];
+                }
+            }
+            return response()->json(['errors' => $errors, 'message' => __('messages.validation_error')], $this->errorStatus);
         }
-        return $this->returnResponse($request, $model->id);
     }
 
     public function update(ServiceRequest $request, $id)
@@ -177,85 +208,113 @@ class ServicesApiController extends Controller
         $staff_services = ($request->add_on_staff) ? explode(",", $request->add_on_staff) : [];
         $staff_services = $staff_services ? array_values(array_filter($staff_services)) : [];
 
-        $appointmentMatch = collect([]);
-        $model = $this->findModel($id);
-        $model->addonservices->map(function ($value) use ($add_on_services, $id) {
-            if ($add_on_services && !in_array($value->id, $add_on_services)) {
-                AddOnServices::where(['service_id' => $id, 'add_on_service_id' => $value->id])->delete();
+        $messages = [
+            '*.price_tier_id.required' => "The price_tier field is required.",
+            '*.price.required' => "The price field is required.",
+
+        ];
+        $validator = Validator::make($service_price, [
+            '*.price_tier_id' => 'required',
+            '*.price' => 'required',
+        ], $messages);
+
+        if ($validator->passes()) {
+            $appointmentMatch = collect([]);
+            $model = $this->findModel($id);
+            $model->addonservices->map(function ($value) use ($add_on_services, $id) {
+                if ($add_on_services && !in_array($value->id, $add_on_services)) {
+                    AddOnServices::where(['service_id' => $id, 'add_on_service_id' => $value->id])->delete();
+                }
+                return;
+            })->toArray();
+            $model->staffservices->map(function ($value) use ($staff_services, $id, $appointmentMatch) {
+                if (empty($staff_services)) {
+                    $appointment = Appointment::where(['service_id' => $id, 'staff_id' => $value->id])->count();
+                    if ($appointment > 0) {
+                        $appointmentstaffdata = [
+                            'staff' => ['id' => $value->id, 'first_name' => $value->first_name, 'last_name' => $value->last_name, 'email' => $value->email, 'phone_number' => $value->phone_number],
+                            'appointmentcount' => $appointment,
+                        ];
+                        $appointmentMatch->push($appointmentstaffdata);
+                    } else {
+                        StaffServices::where(['service_id' => $id, 'staff_id' => $value->id])->delete();
+                    }
+                }
+                if ($staff_services && !in_array($value->id, $staff_services)) {
+                    $appointment = Appointment::where(['service_id' => $id, 'staff_id' => $value->id])->count();
+                    if ($appointment > 0) {
+                        $appointmentstaffdata = [
+                            'staff' => ['id' => $value->id, 'first_name' => $value->first_name, 'last_name' => $value->last_name, 'email' => $value->email, 'phone_number' => $value->phone_number],
+                            'appointmentcount' => $appointment,
+                        ];
+                        $appointmentMatch->push($appointmentstaffdata);
+                    } else {
+                        StaffServices::where(['service_id' => $id, 'staff_id' => $value->id])->delete();
+                    }
+                }
+                return;
+            })->toArray();
+            $appointmentMatchAll = $appointmentMatch->all();
+            if ($appointmentMatchAll && empty($pagetype)) {
+                return response()->json(['appointmentMatchAll' => $appointmentMatchAll, 'message' => __('messages.success')], $this->warningStatus);
             }
-            return;
-        })->toArray();
-        $model->staffservices->map(function ($value) use ($staff_services, $id, $appointmentMatch) {
-            if (empty($staff_services)) {
-                $appointment = Appointment::where(['service_id' => $id, 'staff_id' => $value->id])->count();
-                if ($appointment > 0) {
-                    $appointmentstaffdata = [
-                        'staff' => ['id' => $value->id, 'first_name' => $value->first_name, 'last_name' => $value->last_name, 'email' => $value->email, 'phone_number' => $value->phone_number],
-                        'appointmentcount' => $appointment,
-                    ];
-                    $appointmentMatch->push($appointmentstaffdata);
-                } else {
-                    StaffServices::where(['service_id' => $id, 'staff_id' => $value->id])->delete();
+            $model->fill($requestAll);
+            $model->description = isset($requestAll['description']) ? $requestAll['description'] : $model->description;
+            $model->save();
+            if ($service_price) {
+                foreach ($service_price as $key => $value) {
+                    if (isset($value['price_tier_id']) && $value['price_tier_id']) {
+                        $servicesPriceModel = ServicesPrice::where(['service_id' => $model->id, 'price_tier_id' => $value['price_tier_id']])->first();
+                        if (empty($servicesPriceModel)) {
+                            $servicesPriceModel = new ServicesPrice();
+                        }
+                        $servicesPriceModel->service_id = $model->id;
+                        $servicesPriceModel->price_tier_id = $value['price_tier_id'];
+                        $servicesPriceModel->price = ($value['price']) ? $value['price'] : '0';
+                        $servicesPriceModel->add_on_price = ($value['add_on_price']) ? $value['add_on_price'] : '0';
+                        $servicesPriceModel->is_active_at = currentDateTime();
+                        $servicesPriceModel->save();
+                    }
                 }
             }
-            if ($staff_services && !in_array($value->id, $staff_services)) {
-                $appointment = Appointment::where(['service_id' => $id, 'staff_id' => $value->id])->count();
-                if ($appointment > 0) {
-                    $appointmentstaffdata = [
-                        'staff' => ['id' => $value->id, 'first_name' => $value->first_name, 'last_name' => $value->last_name, 'email' => $value->email, 'phone_number' => $value->phone_number],
-                        'appointmentcount' => $appointment,
-                    ];
-                    $appointmentMatch->push($appointmentstaffdata);
-                } else {
-                    StaffServices::where(['service_id' => $id, 'staff_id' => $value->id])->delete();
+            if ($add_on_services) {
+                foreach ($add_on_services as $key => $value) {
+                    $AddOnServicesModel = AddOnServices::where(['service_id' => $model->id, 'add_on_service_id' => $value])->first();
+                    if (empty($AddOnServicesModel)) {
+                        $AddOnServicesModel = new AddOnServices;
+                    }
+                    $AddOnServicesModel->service_id = $model->id;
+                    $AddOnServicesModel->add_on_service_id = $value;
+                    $AddOnServicesModel->save();
                 }
             }
-            return;
-        })->toArray();
-        $appointmentMatchAll = $appointmentMatch->all();
-        if ($appointmentMatchAll && empty($pagetype)) {
-            return response()->json(['appointmentMatchAll' => $appointmentMatchAll, 'message' => __('messages.success')], $this->warningStatus);
+            if ($staff_services) {
+                foreach ($staff_services as $key => $value) {
+                    $StaffServicesModel = StaffServices::where(['service_id' => $model->id, 'staff_id' => $value])->first();
+                    if (empty($StaffServicesModel)) {
+                        $StaffServicesModel = new StaffServices;
+                    }
+                    $StaffServicesModel->service_id = $model->id;
+                    $StaffServicesModel->staff_id = $value;
+                    $StaffServicesModel->save();
+                }
+            }
+            return $this->returnResponse($request, $model->id);
+        } else {
+            $messages = $validator->messages();
+            $keys = array_keys($messages->toArray());
+            $values = array_values($messages->toArray());
+            $errors = [];
+
+            if ($keys) {
+                for ($i = 0; $i < count($keys); $i++) {
+                    $valueArray = explode(".", $keys[$i]);
+                    $valid = [];
+                    $errors['service_price'][$valueArray[0]][$valueArray[1]] = $values[$i];
+                }
+            }
+            return response()->json(['errors' => $errors, 'message' => __('messages.validation_error')], $this->errorStatus);
         }
-        $model->fill($requestAll);
-        $model->description = isset($requestAll['description']) ? $requestAll['description'] : $model->description;
-        $model->save();
-        if ($service_price) {
-            foreach ($service_price as $key => $value) {
-                $servicesPriceModel = ServicesPrice::where(['service_id' => $model->id, 'name' => ucfirst($key)])->first();
-                if (empty($servicesPriceModel)) {
-                    $servicesPriceModel = new ServicesPrice();
-                }
-                $servicesPriceModel->service_id = $model->id;
-                $servicesPriceModel->name = ucfirst($key);
-                $servicesPriceModel->price = ($value['price']) ? $value['price'] : '0';
-                $servicesPriceModel->add_on_price = ($value['add_on_price']) ? $value['add_on_price'] : '0';
-                $servicesPriceModel->is_active_at = currentDateTime();
-                $servicesPriceModel->save();
-            }
-        }
-        if ($add_on_services) {
-            foreach ($add_on_services as $key => $value) {
-                $AddOnServicesModel = AddOnServices::where(['service_id' => $model->id, 'add_on_service_id' => $value])->first();
-                if (empty($AddOnServicesModel)) {
-                    $AddOnServicesModel = new AddOnServices;
-                }
-                $AddOnServicesModel->service_id = $model->id;
-                $AddOnServicesModel->add_on_service_id = $value;
-                $AddOnServicesModel->save();
-            }
-        }
-        if ($staff_services) {
-            foreach ($staff_services as $key => $value) {
-                $StaffServicesModel = StaffServices::where(['service_id' => $model->id, 'staff_id' => $value])->first();
-                if (empty($StaffServicesModel)) {
-                    $StaffServicesModel = new StaffServices;
-                }
-                $StaffServicesModel->service_id = $model->id;
-                $StaffServicesModel->staff_id = $value;
-                $StaffServicesModel->save();
-            }
-        }
-        return $this->returnResponse($request, $model->id);
     }
 
     public function delete(Request $request, $id)
@@ -477,10 +536,19 @@ class ServicesApiController extends Controller
         $requestAll = $request->all();
         $salon_id = $request->salon_id;
         $service_id = $request->service_id;
+        $staff_id = $request->staff_id;
+        $staff = Staff::select('price_tier_id')->where('id', $staff_id)->where('salon_id', $salon_id)->first();
 
         $withArray = [];
-        $withArray[] = 'serviceprice:id,service_id,name,price,add_on_price';
-        $withArray[] = 'staffservices:id,first_name,last_name';
+        $withArray = [
+            'serviceprice' => function ($query) use ($staff) {
+                $query->select('id', 'service_id', 'price_tier_id', 'price', 'add_on_price')->where('is_active', '1');
+                if ($staff && $staff->price_tier_id) {
+                    $query->where('price_tier_id', $staff->price_tier_id);
+                }
+            },
+            'staffservices:id,first_name,last_name',
+        ];
         $service = Services::with($withArray)->where(['id' => $service_id, 'salon_id' => $salon_id])->where('is_active', '1')->first();
         if ($service) {
             $service = $service->makeHidden(['is_active', 'is_active_at', 'created_at', 'updated_at', 'isNotId', 'isServiceChecked']);
@@ -488,6 +556,7 @@ class ServicesApiController extends Controller
             $successData = $service->toArray();
             return response()->json($successData, $this->successStatus);
         }
+
         return response()->json(['message' => __('messages.not_found')], $this->errorStatus);
     }
 }

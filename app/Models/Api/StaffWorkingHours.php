@@ -37,6 +37,10 @@ class StaffWorkingHours extends Model
      * @var array
      */
     protected $hidden = [
+        'is_active',
+        'is_active_at',
+        'created_at',
+        'updated_at',
     ];
 
     /**

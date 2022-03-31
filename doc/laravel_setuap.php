@@ -34,6 +34,8 @@ php artisan db:seed --class=RoleSeeder
 DB import in class
 use Illuminate\Support\Facades\DB;
 
+Custom Mail Uses
+php artisan vendor:publish --tag=laravel-mail
 
 Creating indexs db in key
 primary

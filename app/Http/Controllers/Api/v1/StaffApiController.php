@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Validator;
 
 class StaffApiController extends Controller
 {
@@ -70,7 +71,7 @@ class StaffApiController extends Controller
         'id',
         'salon_id',
         'staff_id',
-        'date',
+        'dateof',
         'start_time',
         'end_time',
         'away',
@@ -110,98 +111,106 @@ class StaffApiController extends Controller
         $requestAll['auth_key'] = hash('sha256', $token);
         $requestAll['username'] = $email_username ? $email_username[0] . random_int(101, 999) : $requestAll['first_name'] . '_' . $requestAll['last_name'] . '_' . random_int(101, 999);
         $requestAll['password'] = Hash::make($randompassword);
-        $requestAll['calendar_booking'] = (isset($requestAll['calendar_booking']) && $requestAll['calendar_booking']) ? '1' : '0';
+        $requestAll['calendar_booking'] = (isset($requestAll['calendar_booking']) && $requestAll['calendar_booking']) ? 1 : 0;
 
-        if ($requestAll['email']) {
-            $field = array();
-            $field['{{password}}'] = $randompassword;
-            $sendmail = sendMail($requestAll['email'], 'send_password', $field);
-            if (empty($sendmail)) {
-                return response()->json(['email' => $requestAll['email'], 'message' => __('messages.wrongmail')], $this->errorStatus);
-            }
-        }
+        // if ($requestAll['email']) {
+        //     $field = array();
+        //     $field['email'] = $requestAll['email'];
+        //     $field['password'] = $randompassword;
+        //     $sendmail = sendMail($requestAll['email'], ['subject' => 'Verify Email Address'], $field);
+        //     if (empty($sendmail)) {
+        //         return response()->json(['email' => $requestAll['email'], 'message' => __('messages.wrongmail')], $this->errorStatus);
+        //     }
+        // }
         $staff_working_hours = ($request->working_hours) ? json_decode($request->working_hours, true) : [];
         $staff_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
         $staff_services = $staff_services ? array_values(array_filter($staff_services)) : [];
+        $messages = [
+            '*.days.required' => "The days field is required.",
+            '*.start_time.required_if' => "The start time field is required when dayoff is on.",
+            '*.end_time.required_if' => "The end time field is required when dayoff is on.",
+            '*.end_time.after' => "The end time must be a date after start time.",
+            '*.break_time.*.break_title.required' => "Break title is Required",
+            '*.break_time.*.break_start_time.required' => "Break start time is Required",
+            '*.break_time.*.break_end_time.required' => "Break end time is Required",
+            '*.break_time.*.break_start_time.required_if' => "The Break start time field is required when dayoff is on.",
+            '*.break_time.*.break_end_time.required_if' => "The Break end time field is required when dayoff is on.",
+            '*.break_time.*.break_end_time.after' => "The end time must be a date after start time.",
+        ];
+        $validator = Validator::make($staff_working_hours, [
+            '*.days' => 'required',
+            '*.start_time' => 'nullable|required_if:*.dayoff,1',
+            '*.end_time' => 'nullable|required_if:*.dayoff,1|date_format:H:i|after:*.start_time',
+            '*.break_time' => 'array',
+            '*.break_time.*.break_title' => 'required',
+            '*.break_time.*.break_start_time' => 'required|required_if:*.break_time.size,>,0',
+            '*.break_time.*.break_end_time' => 'required|required_if:*.break_time.size,>,0|date_format:H:i|after:*.break_time.*.break_start_time',
+        ], $messages);
 
-        // $working_hour_error = [];
-        // if ($staff_working_hours) {
-        //     foreach ($staff_working_hours as $key => $value) {
-        //         if (isset($value['days']) && in_array($value['days'], $days)) {
-        //             $start_time = isset($value['start_time']) ? strtotime($value['start_time']) : '';
-        //             $end_time = isset($value['end_time']) ? strtotime($value['end_time']) : '';
-        //             $break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : [];
-        //             $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
-        //             if ($start_time && $end_time && $start_time >= $end_time) {
-        //                 // $working_hour_error[$value['days']]["errors"] = __('messages.failed');
-        //                 $working_hour_error["working_hours"][$key] = ['start_time' => __('messages.endtime_greater_starttime')];
-        //             }
-        //             $break_time_error = [];
-        //             if ($break_time) {
-        //                 foreach ($break_time as $bkey => $bvalue) {
-        //                     $break_title = isset($bvalue['break_title']) ? $bvalue['break_title'] : '';
-        //                     $break_start_time = isset($bvalue['break_start_time']) ? $bvalue['break_start_time'] : '';
-        //                     $break_end_time = isset($bvalue['break_end_time']) ? $bvalue['break_end_time'] : '';
-        //                     if ($break_start_time && $break_end_time && $break_start_time >= $break_end_time) {
-        //                         $break_time_error[$bkey] = ['break_start_time' => __('messages.endtime_greater_starttime'), 'break_end_time' => __('messages.endtime_greater_starttime')];
-        //                     }
-        //                 }
-        //             }
-        //             if ($break_time_error) {
-        //                 $working_hour_error["working_hours"][$key] = ['break_time' => $break_time_error];
-        //             }
-        //         }
-        //     }
-        // }
-        // if ($working_hour_error) {
-        //     return response()->json(['errors' => $working_hour_error], $this->errorStatus);
-        // }
-
-        $model = new Staff;
-        $model->fill($requestAll);
-        $file = $request->file('profile_photo');
-        if ($file) {
-            $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-            $filePath = $file->storeAs('staff', $fileName, 'public');
-            $model->profile_photo = $fileName;
-        }
-        $model->save();
-        if ($staff_services) {
-            foreach ($staff_services as $key => $value) {
-                $StaffServicesModel = StaffServices::where(['staff_id' => $model->id, 'service_id' => $value])->first();
-                if (empty($StaffServicesModel)) {
-                    $StaffServicesModel = new StaffServices;
-                }
-                $StaffServicesModel->staff_id = $model->id;
-                $StaffServicesModel->service_id = $value;
-                $StaffServicesModel->save();
+        if ($validator->passes()) {
+            $model = new Staff;
+            $model->fill($requestAll);
+            $file = $request->file('profile_photo');
+            if ($file) {
+                $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+                $filePath = $file->storeAs('staff', $fileName, 'public');
+                $model->profile_photo = $fileName;
             }
-        }
-
-        if ($staff_working_hours) {
-            foreach ($staff_working_hours as $key => $value) {
-                if (isset($value['days']) && in_array($value['days'], $days)) {
-                    $StaffWorkingHoursModel = StaffWorkingHours::where(['staff_id' => $model->id, 'days' => $value['days']])->first();
-                    if (empty($StaffWorkingHoursModel)) {
-                        $StaffWorkingHoursModel = new StaffWorkingHours;
+            $model->save();
+            if ($staff_services) {
+                foreach ($staff_services as $key => $value) {
+                    $StaffServicesModel = StaffServices::where(['staff_id' => $model->id, 'service_id' => $value])->first();
+                    if (empty($StaffServicesModel)) {
+                        $StaffServicesModel = new StaffServices;
                     }
-                    $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
-                    $start_time = isset($value['start_time']) ? $value['start_time'] : '';
-                    $end_time = isset($value['end_time']) ? $value['end_time'] : '';
-                    $break_time = isset($value['break_time']) ? $value['break_time'] : '';
-                    $StaffWorkingHoursModel->salon_id = $model->salon_id;
-                    $StaffWorkingHoursModel->staff_id = $model->id;
-                    $StaffWorkingHoursModel->days = $value['days'];
-                    $StaffWorkingHoursModel->start_time = $dayoff ? $start_time : null;
-                    $StaffWorkingHoursModel->end_time = $dayoff ? $end_time : null;
-                    $StaffWorkingHoursModel->break_time = $dayoff ? $break_time : [];
-                    $StaffWorkingHoursModel->dayoff = $dayoff;
-                    $StaffWorkingHoursModel->is_active_at = currentDateTime();
-                    $StaffWorkingHoursModel->save();
+                    $StaffServicesModel->staff_id = $model->id;
+                    $StaffServicesModel->service_id = $value;
+                    $StaffServicesModel->save();
                 }
             }
+
+            if ($staff_working_hours) {
+                foreach ($staff_working_hours as $key => $value) {
+                    if (isset($value['days']) && in_array($value['days'], $days)) {
+                        $StaffWorkingHoursModel = StaffWorkingHours::where(['staff_id' => $model->id, 'days' => $value['days']])->first();
+                        if (empty($StaffWorkingHoursModel)) {
+                            $StaffWorkingHoursModel = new StaffWorkingHours;
+                        }
+                        $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
+                        $start_time = isset($value['start_time']) ? $value['start_time'] : '';
+                        $end_time = isset($value['end_time']) ? $value['end_time'] : '';
+                        $break_time = isset($value['break_time']) ? $value['break_time'] : '';
+                        $StaffWorkingHoursModel->salon_id = $model->salon_id;
+                        $StaffWorkingHoursModel->staff_id = $model->id;
+                        $StaffWorkingHoursModel->days = $value['days'];
+                        $StaffWorkingHoursModel->start_time = $dayoff ? $start_time : null;
+                        $StaffWorkingHoursModel->end_time = $dayoff ? $end_time : null;
+                        $StaffWorkingHoursModel->break_time = $dayoff ? $break_time : [];
+                        $StaffWorkingHoursModel->dayoff = $dayoff;
+                        $StaffWorkingHoursModel->is_active_at = currentDateTime();
+                        $StaffWorkingHoursModel->save();
+                    }
+                }
+            }
+            return $this->returnResponse($request, $model->id);
+        } else {
+            $messages = $validator->messages();
+            $keys = array_keys($messages->toArray());
+            $values = array_values($messages->toArray());
+            $errors = [];
+            if ($keys) {
+                for ($i = 0; $i < count($keys); $i++) {
+                    $valueArray = explode(".", $keys[$i]);
+                    $valid = [];
+                    if (count($valueArray) != 4) {
+                        $errors['working_hours'][$valueArray[0]][$valueArray[1]] = $values[$i];
+                    } else {
+                        $errors['working_hours'][$valueArray[0]][$valueArray[1]][$valueArray[2]][$valueArray[3]] = $values[$i];
+                    }
+                }
+            }
+            return response()->json(['errors' => $errors, 'message' => __('messages.validation_error')], $this->errorStatus);
         }
-        return $this->returnResponse($request, $model->id);
     }
 
     public function update(StaffRequest $request, $id)
@@ -220,128 +229,129 @@ class StaffApiController extends Controller
         $staff_working_hours = ($request->working_hours) ? json_decode($request->working_hours, true) : [];
         $staff_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
         $staff_services = $staff_services ? array_values(array_filter($staff_services)) : [];
+        $messages = [
+            '*.days.required' => "The days field is required.",
+            '*.start_time.required_if' => "The start time field is required when dayoff is on.",
+            '*.end_time.required_if' => "The end time field is required when dayoff is on.",
+            '*.end_time.after' => "The end time must be a date after start time.",
+            '*.break_time.*.break_title.required' => "Break title is Required",
+            '*.break_time.*.break_start_time.required' => "Break start time is Required",
+            '*.break_time.*.break_end_time.required' => "Break end time is Required",
+            '*.break_time.*.break_start_time.required_if' => "The Break start time field is required when dayoff is on.",
+            '*.break_time.*.break_end_time.required_if' => "The Break end time field is required when dayoff is on.",
+            '*.break_time.*.break_end_time.after' => "The end time must be a date after start time.",
+        ];
+        $validator = Validator::make($staff_working_hours, [
+            '*.days' => 'required',
+            '*.start_time' => 'nullable|required_if:*.dayoff,1',
+            '*.end_time' => 'nullable|required_if:*.dayoff,1|date_format:H:i|after:*.start_time',
+            '*.break_time' => 'array',
+            '*.break_time.*.break_title' => 'required|required_if:*.dayoff,1',
+            '*.break_time.*.break_start_time' => 'required|required_if:*.dayoff,1|required_if:*.break_time.size,>,0',
+            '*.break_time.*.break_end_time' => 'required|required_if:*.dayoff,1|required_if:*.break_time.size,>,0|date_format:H:i|after:*.break_time.*.break_start_time',
+        ], $messages);
 
-        // $working_hour_error = [];
-        // if ($staff_working_hours) {
-        //     foreach ($staff_working_hours as $key => $value) {
-        //         if (isset($value['days']) && in_array($value['days'], $days)) {
-        //             $start_time = isset($value['start_time']) ? strtotime($value['start_time']) : '';
-        //             $end_time = isset($value['end_time']) ? strtotime($value['end_time']) : '';
-        //             $break_time = (isset($value['break_time']) && $value['break_time']) ? $value['break_time'] : [];
-        //             $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
-        //             if ($start_time && $end_time && $start_time >= $end_time) {
-        //                 // $working_hour_error[$value['days']]["errors"] = __('messages.failed');
-        //                 $working_hour_error["working_hours"][$key] = ['start_time' => __('messages.endtime_greater_starttime')];
-        //             }
-        //             $break_time_error = [];
-        //             if ($break_time) {
-        //                 foreach ($break_time as $bkey => $bvalue) {
-        //                     $break_title = isset($bvalue['break_title']) ? $bvalue['break_title'] : '';
-        //                     $break_start_time = isset($bvalue['break_start_time']) ? $bvalue['break_start_time'] : '';
-        //                     $break_end_time = isset($bvalue['break_end_time']) ? $bvalue['break_end_time'] : '';
-        //                     // echo $break_start_time . ' ' . $start_time;
-        //                     if ($break_start_time && $break_end_time && $break_start_time >= $break_end_time) {
-        //                         // $working_hour_error[$value['days']]["errors"] = __('messages.failed');
-        //                         $break_time_error[$bkey] = ['break_start_time' => __('messages.endtime_greater_starttime'), 'break_end_time' => __('messages.endtime_greater_starttime')];
-        //                     }
-        //                     //  else if ($break_start_time && $start_time && $end_time && $break_start_time <= $start_time && $end_time >= $break_end_time) {
-        //                     //     $break_time_error[$bkey] = ['break_start_time' => __('messages.beetween_startendtime'), 'break_end_time' => __('messages.endtime_greater_starttime')];
-        //                     // }
-        //                     // echo $start_time . '<=' . $break_start_time . '<br>';
-        //                     // echo $end_time . '>=' . $break_end_time;
-        //                 }
-        //             }
-        //             if ($break_time_error) {
-        //                 $working_hour_error["working_hours"][$key] = ['break_time' => $break_time_error];
-        //             }
-        //         }
-        //     }
-        // }
-        // if ($working_hour_error) {
-        //     return response()->json(['errors' => $working_hour_error], $this->errorStatus);
-        // }
-        $appointmentMatch = collect([]);
-        $model = $this->findModel($id);
-        if (empty($model->auth_key)) {
-            $token = Str::random(config('params.auth_key_character'));
-            $model->auth_key = hash('sha256', $token);
-        }
-        $model->staffservices->map(function ($value) use ($staff_services, $id, $appointmentMatch) {
-            if (empty($staff_services)) {
-                $appointment = Appointment::where(['staff_id' => $id, 'service_id' => $value->id])->count();
-                if ($appointment > 0) {
-                    $appointmentstaffdata = [
-                        'service' => ['id' => $value->id, 'name' => $value->name],
-                        'appointmentcount' => $appointment,
-                    ];
-                    $appointmentMatch->push($appointmentstaffdata);
-                } else {
-                    StaffServices::where(['staff_id' => $id, 'service_id' => $value->id])->delete();
-                }
+        if ($validator->passes()) {
+            $appointmentMatch = collect([]);
+            $model = $this->findModel($id);
+            if (empty($model->auth_key)) {
+                $token = Str::random(config('params.auth_key_character'));
+                $model->auth_key = hash('sha256', $token);
             }
-            if ($staff_services && !in_array($value->id, $staff_services)) {
-                $appointment = Appointment::where(['staff_id' => $id, 'service_id' => $value->id])->count();
-                if ($appointment > 0) {
-                    $appointmentstaffdata = [
-                        'service' => ['id' => $value->id, 'name' => $value->name],
-                        'appointmentcount' => $appointment,
-                    ];
-                    $appointmentMatch->push($appointmentstaffdata);
-                } else {
-                    StaffServices::where(['staff_id' => $id, 'service_id' => $value->id])->delete();
-                }
-            }
-            return;
-        })->toArray();
-        $appointmentMatchAll = $appointmentMatch->all();
-        if ($appointmentMatchAll && empty($pagetype)) {
-            return response()->json(['appointmentMatchAll' => $appointmentMatchAll, 'message' => __('messages.success')], $this->warningStatus);
-        }
-
-        $model->fill($requestAll);
-        $file = $request->file('profile_photo');
-        if ($file) {
-            Storage::delete('/public/staff/' . $model->profile_photo);
-            $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-            $filePath = $file->storeAs('staff', $fileName, 'public');
-            $model->profile_photo = $fileName;
-        }
-        $model->save();
-        if ($staff_services) {
-            foreach ($staff_services as $key => $value) {
-                $StaffServicesModel = StaffServices::where(['staff_id' => $model->id, 'service_id' => $value])->first();
-                if (empty($StaffServicesModel)) {
-                    $StaffServicesModel = new StaffServices;
-                }
-                $StaffServicesModel->staff_id = $model->id;
-                $StaffServicesModel->service_id = $value;
-                $StaffServicesModel->save();
-            }
-        }
-
-        if ($staff_working_hours) {
-            foreach ($staff_working_hours as $key => $value) {
-                if (isset($value['days']) && in_array($value['days'], $days)) {
-                    $StaffWorkingHoursModel = StaffWorkingHours::where(['staff_id' => $model->id, 'days' => $value['days']])->first();
-                    if (empty($StaffWorkingHoursModel)) {
-                        $StaffWorkingHoursModel = new StaffWorkingHours;
+            $model->staffservices->map(function ($value) use ($staff_services, $id, $appointmentMatch) {
+                if (empty($staff_services)) {
+                    $appointment = Appointment::where(['staff_id' => $id, 'service_id' => $value->id])->count();
+                    if ($appointment > 0) {
+                        $appointmentstaffdata = [
+                            'service' => ['id' => $value->id, 'name' => $value->name],
+                            'appointmentcount' => $appointment,
+                        ];
+                        $appointmentMatch->push($appointmentstaffdata);
+                    } else {
+                        StaffServices::where(['staff_id' => $id, 'service_id' => $value->id])->delete();
                     }
-                    $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
-                    $start_time = isset($value['start_time']) ? $value['start_time'] : '';
-                    $end_time = isset($value['end_time']) ? $value['end_time'] : '';
-                    $break_time = isset($value['break_time']) ? $value['break_time'] : '';
-                    $StaffWorkingHoursModel->salon_id = $model->salon_id;
-                    $StaffWorkingHoursModel->staff_id = $model->id;
-                    $StaffWorkingHoursModel->days = $value['days'];
-                    $StaffWorkingHoursModel->start_time = $dayoff ? $start_time : null;
-                    $StaffWorkingHoursModel->end_time = $dayoff ? $end_time : null;
-                    $StaffWorkingHoursModel->break_time = $dayoff ? $break_time : [];
-                    $StaffWorkingHoursModel->dayoff = $dayoff;
-                    $StaffWorkingHoursModel->save();
+                }
+                if ($staff_services && !in_array($value->id, $staff_services)) {
+                    $appointment = Appointment::where(['staff_id' => $id, 'service_id' => $value->id])->count();
+                    if ($appointment > 0) {
+                        $appointmentstaffdata = [
+                            'service' => ['id' => $value->id, 'name' => $value->name],
+                            'appointmentcount' => $appointment,
+                        ];
+                        $appointmentMatch->push($appointmentstaffdata);
+                    } else {
+                        StaffServices::where(['staff_id' => $id, 'service_id' => $value->id])->delete();
+                    }
+                }
+                return;
+            })->toArray();
+            $appointmentMatchAll = $appointmentMatch->all();
+            if ($appointmentMatchAll && empty($pagetype)) {
+                return response()->json(['appointmentMatchAll' => $appointmentMatchAll, 'message' => __('messages.success')], $this->warningStatus);
+            }
+
+            $model->fill($requestAll);
+            $file = $request->file('profile_photo');
+            if ($file) {
+                Storage::delete('/public/staff/' . $model->profile_photo);
+                $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+                $filePath = $file->storeAs('staff', $fileName, 'public');
+                $model->profile_photo = $fileName;
+            }
+            $model->save();
+            if ($staff_services) {
+                foreach ($staff_services as $key => $value) {
+                    $StaffServicesModel = StaffServices::where(['staff_id' => $model->id, 'service_id' => $value])->first();
+                    if (empty($StaffServicesModel)) {
+                        $StaffServicesModel = new StaffServices;
+                    }
+                    $StaffServicesModel->staff_id = $model->id;
+                    $StaffServicesModel->service_id = $value;
+                    $StaffServicesModel->save();
                 }
             }
+
+            if ($staff_working_hours) {
+                foreach ($staff_working_hours as $key => $value) {
+                    if (isset($value['days']) && in_array($value['days'], $days)) {
+                        $StaffWorkingHoursModel = StaffWorkingHours::where(['staff_id' => $model->id, 'days' => $value['days']])->first();
+                        if (empty($StaffWorkingHoursModel)) {
+                            $StaffWorkingHoursModel = new StaffWorkingHours;
+                        }
+                        $dayoff = (isset($value['dayoff']) && $value['dayoff']) ? '1' : '0';
+                        $start_time = isset($value['start_time']) ? $value['start_time'] : '';
+                        $end_time = isset($value['end_time']) ? $value['end_time'] : '';
+                        $break_time = isset($value['break_time']) ? $value['break_time'] : '';
+                        $StaffWorkingHoursModel->salon_id = $model->salon_id;
+                        $StaffWorkingHoursModel->staff_id = $model->id;
+                        $StaffWorkingHoursModel->days = $value['days'];
+                        $StaffWorkingHoursModel->start_time = $dayoff ? $start_time : null;
+                        $StaffWorkingHoursModel->end_time = $dayoff ? $end_time : null;
+                        $StaffWorkingHoursModel->break_time = $dayoff ? $break_time : [];
+                        $StaffWorkingHoursModel->dayoff = $dayoff;
+                        $StaffWorkingHoursModel->save();
+                    }
+                }
+            }
+            return $this->returnResponse($request, $model->id);
+        } else {
+            $messages = $validator->messages();
+            $keys = array_keys($messages->toArray());
+            $values = array_values($messages->toArray());
+            $errors = [];
+            if ($keys) {
+                for ($i = 0; $i < count($keys); $i++) {
+                    $valueArray = explode(".", $keys[$i]);
+                    $valid = [];
+                    if (count($valueArray) != 4) {
+                        $errors['working_hours'][$valueArray[0]][$valueArray[1]] = $values[$i];
+                    } else {
+                        $errors['working_hours'][$valueArray[0]][$valueArray[1]][$valueArray[2]][$valueArray[3]] = $values[$i];
+                    }
+                }
+            }
+            return response()->json(['errors' => $errors, 'message' => __('messages.validation_error')], $this->errorStatus);
         }
-        return $this->returnResponse($request, $model->id);
     }
 
     public function delete(Request $request, $id)

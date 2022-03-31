@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->date('invoicedate')->nullable()->comment('calendar event date');
             $table->enum('paidby', ['CreditCard', 'Cash', 'Voucher'])->default(null)->nullable()->comment('');
-            $table->enum('is_stripe', ['0', '1'])->default(null)->nullable()->comment('stripe payment flag');
+            $table->boolean('is_stripe')->default(0)->nullable()->comment('stripe payment flag');
             $table->decimal('totalprice', 10, 2)->nullable()->comment('Sale total price');
             $table->decimal('voucherprice', 10, 2)->nullable()->comment('Voucher price');
             $table->enum('status', ['Pending', 'Paid', 'Failed'])->default(null)->nullable();

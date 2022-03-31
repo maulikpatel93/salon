@@ -1,5 +1,6 @@
 <?php
 
+use App\Mail\VerifyEmail;
 use App\Models\Modules;
 use App\Models\Permissions;
 use App\Models\RoleAccess;
@@ -297,14 +298,9 @@ if (!function_exists('UtcToLocal')) {
 }
 
 if (!function_exists('sendMail')) {
-    function sendMail($email, $code, $field = array())
+    function sendMail($email, $template, $field = array())
     {
-        if ($email && $code) {
-            // $EmailTemplates = Emailtemplates::where(['code' => $code])->first();
-            // if (empty($EmailTemplates)) {
-            //     return false;
-            // }
-
+        if ($email && $template) {
             $action_url = URL::to(config('params.site_url'));
             $name = "Beauty@info";
 
@@ -313,39 +309,55 @@ if (!function_exists('sendMail')) {
             $site_name = config('params.site_name');
             $site_address = config('params.site_address');
             $fromEmail = config('params.support_email');
-            $subject = $EmailTemplates->subject;
+
             $toEmail = $email;
             $copyright_text = str_replace('{year}', date('Y'), config('params.copyright_text'));
 
-            $message = $EmailTemplates->html;
-            $message = str_replace('{{logo}}', $logo, $message);
-            $message = str_replace('{{site_url}}', $site_url, $message);
-            $message = str_replace('{{site_name}}', $site_name, $message);
-            $message = str_replace('{{site_address}}', $site_address, $message);
-            $message = str_replace('{{copyright_text}}', $copyright_text, $message);
-            $message = str_replace('{{name}}', $name, $message);
-            $message = str_replace('{{action_url}}', $action_url, $message);
-
-            if ($field) {
-                foreach ($field as $key => $value) {
-                    $message = str_replace($key, $value, $message);
-                }
-            }
-            $data = array(
-                'body' => $message,
-            );
-
-            try {
-                $sendemail = Mail::send(['html' => 'admin.emailtemplates.template.mail'], $data, function ($message) use ($toEmail, $fromEmail, $subject) {
-                    // echo $toEmail . ' ' . $fromEmail . ' ' . $subject;
-                    $message->to($toEmail)->subject($subject);
-                    $message->from($fromEmail);
-                });
-            } catch (\Exception$e) {
-                if (count(Mail::failures()) > 0) {
+            if (isset($template['code']) && $template['template']) {
+                $EmailTemplates = Emailtemplates::where(['code' => $code])->first();
+                if (empty($EmailTemplates)) {
                     return false;
                 }
+                $subject = $EmailTemplates->subject;
+                $message = $EmailTemplates->html;
+                $message = str_replace('{{logo}}', $logo, $message);
+                $message = str_replace('{{site_url}}', $site_url, $message);
+                $message = str_replace('{{site_name}}', $site_name, $message);
+                $message = str_replace('{{site_address}}', $site_address, $message);
+                $message = str_replace('{{copyright_text}}', $copyright_text, $message);
+                $message = str_replace('{{name}}', $name, $message);
+                $message = str_replace('{{action_url}}', $action_url, $message);
+                if ($field) {
+                    foreach ($field as $key => $value) {
+                        $message = str_replace("{{" . $key . "}}", $value, $message);
+                    }
+                }
+                $data = array(
+                    'body' => $message,
+                );
+                try {
+                    $sendemail = Mail::send(['html' => 'admin.emailtemplates.template.mail'], $data, function ($message) use ($toEmail, $fromEmail, $subject) {
+                        // echo $toEmail . ' ' . $fromEmail . ' ' . $subject;
+                        $message->to($toEmail)->subject($subject);
+                        $message->from($fromEmail);
+                    });
+                } catch (\Exception$e) {
+                    if (count(Mail::failures()) > 0) {
+                        return false;
+                    }
+                }
+            } else {
+                try {
+                    $data = $field;
+                    Mail::to($toEmail)->send(new VerifyEmail($data));
+                } catch (\Exception$e) {
+                    if (count(Mail::failures()) > 0) {
+                        return false;
+                    }
+                }
+
             }
+
             return true;
         }
         return "";

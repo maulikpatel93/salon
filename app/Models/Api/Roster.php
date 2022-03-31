@@ -24,7 +24,7 @@ class Roster extends Model
     protected $fillable = [
         'salon_id',
         'staff_id',
-        'date',
+        'dateof',
         'start_time',
         'end_time',
         'away',

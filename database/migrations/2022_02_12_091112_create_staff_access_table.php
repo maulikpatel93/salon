@@ -26,8 +26,8 @@ class CreateStaffAccessTable extends Migration
             $table->integer('parent_submenu_id', false, true)->nullable();
             $table->integer('menu_position', false, true)->nullable();
             $table->integer('submenu_position', false, true)->nullable();
-            $table->enum('is_hiddden', ['0', '1'])->default('0');
-            $table->enum('is_active', ['0', '1'])->default('1'); // 1:Active, 0:Inactive
+            $table->boolean('is_hiddden')->default(0);
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
@@ -39,7 +39,7 @@ class CreateStaffAccessTable extends Migration
             $table->string('name', 100)->comment('Ony use view / No any api call');
             $table->string('controller', 100)->comment('Not any api call url controller in laravel api');
             $table->string('action', 100)->comment('Not any api call or Url method in laravel api');
-            $table->enum('is_active', ['0', '1'])->default('1'); // 1:Active, 0:Inactive
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
         });
 
@@ -50,7 +50,7 @@ class CreateStaffAccessTable extends Migration
 
         Schema::create('salon_access', function (Blueprint $table) {
             $table->id();
-            $table->enum('access', ['0', '1'])->default('0')->nullable();
+            $table->boolean('access')->default(0)->nullable();
         });
 
         Schema::table('salon_access', function (Blueprint $table) {
