@@ -11,6 +11,7 @@ use App\Models\Api\Products;
 use App\Models\Api\Sale;
 use App\Models\Api\Services;
 use Illuminate\Http\Request;
+use Validator;
 
 class SaleApiController extends Controller
 {
@@ -22,9 +23,11 @@ class SaleApiController extends Controller
         'id',
         'salon_id',
         'client_id',
+        'appointment_id',
+        'voucher_id',
         'invoicedate',
         'totalprice',
-        'paidtype',
+        'paidby',
         'status',
     ];
 
@@ -139,7 +142,7 @@ class SaleApiController extends Controller
         $model->appointment_id = $appointment_id;
         $model->invoicedate = $invoicedate;
         $model->totalprice = null;
-        $model->paidtype = $request->paidtype;
+        $model->paidby = $request->paidby;
         $model->status = 'Paid';
         $model->save();
         if ($model) {
@@ -186,7 +189,7 @@ class SaleApiController extends Controller
         return response()->json(['message' => __('messages.not_found')], $this->errorStatus);
     }
 
-    public function view(Request $request)
+    public function invoice(Request $request)
     {
         $requestAll = $request->all();
         $id = $request->id;
@@ -197,7 +200,8 @@ class SaleApiController extends Controller
     {
         $requestAll = $request->all();
         $field = ($request->field) ? array_merge(['id'], explode(',', $request->field)) : $this->field;
-
+        $client_id = $request->client_id;
+        $daterange = $request->daterange ? explode(" - ", $request->daterange) : "";
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
             $salon_field = false;
@@ -206,59 +210,109 @@ class SaleApiController extends Controller
         } else if ($request->salon_field) {
             $salon_field = array_merge(['id'], explode(',', $request->salon_field));
         }
-
-        $client_field = $this->client_field;
-        if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
-            $client_field = false;
-        } else if ($request->client_field == '*') {
-            $client_field = [$request->client_field];
-        } else if ($request->client_field) {
-            $client_field = array_merge(['id'], explode(',', $request->client_field));
-        }
-
         $withArray = [];
         if ($salon_field) {
             $withArray[] = 'salon:' . implode(',', $salon_field);
         }
-        if ($client_field) {
-            $withArray[] = 'client:' . implode(',', $client_field);
-        }
-        $withArray[] = 'cart';
-
+        $withArray = [
+            'salon:' . implode(',', $this->salon_field),
+            'client:' . implode(',', $this->client_field),
+            'cart',
+            'appointment:id,dateof,start_time,end_time,duration,cost',
+        ];
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
         $where = ['salon_id' => $request->salon_id];
+        if ($client_id) {
+            $where['client_id'] = $client_id;
+        }
+
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
         $orderby = 'id desc';
+        $query = Sale::with($withArray)->select($field)->where($where);
+        if ($daterange) {
+            $startdate = $daterange[0] . ' 00:00:00';
+            $enddate = $daterange[1] . ' 23:59:59';
+            $query->whereBetween("invoicedate", [$startdate, $enddate]);
+        }
         if ($id) {
             if ($request->result == 'result_array') {
-                $model = Sale::with($withArray)->select($field)->where($where)->get();
+                $model = $query->get();
             } else {
-                $model = Sale::with($withArray)->select($field)->where($where)->first();
+                $model = $query->first();
             }
             $successData = $model->toArray();
             return response()->json($successData, $this->successStatus);
         } else {
             if ($pagination == true) {
-                $model = Sale::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
+                $model = $query->orderByRaw($orderby)->paginate($limit);
                 $model->data = $model;
             } else {
-                $model = Sale::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                $model = $query->orderByRaw($orderby)->get();
             }
             if ($model->count()) {
                 $successData = $model->toArray();
                 if ($successData) {
-                    if ($pagination == true) {
-                        // return response()->json(array_merge(['status' => $this->successStatus, 'message' => 'Success'], $successData));
-                    }
                     return response()->json($successData, $this->successStatus);
                 }
             }
         }
 
         return response()->json(['message' => __('messages.failed')], $this->errorStatus);
+    }
+
+    public function createinvoice(Request $request)
+    {
+        $requestAll = $request->all();
+        $client_id = $request->client_id;
+        $id = $request->id;
+        $daterange = $request->daterange ? explode(" - ", $request->daterange) : "";
+        $validator = Validator::make($requestAll, [
+            'salon_id' => 'required',
+        ]);
+        if ($validator->passes()) {
+            $pagination = $request->pagination ? $request->pagination : false;
+            $limit = $request->limit ? $request->limit : config('params.apiPerPage');
+            $field = [
+                'id',
+                'salon_id',
+                'client_id',
+                'service_id',
+                'staff_id',
+                'dateof',
+                'start_time',
+                'end_time',
+                'duration',
+                'cost',
+            ];
+            $withArray = [
+                'salon:id,business_name',
+                'client:id,first_name,last_name',
+                'service:id,name',
+                'staff:id,first_name,last_name',
+            ];
+            $where = ['is_active' => 1, 'salon_id' => $request->salon_id];
+            if ($client_id) {
+                $where['client_id'] = $client_id;
+            }
+            $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
+            $query = Appointment::with($withArray)->select($field)->where($where);
+            if ($daterange) {
+                $startdate = $daterange[0] . ' 00:00:00';
+                $enddate = $daterange[1] . ' 23:59:59';
+                $query->whereBetween("invoicedate", [$startdate, $enddate]);
+            }
+            $model = $query->orderByRaw('id desc')->paginate($limit);
+            $model->makeHidden(['salon_id', 'client_id', 'service_id', 'staff_id']);
+            $successData = $model->toArray();
+            return response()->json($successData, $this->successStatus);
+        } else {
+            // $errors = $validator->errors()->all();
+            $messages = $validator->messages();
+            return response()->json(['errors' => $messages, 'message' => __('messages.validation_error')], $this->errorStatus);
+        }
     }
 
 }

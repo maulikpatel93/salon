@@ -29,7 +29,7 @@ class SaleRequest extends FormRequest
             'salon_id' => 'required|integer',
             'client_id' => 'required|integer',
             'invoicedate' => 'nullable|date',
-            'paidtype' => 'nullable',
+            'paidby' => 'nullable',
             'totalprice' => 'nullable',
             'status' => 'nullable',
         ];

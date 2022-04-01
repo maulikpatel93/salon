@@ -25,7 +25,7 @@ class Sale extends Model
         'client_id',
         'invoicedate',
         'totalprice',
-        'paidtype',
+        'paidby',
         'status',
     ];
 
@@ -37,6 +37,8 @@ class Sale extends Model
     protected $hidden = [
         'salon_id',
         'client_id',
+        'appointment_id',
+        'voucher_id',
     ];
 
     /**
@@ -55,6 +57,11 @@ class Sale extends Model
     public function client()
     {
         return $this->hasOne(Client::class, 'id', 'client_id');
+    }
+
+    public function appointment()
+    {
+        return $this->hasOne(Appointment::class, 'id', 'appointment_id');
     }
 
     public function cart()
