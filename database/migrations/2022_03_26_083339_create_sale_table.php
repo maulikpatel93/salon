@@ -15,11 +15,11 @@ return new class extends Migration
     {
         Schema::create('sale', function (Blueprint $table) {
             $table->id();
-            $table->date('invoicedate')->nullable()->comment('calendar event date');
+            $table->date('eventdate')->nullable()->comment('calendar event date');
+            $table->date('invoicedate')->nullable()->comment('sale Invoice date');
             $table->enum('paidby', ['CreditCard', 'Cash', 'Voucher'])->default(null)->nullable()->comment('');
             $table->boolean('is_stripe')->default(0)->nullable()->comment('stripe payment flag');
             $table->decimal('totalprice', 10, 2)->nullable()->comment('Sale total price');
-            $table->decimal('voucherprice', 10, 2)->nullable()->comment('Voucher price');
             $table->enum('status', ['Pending', 'Paid', 'Failed'])->default(null)->nullable();
             $table->timestamps();
         });
@@ -33,16 +33,14 @@ return new class extends Migration
 
             $table->unsignedBigInteger('appointment_id')->after('client_id')->nullable()->comment('Type Of Appointment');
             $table->foreign('appointment_id')->references('id')->on('appointment')->onUpdate('cascade')->onDelete('cascade');
-
-            $table->unsignedBigInteger('voucher_id')->after('appointment_id')->nullable()->comment('Type Of Voucher');
-            $table->foreign('voucher_id')->references('id')->on('voucher')->onUpdate('cascade')->onDelete('cascade');
         });
 
         Schema::create('cart', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['Appointment', 'Service', 'Product'])->default(null)->nullable();
+            $table->enum('type', ['Appointment', 'Service', 'Product', 'Voucher', 'Membership', 'Subscription', 'OnOffVoucher'])->default(null)->nullable();
             $table->decimal('cost', 10, 2)->nullable()->comment('depend on type, Booked Appointment or Service or Product sale cost');
             $table->integer('qty', false, true)->nullable()->comment('only product use');
+            $table->text('recipient', 10, 2)->nullable();
             $table->timestamps();
         });
 
@@ -58,6 +56,12 @@ return new class extends Migration
 
             $table->unsignedBigInteger('product_id')->after('staff_id')->nullable()->comment('Type Of Product');
             $table->foreign('product_id')->references('id')->on('products')->onUpdate('cascade')->onDelete('cascade');
+
+            $table->unsignedBigInteger('voucher_id')->after('product_id')->nullable()->comment('Type Of Voucher');
+            $table->foreign('voucher_id')->references('id')->on('voucher')->onUpdate('cascade')->onDelete('cascade');
+
+            $table->unsignedBigInteger('membership_id')->after('voucher_id')->nullable()->comment('Type Of membership');
+            $table->foreign('membership_id')->references('id')->on('membership')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

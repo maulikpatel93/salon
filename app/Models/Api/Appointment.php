@@ -68,7 +68,7 @@ class Appointment extends Model
     }
     public function getSaleAttribute()
     {
-        $sale = Sale::where(['salon_id' => $this->salon_id, 'client_id' => $this->client_id, 'appointment_id' => $this->id, 'invoicedate' => $this->showdate])->first();
+        $sale = Sale::where(['salon_id' => $this->salon_id, 'client_id' => $this->client_id, 'appointment_id' => $this->id, 'eventdate' => $this->showdate])->first();
         return $this->attributes['sale'] = $sale ? $sale->toArray() : [];
     }
     public function salon()

@@ -28,6 +28,7 @@ class SaleRequest extends FormRequest
         return [
             'salon_id' => 'required|integer',
             'client_id' => 'required|integer',
+            'eventdate' => 'nullable|date',
             'invoicedate' => 'nullable|date',
             'paidby' => 'nullable',
             'totalprice' => 'nullable',

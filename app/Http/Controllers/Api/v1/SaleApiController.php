@@ -10,6 +10,7 @@ use App\Models\Api\Categories;
 use App\Models\Api\Products;
 use App\Models\Api\Sale;
 use App\Models\Api\Services;
+use App\Models\Api\Voucher;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -25,7 +26,7 @@ class SaleApiController extends Controller
         'client_id',
         'appointment_id',
         'voucher_id',
-        'invoicedate',
+        'eventdate',
         'totalprice',
         'paidby',
         'status',
@@ -125,6 +126,39 @@ class SaleApiController extends Controller
         return response()->json(['message' => __('messages.not_found')], $this->errorStatus);
     }
 
+    public function vouchers(Request $request)
+    {
+        $requestAll = $request->all();
+        $pagination = $request->pagination ? $request->pagination : false;
+        $limit = $request->limit ? $request->limit : config('params.apiPerPage');
+        $whereLike = $request->q;
+
+        $voucher_id = $request->voucher_id;
+        $salon_id = $request->salon_id;
+        if ($salon_id) {
+            if ($voucher_id) {
+                $withArray = [];
+                $vouchers = Voucher::select(['id', 'code', 'name', 'description', 'amount', 'used_online', 'terms_and_conditions'])->where('id', $voucher_id)->first();
+            } else {
+                $vouchers = Voucher::select(['id',
+                    'salon_id',
+                    'code',
+                    'name',
+                    'description',
+                    'amount',
+                    'valid',
+                    'used_online',
+                    'terms_and_conditions'])->where('is_active', '1')->paginate($limit);
+            }
+
+            if ($vouchers) {
+                $successData = $vouchers->toArray();
+                return response()->json($successData, $this->successStatus);
+            }
+        }
+        return response()->json(['message' => __('messages.not_found')], $this->errorStatus);
+    }
+
     public function store(SaleRequest $request)
     {
         $requestAll = $request->all();
@@ -132,15 +166,16 @@ class SaleApiController extends Controller
         $salon_id = $request->salon_id;
         $client_id = $request->client_id;
         $appointment_id = $request->appointment_id;
-        $invoicedate = $request->invoicedate;
+        $eventdate = $request->eventdate;
+        $invoicedate = date('Y-m-d');
         if ($appointment_id) {
-            $model = Sale::where(['salon_id' => $salon_id, 'client_id' => $client_id, 'appointment_id' => $appointment_id, 'invoicedate' => $invoicedate])->first();
+            $model = Sale::where(['salon_id' => $salon_id, 'client_id' => $client_id, 'appointment_id' => $appointment_id, 'eventdate' => $eventdate])->first();
         }
         $model = new Sale;
         $model->salon_id = $salon_id;
         $model->client_id = $client_id;
         $model->appointment_id = $appointment_id;
-        $model->invoicedate = $invoicedate;
+        $model->eventdate = $eventdate;
         $model->totalprice = null;
         $model->paidby = $request->paidby;
         $model->status = 'Paid';
@@ -302,7 +337,7 @@ class SaleApiController extends Controller
             if ($daterange) {
                 $startdate = $daterange[0] . ' 00:00:00';
                 $enddate = $daterange[1] . ' 23:59:59';
-                $query->whereBetween("invoicedate", [$startdate, $enddate]);
+                $query->whereBetween("dateof", [$startdate, $enddate]);
             }
             $model = $query->orderByRaw('id desc')->paginate($limit);
             $model->makeHidden(['salon_id', 'client_id', 'service_id', 'staff_id']);

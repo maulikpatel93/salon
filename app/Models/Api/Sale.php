@@ -23,6 +23,7 @@ class Sale extends Model
     protected $fillable = [
         'salon_id',
         'client_id',
+        'eventdate',
         'invoicedate',
         'totalprice',
         'paidby',

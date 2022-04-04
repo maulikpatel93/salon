@@ -210,6 +210,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/createinvoice', 'createinvoice')->name('createinvoice');
             Route::post('/services', 'services')->name('services');
             Route::post('/products', 'products')->name('products');
+            Route::post('/vouchers', 'vouchers')->name('vouchers');
             Route::post('/store', 'store')->name('store');
         });
     });

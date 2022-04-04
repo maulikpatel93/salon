@@ -253,6 +253,7 @@ class CreateSalonsTable extends Migration
             $table->boolean('limit_uses')->default(1)->nullable(); // 1:Active, 0:Inactive
             $table->integer('limit_uses_value', false, true)->nullable();
             $table->text('terms_and_conditions')->nullable();
+            $table->datetime('expiry_at')->nullable()->comment('voucher expiry datetime');
             $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
@@ -261,16 +262,29 @@ class CreateSalonsTable extends Migration
             $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
             $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
         });
-        Schema::create('voucher_services', function (Blueprint $table) {
+        // Schema::create('voucher_services', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->timestamps();
+        // });
+        // Schema::table('voucher_services', function (Blueprint $table) {
+        //     $table->unsignedBigInteger('voucher_id')->after('id')->nullable()->comment('Type Of Voucher');
+        //     $table->foreign('voucher_id')->references('id')->on('voucher')->onUpdate('cascade')->onDelete('cascade');
+
+        //     $table->unsignedBigInteger('service_id')->after('voucher_id')->nullable()->comment('Type Of Voucher Service include');
+        //     $table->foreign('service_id')->references('id')->on('services')->onUpdate('cascade')->onDelete('cascade');
+        // });
+        Schema::create('membership', function (Blueprint $table) {
             $table->id();
+            $table->string('name', 200);
+            $table->decimal('credit', 10, 2)->nullable();
+            $table->decimal('cost', 10, 2)->nullable();
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
+            $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
         });
-        Schema::table('voucher_services', function (Blueprint $table) {
-            $table->unsignedBigInteger('voucher_id')->after('id')->nullable()->comment('Type Of Voucher');
-            $table->foreign('voucher_id')->references('id')->on('voucher')->onUpdate('cascade')->onDelete('cascade');
-
-            $table->unsignedBigInteger('service_id')->after('voucher_id')->nullable()->comment('Type Of Voucher Service include');
-            $table->foreign('service_id')->references('id')->on('services')->onUpdate('cascade')->onDelete('cascade');
+        Schema::table('membership', function (Blueprint $table) {
+            $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
+            $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
         });
 
         Schema::create('busy_time', function (Blueprint $table) {
