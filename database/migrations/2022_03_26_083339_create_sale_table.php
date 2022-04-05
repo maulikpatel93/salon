@@ -63,6 +63,22 @@ return new class extends Migration
             $table->unsignedBigInteger('membership_id')->after('voucher_id')->nullable()->comment('Type Of membership');
             $table->foreign('membership_id')->references('id')->on('membership')->onUpdate('cascade')->onDelete('cascade');
         });
+
+        Schema::create('voucher_to', function (Blueprint $table) {
+            $table->string('first_name', 100);
+            $table->string('last_name', 100);
+            $table->string('email', 100)->nullable();
+            $table->string('code', 16);
+            $table->boolean('is_send')->default(0)->comment('only use email send with pdf attachment');
+            $table->decimal('amount', 10, 2)->nullable()->comment('Voucher and onoffvoucher amount');
+            $table->text('message')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::table('voucher_to', function (Blueprint $table) {
+            $table->unsignedBigInteger('cart_id')->after('id')->nullable()->comment('Type Of Cart');
+            $table->foreign('cart_id')->references('id')->on('cart')->onUpdate('cascade')->onDelete('cascade');
+        });
     }
 
     /**

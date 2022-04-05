@@ -579,6 +579,146 @@ class PermissionsTableSeeder extends Seeder
                 'controller' => 'salons',
                 'action' => 'export',
             ),
+            56 => 
+            array (
+                'id' => 57,
+                'module_id' => 12,
+                'panel' => 'Backend',
+                'title' => 'List',
+                'name' => 'list',
+                'controller' => 'salonmodules',
+                'action' => 'index',
+            ),
+            57 => 
+            array (
+                'id' => 58,
+                'module_id' => 12,
+                'panel' => 'Backend',
+                'title' => 'Create',
+                'name' => 'create',
+                'controller' => 'salonmodules',
+                'action' => 'create',
+            ),
+            58 => 
+            array (
+                'id' => 59,
+                'module_id' => 12,
+                'panel' => 'Backend',
+                'title' => 'Update',
+                'name' => 'update',
+                'controller' => 'salonmodules',
+                'action' => 'update',
+            ),
+            59 => 
+            array (
+                'id' => 60,
+                'module_id' => 12,
+                'panel' => 'Backend',
+                'title' => 'View',
+                'name' => 'view',
+                'controller' => 'salonmodules',
+                'action' => 'view',
+            ),
+            60 => 
+            array (
+                'id' => 61,
+                'module_id' => 12,
+                'panel' => 'Backend',
+                'title' => 'Delete',
+                'name' => 'delete',
+                'controller' => 'salonmodules',
+                'action' => 'delete',
+            ),
+            61 => 
+            array (
+                'id' => 62,
+                'module_id' => 12,
+                'panel' => 'Backend',
+                'title' => 'Is active',
+                'name' => 'isactive',
+                'controller' => 'salonmodules',
+                'action' => 'isactive',
+            ),
+            62 => 
+            array (
+                'id' => 63,
+                'module_id' => 12,
+                'panel' => 'Backend',
+                'title' => 'Export',
+                'name' => 'export',
+                'controller' => 'salonmodules',
+                'action' => 'export',
+            ),
+            63 => 
+            array (
+                'id' => 64,
+                'module_id' => 13,
+                'panel' => 'Backend',
+                'title' => 'List',
+                'name' => 'list',
+                'controller' => 'salonpermissions',
+                'action' => 'index',
+            ),
+            64 => 
+            array (
+                'id' => 65,
+                'module_id' => 13,
+                'panel' => 'Backend',
+                'title' => 'Create',
+                'name' => 'create',
+                'controller' => 'salonpermissions',
+                'action' => 'create',
+            ),
+            65 => 
+            array (
+                'id' => 66,
+                'module_id' => 13,
+                'panel' => 'Backend',
+                'title' => 'Update',
+                'name' => 'update',
+                'controller' => 'salonpermissions',
+                'action' => 'update',
+            ),
+            66 => 
+            array (
+                'id' => 67,
+                'module_id' => 13,
+                'panel' => 'Backend',
+                'title' => 'View',
+                'name' => 'view',
+                'controller' => 'salonpermissions',
+                'action' => 'view',
+            ),
+            67 => 
+            array (
+                'id' => 68,
+                'module_id' => 13,
+                'panel' => 'Backend',
+                'title' => 'Delete',
+                'name' => 'delete',
+                'controller' => 'salonpermissions',
+                'action' => 'delete',
+            ),
+            68 => 
+            array (
+                'id' => 69,
+                'module_id' => 13,
+                'panel' => 'Backend',
+                'title' => 'Is active',
+                'name' => 'isactive',
+                'controller' => 'salonpermissions',
+                'action' => 'isactive',
+            ),
+            69 => 
+            array (
+                'id' => 70,
+                'module_id' => 13,
+                'panel' => 'Backend',
+                'title' => 'Export',
+                'name' => 'export',
+                'controller' => 'salonpermissions',
+                'action' => 'export',
+            ),
         ));
         
         

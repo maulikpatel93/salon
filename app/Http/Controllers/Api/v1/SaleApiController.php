@@ -7,6 +7,7 @@ use App\Http\Requests\Api\SaleRequest;
 use App\Models\Api\Appointment;
 use App\Models\Api\Cart;
 use App\Models\Api\Categories;
+use App\Models\Api\Membership;
 use App\Models\Api\Products;
 use App\Models\Api\Sale;
 use App\Models\Api\Services;
@@ -65,13 +66,13 @@ class SaleApiController extends Controller
                     'serviceprice:id,service_id,price_tier_id,price,add_on_price',
                     'tax:id,name,percentage',
                 ];
-                $services = Services::with($withArray)->select(['id', 'tax_id', 'name'])->where('id', $service_id)->whereNotNull('category_id')->first()->makeHidden(['isServiceChecked', 'isNotId', 'tax_id']);
+                $services = Services::with($withArray)->select(['id', 'tax_id', 'name'])->where('id', $service_id)->where('salon_id', $salon_id)->whereNotNull('category_id')->first()->makeHidden(['isServiceChecked', 'isNotId', 'tax_id']);
             } else {
                 $services = Categories::with(['services' => function ($query) use ($salon_id, $whereLike) {
                     $query->with(['serviceprice:id,service_id,price_tier_id,price,add_on_price'])->select('category_id', 'id', 'name', 'duration')->where('salon_id', $salon_id)->where('is_active', '1')->where(function ($squery) use ($whereLike) {
                         $squery->where('name', "like", "%" . $whereLike . "%");
                     });
-                }])->has('services')->select('id', 'name')->where('is_active', '1')->paginate($limit);
+                }])->has('services')->select('id', 'name')->where('salon_id', $salon_id)->where('is_active', '1')->paginate($limit);
             }
             if ($services) {
                 $services = $services->toArray();
@@ -99,7 +100,7 @@ class SaleApiController extends Controller
                 $withArray = [
                     'tax:id,name,percentage',
                 ];
-                $products = Products::with($withArray)->select(['id', 'tax_id', 'name', 'image', 'sku', 'cost_price', 'retail_price'])->where('id', $product_id)->first()->makeHidden(['tax_id']);
+                $products = Products::with($withArray)->select(['id', 'tax_id', 'name', 'image', 'sku', 'cost_price', 'retail_price'])->where('id', $product_id)->where('salon_id', $salon_id)->first()->makeHidden(['tax_id']);
             } else {
                 $products = Products::select(['id',
                     'salon_id',
@@ -115,7 +116,7 @@ class SaleApiController extends Controller
                     'stock_quantity',
                     'low_stock_threshold'])->where(function ($query) use ($whereLike) {
                     $query->where('name', "like", "%" . $whereLike . "%");
-                })->where('is_active', '1')->paginate($limit);
+                })->where('is_active', '1')->where('salon_id', $salon_id)->paginate($limit);
             }
 
             if ($products) {
@@ -138,7 +139,7 @@ class SaleApiController extends Controller
         if ($salon_id) {
             if ($voucher_id) {
                 $withArray = [];
-                $vouchers = Voucher::select(['id', 'code', 'name', 'description', 'amount', 'used_online', 'terms_and_conditions'])->where('id', $voucher_id)->first();
+                $vouchers = Voucher::select(['id', 'code', 'name', 'description', 'amount', 'used_online', 'terms_and_conditions'])->where('id', $voucher_id)->where('salon_id', $salon_id)->first();
             } else {
                 $vouchers = Voucher::select(['id',
                     'salon_id',
@@ -148,7 +149,32 @@ class SaleApiController extends Controller
                     'amount',
                     'valid',
                     'used_online',
-                    'terms_and_conditions'])->where('is_active', '1')->paginate($limit);
+                    'terms_and_conditions'])->where('is_active', '1')->where('salon_id', $salon_id)->paginate($limit);
+            }
+
+            if ($vouchers) {
+                $successData = $vouchers->toArray();
+                return response()->json($successData, $this->successStatus);
+            }
+        }
+        return response()->json(['message' => __('messages.not_found')], $this->errorStatus);
+    }
+
+    public function membership(Request $request)
+    {
+        $requestAll = $request->all();
+        $pagination = $request->pagination ? $request->pagination : false;
+        $limit = $request->limit ? $request->limit : config('params.apiPerPage');
+        $whereLike = $request->q;
+
+        $membership_id = $request->membership_id;
+        $salon_id = $request->salon_id;
+        if ($salon_id) {
+            if ($membership_id) {
+                $withArray = [];
+                $vouchers = Membership::select(['id', 'name', 'credit', 'cost'])->where('id', $membership_id)->where('salon_id', $salon_id)->first();
+            } else {
+                $vouchers = Membership::select(['id', 'name', 'credit', 'cost'])->where('is_active', '1')->where('salon_id', $salon_id)->paginate($limit);
             }
 
             if ($vouchers) {

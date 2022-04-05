@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\v1\ClientDocumentApiController;
 use App\Http\Controllers\Api\v1\ClientNoteApiController;
 use App\Http\Controllers\Api\v1\ClientPhotoApiController;
 use App\Http\Controllers\Api\v1\GuestApiController;
+use App\Http\Controllers\Api\v1\MembershipApiController;
 use App\Http\Controllers\Api\v1\PricetierApiController;
 use App\Http\Controllers\Api\v1\ProductsApiController;
 use App\Http\Controllers\Api\v1\RosterApiController;
@@ -168,6 +169,13 @@ Route::prefix('v1')->group(function () {
             Route::post('/delete/{id}', [VoucherApiController::class, 'delete'])->name('delete');
         });
 
+        //Membership
+        Route::controller(MembershipApiController::class)->prefix('membership')->name('membership.')->group(function () {
+            Route::post('/view', 'view');
+            Route::post('/store', 'store');
+            Route::post('/update/{id}', 'update')->whereNumber('id');
+            Route::post('/delete/{id}', 'delete')->whereNumber('id');
+        });
         //Appointment
         Route::prefix('appointment')->name('appointment.')->group(function () {
             Route::post('/view', [AppointmentApiController::class, 'view'])->name('view');
@@ -211,6 +219,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/services', 'services')->name('services');
             Route::post('/products', 'products')->name('products');
             Route::post('/vouchers', 'vouchers')->name('vouchers');
+            Route::post('/membership', 'membership')->name('membership');
             Route::post('/store', 'store')->name('store');
         });
     });

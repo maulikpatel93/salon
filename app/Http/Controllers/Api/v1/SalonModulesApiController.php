@@ -89,7 +89,7 @@ class SalonModulesApiController extends Controller
 
         $whereLike = $request->q ? explode(' ', $request->q) : '';
 
-        $orderby = 'id asc';
+        $orderby = 'menu_position asc';
 
         if ($id) {
             if ($request->result == 'result_array') {
