@@ -12,7 +12,9 @@ use App\Models\Api\Products;
 use App\Models\Api\Sale;
 use App\Models\Api\Services;
 use App\Models\Api\Voucher;
+use App\Models\Api\VoucherTo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Validator;
 
 class SaleApiController extends Controller
@@ -136,10 +138,12 @@ class SaleApiController extends Controller
 
         $voucher_id = $request->voucher_id;
         $salon_id = $request->salon_id;
+        $voucher_to = $request->voucher_to;
         if ($salon_id) {
             if ($voucher_id) {
                 $withArray = [];
                 $vouchers = Voucher::select(['id', 'code', 'name', 'description', 'amount', 'used_online', 'terms_and_conditions'])->where('id', $voucher_id)->where('salon_id', $salon_id)->first();
+                $vouchers->voucher_to = $voucher_to;
             } else {
                 $vouchers = Voucher::select(['id',
                     'salon_id',
@@ -188,6 +192,10 @@ class SaleApiController extends Controller
     public function store(SaleRequest $request)
     {
         $requestAll = $request->all();
+        echo '<pre>';
+        print_r($requestAll);
+        echo '<pre>';
+        dd();
         $cart = $request->cart ? json_decode($request->cart, true) : [];
         $salon_id = $request->salon_id;
         $client_id = $request->client_id;
@@ -234,12 +242,62 @@ class SaleApiController extends Controller
                 }
                 if (isset($cart['products']) && $cart['products']) {
                     foreach ($cart['products'] as $value) {
-                        $modelCartProduct = new Cart;
+                        $modelCart = new Cart;
                         $modelCart->sale_id = $model->id;
                         $modelCart->product_id = $value['id'];
                         $modelCart->qty = $value['qty'];
                         $modelCart->cost = $value['price'];
                         $modelCart->type = "Product";
+                        $modelCart->save();
+                    }
+                }
+                if (isset($cart['vouchers']) && $cart['vouchers']) {
+                    foreach ($cart['vouchers'] as $value) {
+                        $voucher_to = (isset($value['voucher_to']) && $value['voucher_to']) ? $value['voucher_to'] : "";
+                        $modelCart = new Cart;
+                        $modelCart->sale_id = $model->id;
+                        $modelCart->voucher_id = $value['id'];
+                        $modelCart->cost = $value['amount'];
+                        $modelCart->type = "Voucher";
+                        $modelCart->save();
+                        if ($voucher_to) {
+                            foreach ($voucher_to as $vt) {
+                                $modelCartVoucherTo = new VoucherTo;
+                                $modelCartVoucherTo->cart_id = $modelCart->id;
+                                $modelCartVoucherTo->first_name = $vt['first_name'];
+                                $modelCartVoucherTo->last_name = $vt['last_name'];
+                                $modelCartVoucherTo->is_send = $vt['is_send'];
+                                $modelCartVoucherTo->email = $vt['email'];
+                                $modelCartVoucherTo->amount = $vt['amount'];
+                                $modelCartVoucherTo->message = $vt['message'];
+                                $modelCartVoucherTo->code = (isset($value['code']) && $value['code']) ? $value['code'] : Str::random(6);
+                                $modelCartVoucherTo->save();
+                                if ($modelCartVoucherTo->is_send) {
+                                    $field = array();
+                                    $field['{{amount}}'] = $modelCartVoucherTo->amount;
+                                    $field['{{code}}'] = $modelCartVoucherTo->code;
+                                    $sendmail = sendMail($modelCartVoucherTo->email, 'email_verification', $field);
+                                }
+                            }
+                        }
+                    }
+                }
+                if (isset($cart['membership']) && $cart['membership']) {
+                    foreach ($cart['membership'] as $value) {
+                        $modelCartProduct = new Cart;
+                        $modelCart->sale_id = $model->id;
+                        $modelCart->membership_id = $value['id'];
+                        $modelCart->cost = $value['amount'];
+                        $modelCart->type = "Membership";
+                        $modelCart->save();
+                    }
+                }
+                if (isset($cart['onoffvouchers']) && $cart['onoffvouchers']) {
+                    foreach ($cart['onoffvouchers'] as $value) {
+                        $modelCartProduct = new Cart;
+                        $modelCart->sale_id = $model->id;
+                        $modelCart->cost = $value['amount'];
+                        $modelCart->type = "OnOffVoucher";
                         $modelCart->save();
                     }
                 }
