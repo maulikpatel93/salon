@@ -113,15 +113,15 @@ class StaffApiController extends Controller
         $requestAll['password'] = Hash::make($randompassword);
         $requestAll['calendar_booking'] = (isset($requestAll['calendar_booking']) && $requestAll['calendar_booking']) ? 1 : 0;
 
-        // if ($requestAll['email']) {
-        //     $field = array();
-        //     $field['email'] = $requestAll['email'];
-        //     $field['password'] = $randompassword;
-        //     $sendmail = sendMail($requestAll['email'], ['subject' => 'Verify Email Address'], $field);
-        //     if (empty($sendmail)) {
-        //         return response()->json(['email' => $requestAll['email'], 'message' => __('messages.wrongmail')], $this->errorStatus);
-        //     }
-        // }
+        if ($requestAll['email']) {
+            $field = array();
+            $field['email'] = $requestAll['email'];
+            $field['password'] = $randompassword;
+            $sendmail = sendMail($requestAll['email'], ['subject' => 'Verify Email Address'], $field);
+            if (empty($sendmail)) {
+                return response()->json(['email' => $requestAll['email'], 'message' => __('messages.wrongmail')], $this->errorStatus);
+            }
+        }
         $staff_working_hours = ($request->working_hours) ? json_decode($request->working_hours, true) : [];
         $staff_services = ($request->add_on_services) ? explode(",", $request->add_on_services) : [];
         $staff_services = $staff_services ? array_values(array_filter($staff_services)) : [];

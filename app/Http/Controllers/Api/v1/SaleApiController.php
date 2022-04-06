@@ -276,7 +276,10 @@ class SaleApiController extends Controller
                                     $field = array();
                                     $field['{{amount}}'] = $modelCartVoucherTo->amount;
                                     $field['{{code}}'] = $modelCartVoucherTo->code;
-                                    $sendmail = sendMail($modelCartVoucherTo->email, 'email_verification', $field);
+                                    $sendmail = sendMail($modelCartVoucherTo->email, ['subject' => 'Beauty- Gift Voucher'], $field);
+                                    if (empty($sendmail)) {
+                                        // return response()->json(['email' => $requestAll['email'], 'message' => __('messages.wrongmail')], $this->errorStatus);
+                                    }
                                 }
                             }
                         }
