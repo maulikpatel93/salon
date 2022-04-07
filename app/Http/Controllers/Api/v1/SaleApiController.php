@@ -61,14 +61,30 @@ class SaleApiController extends Controller
         $whereLike = $request->q;
         $service_id = $request->service_id;
         $salon_id = $request->salon_id;
+        $serviceprice = $request->serviceprice;
         if ($salon_id) {
             if ($service_id) {
                 $withArray = [
                     'staffservices:id,first_name,last_name,email',
-                    'serviceprice:id,service_id,price_tier_id,price,add_on_price',
+                    // 'serviceprice:id,service_id,price_tier_id,price,add_on_price',
                     'tax:id,name,percentage',
                 ];
+                if ($serviceprice) {
+                    $withArray = [
+                        'staffservices:id,first_name,last_name,email',
+                        'tax:id,name,percentage',
+                    ];
+                } else {
+                    $withArray = [
+                        'staffservices:id,first_name,last_name,email',
+                        'serviceprice:id,service_id,price_tier_id,price,add_on_price',
+                        'tax:id,name,percentage',
+                    ];
+                }
                 $services = Services::with($withArray)->select(['id', 'tax_id', 'name'])->where('id', $service_id)->where('salon_id', $salon_id)->whereNotNull('category_id')->first()->makeHidden(['isServiceChecked', 'isNotId', 'tax_id']);
+                if ($serviceprice) {
+                    $services->serviceprice = $serviceprice;
+                }
             } else {
                 $services = Categories::with(['services' => function ($query) use ($salon_id, $whereLike) {
                     $query->with(['serviceprice:id,service_id,price_tier_id,price,add_on_price'])->select('category_id', 'id', 'name', 'duration')->where('salon_id', $salon_id)->where('is_active', '1')->where(function ($squery) use ($whereLike) {
