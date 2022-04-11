@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class SendMail extends Mailable
+class OtpSendToEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -15,9 +15,9 @@ class SendMail extends Mailable
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($request)
     {
-        //
+        $this->request = $request;
     }
 
     /**
@@ -27,6 +27,6 @@ class SendMail extends Mailable
      */
     public function build()
     {
-        return $this->view('view.name');
+        return $this->markdown('emails.OtpSendToEmail', ['request' => $this->request]);
     }
 }

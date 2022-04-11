@@ -1,15 +1,20 @@
 <?php
 
+use App\Mail\GiftVoucher;
+use App\Mail\OtpSendToEmail;
 use App\Mail\VerifyEmail;
+use App\Models\Api\Users;
+use App\Models\Emailtemplates;
 use App\Models\Modules;
 use App\Models\Permissions;
 use App\Models\RoleAccess;
 use App\Models\Salons;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Mail;
+// use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Route;
 use Illuminate\Support\Str;
+use Mail;
 // use Mail;
 /**
  * Henerate UUID.
@@ -313,7 +318,8 @@ if (!function_exists('sendMail')) {
             $toEmail = $email;
             $copyright_text = str_replace('{year}', date('Y'), config('params.copyright_text'));
 
-            if (isset($template['code']) && $template['template']) {
+            if (isset($template['code']) && $template['code']) {
+                $code = $template['code'];
                 $EmailTemplates = Emailtemplates::where(['code' => $code])->first();
                 if (empty($EmailTemplates)) {
                     return false;
@@ -336,7 +342,7 @@ if (!function_exists('sendMail')) {
                     'body' => $message,
                 );
                 try {
-                    $sendemail = Mail::send(['html' => 'admin.emailtemplates.template.mail'], $data, function ($message) use ($toEmail, $fromEmail, $subject) {
+                    $sendemail = Mail::send(['html' => 'emails.mail'], $data, function ($message) use ($toEmail, $fromEmail, $subject) {
                         // echo $toEmail . ' ' . $fromEmail . ' ' . $subject;
                         $message->to($toEmail)->subject($subject);
                         $message->from($fromEmail);
@@ -349,8 +355,36 @@ if (!function_exists('sendMail')) {
             } else {
                 try {
                     $data = $field;
-                    Mail::to($toEmail)->send(new VerifyEmail($data));
+                    $template = isset($template['template']) && $template['template'] ? $template['template'] : "";
+                    $templateClass = "";
+                    if ($template === "OtpSendToEmail") {
+                        Mail::to($toEmail)->send(new OtpSendToEmail($data));
+                    }
+                    if ($template === "VerifyEmail") {
+                        Mail::to($toEmail)->send(new VerifyEmail($data));
+                    }
+
+                    if ($template === "GiftVoucher") {
+                        $user = Users::find(auth()->user()->id);
+                        $salon = $user->salon;
+                        $data['business_logo'] = $salon->logo_url;
+                        $data['business_name'] = $salon->business_name ? $salon->business_name : config('app.name');
+                        $data['business_email'] = $user->email;
+                        $data['business_phone_number'] = $salon->business_phone_number;
+                        $data['business_address'] = $salon->business_address;
+                        Mail::to($toEmail)->send(new GiftVoucher($data));
+                    }
+                    // } catch (\Swift_TransportException$e) {
+                    //     if ($e->getMessage()) {
+                    //         dd($e->getMessage());
+                    //     }
+                    // }
                 } catch (\Exception$e) {
+                    echo '<pre>';
+                    print_r(Mail::failures());
+                    echo '<pre>';
+                    dd();
+
                     if (count(Mail::failures()) > 0) {
                         return false;
                     }

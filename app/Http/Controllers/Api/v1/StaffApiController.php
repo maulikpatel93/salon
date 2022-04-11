@@ -117,7 +117,7 @@ class StaffApiController extends Controller
             $field = array();
             $field['email'] = $requestAll['email'];
             $field['password'] = $randompassword;
-            $sendmail = sendMail($requestAll['email'], ['subject' => 'Verify Email Address'], $field);
+            $sendmail = sendMail($requestAll['email'], ['subject' => 'Verify Email Address', 'template' => 'VerifyEmail'], $field);
             if (empty($sendmail)) {
                 return response()->json(['email' => $requestAll['email'], 'message' => __('messages.wrongmail')], $this->errorStatus);
             }

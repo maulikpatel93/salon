@@ -11,6 +11,7 @@ use App\Models\Api\Membership;
 use App\Models\Api\Products;
 use App\Models\Api\Sale;
 use App\Models\Api\Services;
+use App\Models\Api\Users;
 use App\Models\Api\Voucher;
 use App\Models\Api\VoucherTo;
 use Illuminate\Http\Request;
@@ -28,8 +29,8 @@ class SaleApiController extends Controller
         'salon_id',
         'client_id',
         'appointment_id',
-        'voucher_id',
         'eventdate',
+        'invoicedate',
         'totalprice',
         'paidby',
         'status',
@@ -214,24 +215,19 @@ class SaleApiController extends Controller
     public function store(SaleRequest $request)
     {
         $requestAll = $request->all();
-        echo '<pre>';
-        print_r($requestAll);
-        echo '<pre>';
-        dd();
         $cart = $request->cart ? json_decode($request->cart, true) : [];
         $salon_id = $request->salon_id;
         $client_id = $request->client_id;
         $appointment_id = $request->appointment_id;
         $eventdate = $request->eventdate;
-        $invoicedate = date('Y-m-d');
-        if ($appointment_id) {
-            $model = Sale::where(['salon_id' => $salon_id, 'client_id' => $client_id, 'appointment_id' => $appointment_id, 'eventdate' => $eventdate])->first();
-        }
+        $invoicedate = gmdate('Y-m-d');
+        $client = Users::find($client_id);
         $model = new Sale;
         $model->salon_id = $salon_id;
         $model->client_id = $client_id;
         $model->appointment_id = $appointment_id;
         $model->eventdate = $eventdate;
+        $model->invoicedate = $invoicedate;
         $model->totalprice = null;
         $model->paidby = $request->paidby;
         $model->status = 'Paid';
@@ -256,7 +252,7 @@ class SaleApiController extends Controller
                         $modelCart = new Cart;
                         $modelCart->sale_id = $model->id;
                         $modelCart->service_id = $value['id'];
-                        $modelCart->staff_id = $value['staff_id'];
+                        $modelCart->staff_id = ($value['staff_id']) ? $value['staff_id'] : null;
                         $modelCart->cost = $value['gprice'];
                         $modelCart->type = "Service";
                         $modelCart->save();
@@ -283,47 +279,72 @@ class SaleApiController extends Controller
                         $modelCart->type = "Voucher";
                         $modelCart->save();
                         if ($voucher_to) {
-                            foreach ($voucher_to as $vt) {
-                                $modelCartVoucherTo = new VoucherTo;
-                                $modelCartVoucherTo->cart_id = $modelCart->id;
-                                $modelCartVoucherTo->first_name = $vt['first_name'];
-                                $modelCartVoucherTo->last_name = $vt['last_name'];
-                                $modelCartVoucherTo->is_send = $vt['is_send'];
-                                $modelCartVoucherTo->email = $vt['email'];
-                                $modelCartVoucherTo->amount = $vt['amount'];
-                                $modelCartVoucherTo->message = $vt['message'];
-                                $modelCartVoucherTo->code = (isset($value['code']) && $value['code']) ? $value['code'] : Str::random(6);
-                                $modelCartVoucherTo->save();
-                                if ($modelCartVoucherTo->is_send) {
-                                    $field = array();
-                                    $field['{{amount}}'] = $modelCartVoucherTo->amount;
-                                    $field['{{code}}'] = $modelCartVoucherTo->code;
-                                    $sendmail = sendMail($modelCartVoucherTo->email, ['subject' => 'Beauty- Gift Voucher'], $field);
-                                    if (empty($sendmail)) {
-                                        // return response()->json(['email' => $requestAll['email'], 'message' => __('messages.wrongmail')], $this->errorStatus);
-                                    }
+                            $vt = $voucher_to;
+                            // foreach ($voucher_to as $vt) {
+                            $modelCartVoucherTo = new VoucherTo;
+                            $modelCartVoucherTo->cart_id = $modelCart->id;
+                            $modelCartVoucherTo->first_name = $vt['first_name'];
+                            $modelCartVoucherTo->last_name = $vt['last_name'];
+                            $modelCartVoucherTo->is_send = (isset($vt['is_send']) && $vt['is_send']) ? 1 : 0;
+                            $modelCartVoucherTo->email = $vt['email'] ? $vt['email'] : null;
+                            $modelCartVoucherTo->amount = $vt['amount'];
+                            $modelCartVoucherTo->message = $vt['message'] ? $vt['message'] : null;
+                            $modelCartVoucherTo->code = (isset($value['code']) && $value['code']) ? $value['code'] : Str::random(6);
+                            $modelCartVoucherTo->save();
+                            if ($modelCartVoucherTo->is_send) {
+                                $field = array();
+                                $field['amount'] = $modelCartVoucherTo->amount;
+                                $field['code'] = $modelCartVoucherTo->code;
+                                $field['message'] = $modelCartVoucherTo->message;
+                                $field['recipient_name'] = ucfirst($modelCartVoucherTo->first_name) . ' ' . ucfirst($modelCartVoucherTo->last_name);
+                                $field['sender_name'] = $client->first_name . ' ' . $client->last_name;
+                                $sendmail = sendMail($modelCartVoucherTo->email, ['subject' => 'Beauty- Gift Voucher', 'template' => 'GiftVoucher'], $field);
+                                if (empty($sendmail)) {
+                                    // return response()->json(['email' => $requestAll['email'], 'message' => __('messages.wrongmail')], $this->errorStatus);
                                 }
                             }
+                            // }
                         }
                     }
                 }
                 if (isset($cart['membership']) && $cart['membership']) {
                     foreach ($cart['membership'] as $value) {
-                        $modelCartProduct = new Cart;
+                        $modelCart = new Cart;
                         $modelCart->sale_id = $model->id;
                         $modelCart->membership_id = $value['id'];
-                        $modelCart->cost = $value['amount'];
+                        $modelCart->cost = $value['cost'];
                         $modelCart->type = "Membership";
                         $modelCart->save();
                     }
                 }
                 if (isset($cart['onoffvouchers']) && $cart['onoffvouchers']) {
-                    foreach ($cart['onoffvouchers'] as $value) {
-                        $modelCartProduct = new Cart;
-                        $modelCart->sale_id = $model->id;
-                        $modelCart->cost = $value['amount'];
-                        $modelCart->type = "OnOffVoucher";
-                        $modelCart->save();
+                    $modelCart = new Cart;
+                    $modelCart->sale_id = $model->id;
+                    $modelCart->type = "OnOffVoucher";
+                    $modelCart->save();
+                    foreach ($cart['onoffvouchers'] as $vt) {
+                        $modelCartVoucherTo = new VoucherTo;
+                        $modelCartVoucherTo->cart_id = $modelCart->id;
+                        $modelCartVoucherTo->first_name = $vt['first_name'];
+                        $modelCartVoucherTo->last_name = $vt['last_name'];
+                        $modelCartVoucherTo->is_send = (isset($vt['is_send']) && $vt['is_send']) ? 1 : 0;
+                        $modelCartVoucherTo->email = $vt['email'] ? $vt['email'] : null;
+                        $modelCartVoucherTo->amount = $vt['amount'];
+                        $modelCartVoucherTo->message = $vt['message'] ? $vt['message'] : null;
+                        $modelCartVoucherTo->code = (isset($value['code']) && $value['code']) ? $value['code'] : Str::random(6);
+                        $modelCartVoucherTo->save();
+                        if ($modelCartVoucherTo->is_send) {
+                            $field = array();
+                            $field['amount'] = $modelCartVoucherTo->amount;
+                            $field['code'] = $modelCartVoucherTo->code;
+                            $field['message'] = $modelCartVoucherTo->message;
+                            $field['recipient_name'] = ucfirst($modelCartVoucherTo->first_name) . ' ' . ucfirst($modelCartVoucherTo->last_name);
+                            $field['sender_name'] = $client->first_name . ' ' . $client->last_name;
+                            $sendmail = sendMail($modelCartVoucherTo->email, ['subject' => 'Beauty- Gift Voucher', 'template' => 'GiftVoucher'], $field);
+                            if (empty($sendmail)) {
+                                // return response()->json(['email' => $requestAll['email'], 'message' => __('messages.wrongmail')], $this->errorStatus);
+                            }
+                        }
                     }
                 }
             }

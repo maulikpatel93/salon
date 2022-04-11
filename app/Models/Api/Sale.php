@@ -67,7 +67,14 @@ class Sale extends Model
 
     public function cart()
     {
-        return $this->hasMany(Cart::class, 'sale_id', 'id');
+        $withArray = [
+            'services',
+            'staff',
+            'products',
+            'vouchers',
+            'membership',
+        ];
+        return $this->hasMany(Cart::class, 'sale_id', 'id')->with($withArray);
     }
 
 }

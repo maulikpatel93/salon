@@ -57,4 +57,29 @@ class Cart extends Model
     {
         return $this->belongsTo(Salons::class, 'salon_id', 'id');
     }
+
+    public function services()
+    {
+        return $this->hasOne(Services::class, 'id', 'service_id')->select('id', 'name');
+    }
+
+    public function staff()
+    {
+        return $this->hasOne(Users::class, 'id', 'staff_id')->select('id', 'first_name', 'last_name');
+    }
+
+    public function products()
+    {
+        return $this->hasOne(Products::class, 'id', 'product_id')->select('id', 'name');
+    }
+
+    public function vouchers()
+    {
+        return $this->hasOne(Voucher::class, 'id', 'voucher_id')->select('id', 'name', 'code');
+    }
+
+    public function membership()
+    {
+        return $this->hasOne(Membership::class, 'id', 'membership_id')->select('id', 'name', 'credit', 'cost');
+    }
 }

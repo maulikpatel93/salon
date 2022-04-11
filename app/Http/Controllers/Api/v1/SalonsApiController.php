@@ -235,8 +235,8 @@ class SalonsApiController extends Controller
                 $email_otp = rand(1000, 9999);
                 // $user = Users::where('email', '=', $request->email)->update(['otp' => $otp]);
                 $field = array();
-                $field['{{otp}}'] = $email_otp;
-                $sendmail = sendMail($request->email, 'email_verification', $field);
+                $field['otp'] = $email_otp;
+                $sendmail = sendMail($request->email, ['subject' => 'Beauty - Otp received', 'template' => 'OtpSendToEmail'], $field);
                 if (empty($sendmail)) {
                     return response()->json(['email' => $requestAll['email'], 'message' => __('messages.wrongmail')], $this->errorStatus);
                 }
