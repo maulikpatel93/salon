@@ -176,6 +176,15 @@ Route::prefix('v1')->group(function () {
             Route::post('/update/{id}', 'update')->whereNumber('id');
             Route::post('/delete/{id}', 'delete')->whereNumber('id');
         });
+
+        //Subscription
+        Route::controller(SubscriptionApiController::class)->prefix('subscription')->name('subscription.')->group(function () {
+            Route::post('/view', 'view');
+            Route::post('/store', 'store');
+            Route::post('/update/{id}', 'update')->whereNumber('id');
+            Route::post('/delete/{id}', 'delete')->whereNumber('id');
+        });
+
         //Appointment
         Route::prefix('appointment')->name('appointment.')->group(function () {
             Route::post('/view', [AppointmentApiController::class, 'view'])->name('view');
