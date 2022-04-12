@@ -155,6 +155,10 @@ php artisan iseed modules
 php artisan iseed permissions
 php artisan iseed roles_access
 
+php artisan iseed salon_modules
+php artisan iseed salon_permissions
+php artisan iseed salon_access
+
 
 Server file buid in laravel
 
