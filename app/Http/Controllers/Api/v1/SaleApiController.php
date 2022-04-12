@@ -348,8 +348,7 @@ class SaleApiController extends Controller
                     }
                 }
             }
-            $successData = $model->toArray();
-            return response()->json($successData, $this->successStatus);
+            return $this->returnResponse($request, $model->id);
         }
         return response()->json(['message' => __('messages.not_found')], $this->errorStatus);
     }
