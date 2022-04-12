@@ -221,6 +221,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/vouchers', 'vouchers')->name('vouchers');
             Route::post('/membership', 'membership')->name('membership');
             Route::post('/store', 'store')->name('store');
+            Route::post('/sendEmailInvoice', 'sendEmailInvoice')->name('sendEmailInvoice');
         });
     });
 });

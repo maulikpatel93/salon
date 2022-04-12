@@ -480,4 +480,25 @@ class SaleApiController extends Controller
         }
     }
 
+    public function sendEmailInvoice(Request $request)
+    {
+        $requestAll = $request->all();
+        $validator = Validator::make($requestAll, [
+            'salon_id' => 'required',
+            'email' => 'required',
+        ]);
+        if ($validator->passes()) {
+            $field = array();
+            $field['SaleCompletedData'] = $request->SaleCompletedData;
+            $sendmail = sendMail($request->email, ['subject' => 'Beauty- Invoice', 'template' => 'Invoice'], $field);
+            if (empty($sendmail)) {
+                // return response()->json(['email' => $requestAll['email'], 'message' => __('messages.wrongmail')], $this->errorStatus);
+            }
+        } else {
+            $messages = $validator->messages();
+            return response()->json(['errors' => $messages, 'message' => __('messages.validation_error')], $this->errorStatus);
+        }
+
+    }
+
 }

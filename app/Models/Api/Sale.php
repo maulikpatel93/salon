@@ -73,6 +73,7 @@ class Sale extends Model
             'products',
             'vouchers',
             'membership',
+            'voucherto',
         ];
         return $this->hasMany(Cart::class, 'sale_id', 'id')->with($withArray);
     }

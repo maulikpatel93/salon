@@ -82,4 +82,10 @@ class Cart extends Model
     {
         return $this->hasOne(Membership::class, 'id', 'membership_id')->select('id', 'name', 'credit', 'cost');
     }
+
+    public function voucherto()
+    {
+        return $this->hasMany(VoucherTo::class, 'cart_id', 'id');
+    }
+
 }

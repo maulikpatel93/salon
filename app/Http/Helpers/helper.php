@@ -1,6 +1,7 @@
 <?php
 
 use App\Mail\GiftVoucher;
+use App\Mail\InvoiceEmail;
 use App\Mail\OtpSendToEmail;
 use App\Mail\VerifyEmail;
 use App\Models\Api\Users;
@@ -10,11 +11,11 @@ use App\Models\Permissions;
 use App\Models\RoleAccess;
 use App\Models\Salons;
 use Carbon\Carbon;
-// use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Route;
 use Illuminate\Support\Str;
-use Mail;
+// use Mail;
 // use Mail;
 /**
  * Henerate UUID.
@@ -373,6 +374,9 @@ if (!function_exists('sendMail')) {
                         $data['business_phone_number'] = $salon->business_phone_number;
                         $data['business_address'] = $salon->business_address;
                         Mail::to($toEmail)->send(new GiftVoucher($data));
+                    }
+                    if ($template === "Invoice") {
+                        Mail::to($toEmail)->send(new InvoiceEmail($data));
                     }
                     // } catch (\Swift_TransportException$e) {
                     //     if ($e->getMessage()) {
