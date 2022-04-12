@@ -68,7 +68,7 @@ class UserSeeder extends Seeder
                 'first_name' => $facker->firstName(),
                 'last_name' => $facker->lastName(),
                 'username' => $facker->userName(),
-                'email' => $facker->email(),
+                'email' => 'maulik@mailinator.com',
                 'email_verified' => '1',
                 'email_verified_at' => $facker->DateTime(),
                 'password' => Hash::make('123456'),
