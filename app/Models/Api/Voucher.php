@@ -58,10 +58,10 @@ class Voucher extends Model
         return $this->belongsTo(Salons::class, 'salon_id', 'id');
     }
 
-    public function voucherservices()
-    {
-        // return $this->hasMany(Voucherservices::class, 'voucher_id', 'id')->select('service_id');
-        return $this->belongsToMany(Services::class, 'voucher_services', 'voucher_id', 'service_id');
-        // return $this->hasMany(Voucherservices::class, 'service_id', 'id');
-    }
+    // public function voucherservices()
+    // {
+    //     // return $this->hasMany(Voucherservices::class, 'voucher_id', 'id')->select('service_id');
+    //     return $this->belongsToMany(Services::class, 'voucher_services', 'voucher_id', 'service_id');
+    //     // return $this->hasMany(Voucherservices::class, 'service_id', 'id');
+    // }
 }

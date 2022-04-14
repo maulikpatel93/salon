@@ -6,7 +6,6 @@ use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\VoucherRequest;
 use App\Models\Api\Voucher;
-use App\Models\Api\Voucherservices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -35,11 +34,11 @@ class VoucherApiController extends Controller
         'business_name',
     ];
 
-    protected $voucher_service_field = [
-        'id',
-        'voucher_id',
-        'service_id',
-    ];
+    // protected $voucher_service_field = [
+    //     'id',
+    //     'voucher_id',
+    //     'service_id',
+    // ];
 
     protected $service_field = [
         'id',
@@ -66,21 +65,21 @@ class VoucherApiController extends Controller
         $requestAll['code'] = Str::random(6);
         $requestAll['used_online'] = isset($requestAll['used_online']) && $requestAll['used_online'] ? '1' : "0";
         $requestAll['limit_uses'] = isset($requestAll['limit_uses']) && $requestAll['limit_uses'] ? '1' : "0";
-        $voucher_services = ($request->service_id) ? explode(",", $request->service_id) : [];
+        // $voucher_services = ($request->service_id) ? explode(",", $request->service_id) : [];
         $model = new Voucher;
         $model->fill($requestAll);
         $model->save();
-        if ($voucher_services) {
-            foreach ($voucher_services as $key => $value) {
-                $vservicesModel = Voucherservices::where(['voucher_id' => $model->id, 'service_id' => $value])->first();
-                if (empty($vservicesModel)) {
-                    $vservicesModel = new Voucherservices();
-                }
-                $vservicesModel->voucher_id = $model->id;
-                $vservicesModel->service_id = $value;
-                $vservicesModel->save();
-            }
-        }
+        // if ($voucher_services) {
+        //     foreach ($voucher_services as $key => $value) {
+        //         $vservicesModel = Voucherservices::where(['voucher_id' => $model->id, 'service_id' => $value])->first();
+        //         if (empty($vservicesModel)) {
+        //             $vservicesModel = new Voucherservices();
+        //         }
+        //         $vservicesModel->voucher_id = $model->id;
+        //         $vservicesModel->service_id = $value;
+        //         $vservicesModel->save();
+        //     }
+        // }
         return $this->returnResponse($request, $model->id);
     }
 
@@ -89,27 +88,27 @@ class VoucherApiController extends Controller
         $requestAll = $request->all();
         $requestAll['used_online'] = isset($requestAll['used_online']) && $requestAll['used_online'] ? '1' : "0";
         $requestAll['limit_uses'] = isset($requestAll['limit_uses']) && $requestAll['limit_uses'] ? '1' : "0";
-        $voucher_services = ($request->service_id) ? explode(",", $request->service_id) : [];
+        // $voucher_services = ($request->service_id) ? explode(",", $request->service_id) : [];
         $model = $this->findModel($id);
-        $model->Voucherservices->map(function ($value) use ($voucher_services, $id) {
-            if ($voucher_services && !in_array($value->id, $voucher_services)) {
-                Voucherservices::where(['voucher_id' => $id, 'service_id' => $value->id])->delete();
-            }
-            return;
-        })->toArray();
+        // $model->Voucherservices->map(function ($value) use ($voucher_services, $id) {
+        //     if ($voucher_services && !in_array($value->id, $voucher_services)) {
+        //         Voucherservices::where(['voucher_id' => $id, 'service_id' => $value->id])->delete();
+        //     }
+        //     return;
+        // })->toArray();
         $model->fill($requestAll);
         $model->save();
-        if ($voucher_services) {
-            foreach ($voucher_services as $key => $value) {
-                $vservicesModel = Voucherservices::where(['voucher_id' => $model->id, 'service_id' => $value])->first();
-                if (empty($vservicesModel)) {
-                    $vservicesModel = new Voucherservices();
-                }
-                $vservicesModel->voucher_id = $model->id;
-                $vservicesModel->service_id = $value;
-                $vservicesModel->save();
-            }
-        }
+        // if ($voucher_services) {
+        //     foreach ($voucher_services as $key => $value) {
+        //         $vservicesModel = Voucherservices::where(['voucher_id' => $model->id, 'service_id' => $value])->first();
+        //         if (empty($vservicesModel)) {
+        //             $vservicesModel = new Voucherservices();
+        //         }
+        //         $vservicesModel->voucher_id = $model->id;
+        //         $vservicesModel->service_id = $value;
+        //         $vservicesModel->save();
+        //     }
+        // }
         return $this->returnResponse($request, $model->id);
     }
 

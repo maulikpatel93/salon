@@ -94,10 +94,10 @@ class Services extends Model
         return $this->belongsToMany(Staff::class, 'staff_services', 'service_id', 'staff_id');
     }
 
-    public function voucherservice()
-    {
-        return $this->belongsToMany(Voucher::class, 'voucher_services', 'service_id', 'voucher_id')->select('voucher_id', 'name');
-    }
+    // public function voucherservice()
+    // {
+    //     return $this->belongsToMany(Voucher::class, 'voucher_services', 'service_id', 'voucher_id')->select('voucher_id', 'name');
+    // }
 
     public function getIsNotIdAttribute()
     {
