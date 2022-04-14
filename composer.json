@@ -9,7 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
-        "doctrine/dbal": "^3.1",
+        "doctrine/dbal": "^3.3",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "itstructure/laravel-detail-view": "^1.0",
@@ -23,6 +23,7 @@
         "laravelcollective/html": "^6.2",
         "orangehill/iseed": "^3.0",
         "proengsoft/laravel-jsvalidation": "^4.5",
+        "stripe/stripe-php": "^7.122",
         "symfony/css-selector": "^5.3",
         "symfony/dom-crawler": "^5.3"
     },

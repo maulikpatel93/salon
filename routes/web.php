@@ -12,9 +12,10 @@ use App\Http\Controllers\Admin\SalonModulesController;
 use App\Http\Controllers\Admin\SalonPermissionsController;
 use App\Http\Controllers\Admin\SalonsController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\StripeController;
 use App\Http\Controllers\Admin\UsersController;
-use App\Http\Controllers\Auth\AdminController;
 //Web Panel
+use App\Http\Controllers\Auth\AdminController;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -127,6 +128,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('/logout', [AdminController::class, 'logout'])->name('logout');
 
+        Route::get('stripe', [StripeController::class, 'stripe']);
+        Route::post('stripe', [StripeController::class, 'stripePost'])->name('stripe.post');
         //Modules
         Route::prefix('modules')->name('modules.')->group(function () {
             Route::get('/', [ModulesController::class, 'index'])->name('index')->middleware('checkpermission');

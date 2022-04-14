@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\v1\SalonModulesApiController;
 use App\Http\Controllers\Api\v1\SalonsApiController;
 use App\Http\Controllers\Api\v1\ServicesApiController;
 use App\Http\Controllers\Api\v1\StaffApiController;
+use App\Http\Controllers\Api\v1\StripeApiController;
 use App\Http\Controllers\Api\v1\SuppliersApiController;
 use App\Http\Controllers\Api\v1\TaxApiController;
 use App\Http\Controllers\Api\v1\VoucherApiController;
@@ -231,6 +232,12 @@ Route::prefix('v1')->group(function () {
             Route::post('/membership', 'membership')->name('membership');
             Route::post('/store', 'store')->name('store');
             Route::post('/sendEmailInvoice', 'sendEmailInvoice')->name('sendEmailInvoice');
+        });
+
+        //Stripe
+        Route::controller(StripeApiController::class)->prefix('stripe')->name('stripe.')->group(function () {
+            Route::post('/setup', 'setup');
+            Route::post('/store', 'store');
         });
     });
 });
