@@ -9,6 +9,7 @@ use App\Http\Requests\Api\StripeSetupRequest;
 // use App\Models\Api\Stripe;
 use App\Models\Api\Users;
 use Illuminate\Http\Request;
+use Validator;
 
 class StripeApiController extends Controller
 {
@@ -43,15 +44,15 @@ class StripeApiController extends Controller
         $requestAll = $request->all();
         $country = $request->country;
         $email = $request->email;
-        $stripe = new \Stripe\StripeClient('sk_test_51Ko2rOSFsrov7HTSJAkhuTXyQiUGw5kfiU67lVR7riELEoXvcoUI6duFWM6djjYVNwmvGMec5OhyVeZyy5X3eRcj00r1l2zaoX');
+        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
         $account = $stripe->accounts->create([
-            'type' => 'standard',
-            // 'country' => $country ? $country : 'AU',
-            // 'email' => $email,
-            // 'capabilities' => [
-            //     'card_payments' => ['requested' => true],
-            //     'transfers' => ['requested' => true],
-            // ],
+            'type' => 'custom',
+            'country' => $country ? $country : 'AU',
+            'email' => $email,
+            'capabilities' => [
+                'card_payments' => ['requested' => true],
+                'transfers' => ['requested' => true],
+            ],
         ]);
         if ($account) {
             $createLink = $stripe->accountLinks->create(
@@ -68,6 +69,59 @@ class StripeApiController extends Controller
 
         return response()->json(['message' => __('messages.failed')], $this->errorStatus);
     }
+    public function customerCreate(Request $request)
+    {
+        $requestAll = $request->all();
+        $validator = Validator::make($requestAll, [
+            'client_id' => 'required',
+            'email' => 'required',
+            'phone' => 'required',
+        ]);
+
+        if ($validator->passes()) {
+            $client_id = $request->client_id;
+            $country = $request->country;
+            $name = $request->name;
+            $email = $request->email;
+            $phone = $request->phone;
+            $address = $request->address;
+            $description = $request->description;
+            $addressData = [
+                'line1' => '',
+                'line2' => '',
+                'postal_code' => '',
+                'city' => '',
+                'state' => '',
+                'country' => '',
+            ];
+            if ($address) {
+                $addressData = [
+                    'line1' => isset($address['line1']) && $address['line1'] ? $address['line1'] : "",
+                    'line2' => isset($address['line2']) && $address['line2'] ? $address['line2'] : "",
+                    'postal_code' => isset($address['postal_code']) && $address['postal_code'] ? $address['postal_code'] : "",
+                    'city' => isset($address['city']) && $address['city'] ? $address['city'] : "",
+                    'state' => isset($address['state']) && $address['state'] ? $address['state'] : "",
+                    'country' => isset($address['country']) && $address['country'] ? $address['country'] : "",
+                ];
+            }
+            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+            $customer = $stripe->customers->create(
+                [
+                    'name' => $name,
+                    'email' => $email,
+                    'phone' => $phone,
+                    'address' => $addressData,
+                    'description' => $description,
+                ]
+            );
+            if ($customer) {
+                Users::where('id', $client_id)->update(['stripe_customer_account_id' => $customer->id]);
+                return response()->json(['stripe_customer_account_id' => $customer->id, 'message' => __('messages.success')], $this->successStatus);
+            }
+        }
+        return response()->json(['message' => __('messages.failed')], $this->errorStatus);
+    }
+
     public function store(StripeRequest $request)
     {
         $requestAll = $request->all();

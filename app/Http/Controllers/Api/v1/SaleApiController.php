@@ -215,6 +215,10 @@ class SaleApiController extends Controller
     public function store(SaleRequest $request)
     {
         $requestAll = $request->all();
+        echo '<pre>';
+        print_r($requestAll);
+        echo '<pre>';
+        dd();
         $cart = $request->cart ? json_decode($request->cart, true) : [];
         $salon_id = $request->salon_id;
         $client_id = $request->client_id;

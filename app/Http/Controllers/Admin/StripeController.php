@@ -16,6 +16,32 @@ class StripeController extends Controller
      */
     public function stripe()
     {
+        $stripe = new \Stripe\StripeClient(
+            'sk_test_51Ko2rOSFsrov7HTSJAkhuTXyQiUGw5kfiU67lVR7riELEoXvcoUI6duFWM6djjYVNwmvGMec5OhyVeZyy5X3eRcj00r1l2zaoX'
+        );
+        $account_id = 'acct_1KohazHEvBTAxzmM';
+        $getaccount = $stripe->accounts->retrieve(
+            $account_id,
+            []
+        );
+        // $update_account = $stripe->accounts->update(
+        //     $account_id,
+        //     ['metadata' => ['order_id' => '6735']]
+        // );
+
+        // $delete_account = $stripe->accounts->delete(
+        //     'acct_1032D82eZvKYlo2C',
+        //     []
+        //   );
+        // $createLoginLink = $stripe->accounts->createLoginLink(
+        //     $account_id,
+        //     []
+        // );
+        echo '<pre>';
+        print_r($getaccount);
+        echo '<pre>';
+        dd();
+
         return view('admin.stripe.stripe');
     }
 

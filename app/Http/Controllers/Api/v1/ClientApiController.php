@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Exceptions\UnsecureException;
+use App\Http\Controllers\Api\v1\StripeApiController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ClientRequest;
 use App\Models\Api\Client;
@@ -86,6 +87,26 @@ class ClientApiController extends Controller
         }
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : '';
         $model->save();
+        if ($model && $model->id) {
+            $StripeModel = new StripeApiController;
+            $CustomerCreateRequestData = [
+                'client_id' => $model->id,
+                'name' => \ucfirst($model->first_name) . ' ' . \ucfirst($model->last_name),
+                'email' => $model->email,
+                'phone' => $model->phone_number,
+                'address' => [
+                    'line1' => $model->address,
+                    'line2' => $model->street . ' ' . $model->suburb,
+                    'postal_code' => $model->postcode,
+                    'city' => $model->suburb,
+                    'state' => $model->state,
+                    'country' => 'AU',
+                ],
+                'description' => $model->description,
+            ];
+            $stripeCustomerCreateRequest = new Request($CustomerCreateRequestData);
+            $stripeCustomerCreate = $StripeModel->customerCreate($stripeCustomerCreateRequest);
+        }
         return $this->returnResponse('store', $request, $model->id);
     }
 
@@ -93,7 +114,6 @@ class ClientApiController extends Controller
     {
         $requestAll = $request->all();
         unset($requestAll['auth_key']);
-
         $model = $this->findModel($id);
         if (empty($model->auth_key)) {
             $token = Str::random(config('params.auth_key_character'));
@@ -112,6 +132,26 @@ class ClientApiController extends Controller
         }
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : $model->description;
         $model->save();
+        if ($model && $model->id && empty($model->stripe_customer_account_id)) {
+            $StripeModel = new StripeApiController;
+            $CustomerCreateRequestData = [
+                'client_id' => $model->id,
+                'name' => \ucfirst($model->first_name) . ' ' . \ucfirst($model->last_name),
+                'email' => $model->email,
+                'phone' => $model->phone_number,
+                'address' => [
+                    'line1' => $model->address,
+                    'line2' => $model->street . ' ' . $model->suburb,
+                    'postal_code' => $model->postcode,
+                    'city' => $model->suburb,
+                    'state' => $model->state,
+                    'country' => 'AU',
+                ],
+                'description' => $model->description,
+            ];
+            $stripeCustomerCreateRequest = new Request($CustomerCreateRequestData);
+            $stripeCustomerCreate = $StripeModel->customerCreate($stripeCustomerCreateRequest);
+        }
         return $this->returnResponse('update', $request, $model->id);
     }
 
