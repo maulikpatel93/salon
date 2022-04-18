@@ -215,17 +215,117 @@ class SaleApiController extends Controller
     public function store(SaleRequest $request)
     {
         $requestAll = $request->all();
-        echo '<pre>';
-        print_r($requestAll);
-        echo '<pre>';
-        dd();
+
         $cart = $request->cart ? json_decode($request->cart, true) : [];
         $salon_id = $request->salon_id;
         $client_id = $request->client_id;
         $appointment_id = $request->appointment_id;
         $eventdate = $request->eventdate;
         $invoicedate = gmdate('Y-m-d');
+
+        $cardnumber = $request->cardnumber;
+        $cardexpiry = $request->cardexpiry ? explode('/', $request->cardexpiry) : "";
+        $cardcvc = $request->cardcvc;
+        $paidby = $request->paidby;
+
         $client = Users::find($client_id);
+        $stripe_customer_account_id = $client->stripe_customer_account_id;
+        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+        // $token = $stripe->tokens->create([
+        //     'card' => [
+        //         'number' => str_replace(' ', '', $cardnumber),
+        //         'exp_month' => $cardexpiry[0],
+        //         'exp_year' => $cardexpiry[1],
+        //         'cvc' => $cardcvc,
+        //     ],
+        // ]);
+        $paymentMethods = $stripe->paymentMethods->create([
+            'type' => 'card',
+            'card' => [
+                'number' => str_replace(' ', '', $cardnumber),
+                'exp_month' => $cardexpiry[0],
+                'exp_year' => $cardexpiry[1],
+                'cvc' => $cardcvc,
+            ],
+        ]);
+
+        $customerattach = $stripe->paymentMethods->attach(
+            $paymentMethods->id,
+            ['customer' => $stripe_customer_account_id]
+        );
+
+        // $StripeModel = new StripeApiController;
+        // $CustomerCreateRequestData = [
+        //     'client_id' => $client->id,
+        //     'name' => \ucfirst($client->first_name) . ' ' . \ucfirst($client->last_name),
+        //     'email' => $client->email,
+        //     'phone' => $client->phone_number,
+        //     'address' => [
+        //         'line1' => $client->address,
+        //         'line2' => $client->street . ' ' . $client->suburb,
+        //         'postal_code' => $client->postcode,
+        //         'city' => $client->suburb,
+        //         'state' => $client->state,
+        //         'country' => 'AU',
+        //     ],
+        //     'description' => $client->description,
+        //     // 'stipeToken' => $token,
+        // ];
+        // $stripeCustomerCreateRequest = new Request($CustomerCreateRequestData);
+        // $stripeCustomerCreate = $StripeModel->customerCreate($stripeCustomerCreateRequest);
+        \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+
+        $Intent = \Stripe\PaymentIntent::create([
+            'customer' => $stripe_customer_account_id,
+            'amount' => 999,
+            'currency' => 'aud',
+            'payment_method' => $customerattach->id,
+            'confirmation_method' => 'manual',
+            'confirm' => true,
+            // 'receipt_email' => $client->email,
+            // 'next_action' => ['type' => 'redirect_to_url', 'redirect_to_url' => ['url' => 'https://hooks.stripe.com', 'return_url' => 'https://mysite.com']],
+            // 'source' => $token,
+            // 'automatic_payment_methods' => [
+            //     'enabled' => true,
+            // ],
+        ]);
+
+        $paymentIntent = \Stripe\PaymentIntent::retrieve(
+            $Intent->id
+        );
+        $paymentIntent->confirm();
+        // $confirm = $stripe->paymentIntents->confirm(
+        //     $paymentIntent->id,
+        //     ['payment_method' => $customerattach->id, 'return_url' => 'https://example.com/return_url']
+        // );
+        // $retrieve = $stripe->paymentIntents->retrieve(
+        //     $confirm->id,
+        //     []
+        // );
+        // echo '<pre>';
+        // print_r($paymentIntent);
+        // echo '<pre>';
+
+        if ($paymentIntent->status == 'requires_action' &&
+            $paymentIntent->next_action->type == 'use_stripe_sdk') {
+            # Tell the client to handle the action
+            echo json_encode([
+                'requires_action' => true,
+                'url' => $paymentIntent->next_action,
+                'payment_intent_client_secret' => $paymentIntent->client_secret,
+            ]);
+        } else if ($paymentIntent->status == 'succeeded') {
+            # The payment didn’t need any additional actions and completed!
+            # Handle post-payment fulfillment
+            echo json_encode([
+                "success" => true,
+            ]);
+        } else {
+            # Invalid status
+            http_response_code(500);
+            echo json_encode(['error' => 'Invalid PaymentIntent status']);
+        }
+        dd();
         $model = new Sale;
         $model->salon_id = $salon_id;
         $model->client_id = $client_id;

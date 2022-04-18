@@ -76,6 +76,7 @@ class StripeApiController extends Controller
             'client_id' => 'required',
             'email' => 'required',
             'phone' => 'required',
+            'stipeToken' => 'required',
         ]);
 
         if ($validator->passes()) {
@@ -86,6 +87,7 @@ class StripeApiController extends Controller
             $phone = $request->phone;
             $address = $request->address;
             $description = $request->description;
+            $stipeToken = $request->stipeToken;
             $addressData = [
                 'line1' => '',
                 'line2' => '',
@@ -112,11 +114,13 @@ class StripeApiController extends Controller
                     'phone' => $phone,
                     'address' => $addressData,
                     'description' => $description,
+                    'source' => $stipeToken,
                 ]
             );
             if ($customer) {
                 Users::where('id', $client_id)->update(['stripe_customer_account_id' => $customer->id]);
-                return response()->json(['stripe_customer_account_id' => $customer->id, 'message' => __('messages.success')], $this->successStatus);
+                return $customer;
+                // return response()->json(['stripe_customer_account_id' => $customer->id, 'message' => __('messages.success')], $this->successStatus);
             }
         }
         return response()->json(['message' => __('messages.failed')], $this->errorStatus);
