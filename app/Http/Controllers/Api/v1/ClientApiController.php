@@ -132,26 +132,26 @@ class ClientApiController extends Controller
         }
         $model->description = isset($requestAll['description']) ? $requestAll['description'] : $model->description;
         $model->save();
-        if ($model && $model->id && empty($model->stripe_customer_account_id)) {
-            $StripeModel = new StripeApiController;
-            $CustomerCreateRequestData = [
-                'client_id' => $model->id,
-                'name' => \ucfirst($model->first_name) . ' ' . \ucfirst($model->last_name),
-                'email' => $model->email,
-                'phone' => $model->phone_number,
-                'address' => [
-                    'line1' => $model->address,
-                    'line2' => $model->street . ' ' . $model->suburb,
-                    'postal_code' => $model->postcode,
-                    'city' => $model->suburb,
-                    'state' => $model->state,
-                    'country' => 'AU',
-                ],
-                'description' => $model->description,
-            ];
-            $stripeCustomerCreateRequest = new Request($CustomerCreateRequestData);
-            $stripeCustomerCreate = $StripeModel->customerCreate($stripeCustomerCreateRequest);
-        }
+        // if ($model && $model->id && empty($model->stripe_customer_account_id)) {
+        //     $StripeModel = new StripeApiController;
+        //     $CustomerCreateRequestData = [
+        //         'client_id' => $model->id,
+        //         'name' => \ucfirst($model->first_name) . ' ' . \ucfirst($model->last_name),
+        //         'email' => $model->email,
+        //         'phone' => $model->phone_number,
+        //         'address' => [
+        //             'line1' => $model->address,
+        //             'line2' => $model->street . ' ' . $model->suburb,
+        //             'postal_code' => $model->postcode,
+        //             'city' => $model->suburb,
+        //             'state' => $model->state,
+        //             'country' => 'AU',
+        //         ],
+        //         'description' => $model->description,
+        //     ];
+        //     $stripeCustomerCreateRequest = new Request($CustomerCreateRequestData);
+        //     $stripeCustomerCreate = $StripeModel->customerCreate($stripeCustomerCreateRequest);
+        // }
         return $this->returnResponse('update', $request, $model->id);
     }
 

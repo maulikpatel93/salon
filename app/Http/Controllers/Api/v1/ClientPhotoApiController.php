@@ -76,8 +76,8 @@ class ClientPhotoApiController extends Controller
     {
         $requestAll = $request->all();
         $model = $this->findModel($id);
-        Clientphoto::where('client_id', $model->client_id)->update(['is_profile_photo' => '0']);
-        $model->is_profile_photo = '1';
+        Clientphoto::where('client_id', $model->client_id)->update(['is_profile_photo' => 0]);
+        $model->is_profile_photo = 1;
         $model->save();
         Client::where('id', $model->client_id)->update(['profile_photo' => $model->name]);
         return $this->returnResponse($request, $model->id);

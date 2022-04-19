@@ -143,14 +143,14 @@ class VoucherApiController extends Controller
             $salon_field = array_merge(['id'], explode(',', $request->salon_field));
         }
 
-        $voucher_service_field = $this->voucher_service_field;
-        if (isset($requestAll['voucher_service_field']) && empty($requestAll['voucher_service_field'])) {
-            $voucher_service_field = false;
-        } else if ($request->voucher_service_field == '*') {
-            $voucher_service_field = [$request->voucher_service_field];
-        } else if ($request->voucher_service_field) {
-            $voucher_service_field = array_merge(['id', 'service_id'], explode(',', $request->voucher_service_field));
-        }
+        // $voucher_service_field = $this->voucher_service_field;
+        // if (isset($requestAll['voucher_service_field']) && empty($requestAll['voucher_service_field'])) {
+        //     $voucher_service_field = false;
+        // } else if ($request->voucher_service_field == '*') {
+        //     $voucher_service_field = [$request->voucher_service_field];
+        // } else if ($request->voucher_service_field) {
+        //     $voucher_service_field = array_merge(['id', 'service_id'], explode(',', $request->voucher_service_field));
+        // }
 
         $service_field = $this->service_field;
         if (isset($requestAll['service_field']) && empty($requestAll['service_field'])) {
@@ -164,9 +164,7 @@ class VoucherApiController extends Controller
         if ($salon_field) {
             $withArray[] = 'salon:' . implode(',', $salon_field);
         }
-        if ($service_field) {
-            $withArray[] = 'voucherservices:' . implode(',', $service_field);
-        }
+
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
