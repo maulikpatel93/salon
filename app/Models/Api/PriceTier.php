@@ -24,6 +24,7 @@ class PriceTier extends Model
     protected $fillable = [
         'salon_id',
         'name',
+        'is_default',
         'is_active',
         'is_active_at',
     ];

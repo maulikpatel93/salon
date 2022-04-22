@@ -6,6 +6,7 @@ use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Api\v1\StripeApiController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ClientRequest;
+use App\Models\Api\Cart;
 use App\Models\Api\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -252,6 +253,32 @@ class ClientApiController extends Controller
             }
         }
 
+        return response()->json(['message' => __('messages.failed')], $this->errorStatus);
+    }
+
+    public function clientmembership(Request $request)
+    {
+        $requestAll = $request->all();
+        $client_id = $request->client_id;
+        unset($requestAll['auth_key']);
+        $model = $this->findModel($client_id);
+        $limit = $request->limit ? $request->limit : config('params.apiPerPage');
+        $withArray = [
+            'services',
+            'staff',
+            'products',
+            'vouchers',
+            'membership',
+            'voucherto',
+            'sale',
+        ];
+        $cardModel = Cart::with($withArray)->whereNotNull('membership_id')->whereHas('sale', function ($q) use ($client_id) {
+            $q->where('client_id', $client_id);
+        })->paginate($limit);
+        if ($cardModel->count()) {
+            $successData = $cardModel->toArray();
+            return response()->json($successData, $this->successStatus);
+        }
         return response()->json(['message' => __('messages.failed')], $this->errorStatus);
     }
 }

@@ -52,12 +52,12 @@ class SubscriptionServices extends Model
 
     public function subscription()
     {
-        return $this->hasOne(Subscription::class, 'subscription_id', 'id');
+        return $this->hasOne(Subscription::class, 'id', 'subscription_id');
     }
 
     public function services()
     {
-        return $this->hasOne(Services::class, 'service_id', 'id');
+        return $this->hasOne(Services::class, 'id', 'service_id')->with(['defaultserviceprice']);
     }
 
 }

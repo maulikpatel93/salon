@@ -21,6 +21,7 @@ class PricetierApiController extends Controller
         'id',
         'salon_id',
         'name',
+        'is_default',
     ];
 
     protected $salon_field = [

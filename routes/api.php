@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\v1\SalonsApiController;
 use App\Http\Controllers\Api\v1\ServicesApiController;
 use App\Http\Controllers\Api\v1\StaffApiController;
 use App\Http\Controllers\Api\v1\StripeApiController;
+use App\Http\Controllers\Api\v1\SubscriptionApiController;
 use App\Http\Controllers\Api\v1\SuppliersApiController;
 use App\Http\Controllers\Api\v1\TaxApiController;
 use App\Http\Controllers\Api\v1\VoucherApiController;
@@ -136,6 +137,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/store', [ClientApiController::class, 'store'])->name('store');
             Route::post('/update/{id}', [ClientApiController::class, 'update'])->name('update');
             Route::post('/delete/{id}', [ClientApiController::class, 'delete'])->name('delete');
+            Route::post('/clientmembership', [ClientApiController::class, 'clientmembership'])->name('clientmembership');
         });
 
         //Client photo
@@ -184,6 +186,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/store', 'store');
             Route::post('/update/{id}', 'update')->whereNumber('id');
             Route::post('/delete/{id}', 'delete')->whereNumber('id');
+            Route::post('/services', 'services');
         });
 
         //Appointment

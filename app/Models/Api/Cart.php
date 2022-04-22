@@ -58,6 +58,11 @@ class Cart extends Model
         return $this->belongsTo(Salons::class, 'salon_id', 'id');
     }
 
+    public function sale()
+    {
+        return $this->hasOne(Sale::class, 'id', 'sale_id');
+    }
+
     public function services()
     {
         return $this->hasOne(Services::class, 'id', 'service_id')->select('id', 'name');

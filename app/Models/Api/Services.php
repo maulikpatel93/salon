@@ -80,6 +80,16 @@ class Services extends Model
         return $this->hasMany(ServicesPrice::class, 'service_id', 'id')->where('is_active', '=', '1')->with($witharray);
     }
 
+    public function defaultserviceprice()
+    {
+        $witharray = [
+            'pricetier',
+        ];
+        return $this->hasMany(ServicesPrice::class, 'service_id', 'id')->where('is_active', '=', '1')->with($witharray)->whereHas('pricetier', function ($q) {
+            $q->where('is_default', 1);
+        });
+    }
+
     public function addonservices()
     {
         // return $this->hasMany(AddOnServices::class, 'service_id', 'id')->select('add_on_service_id');

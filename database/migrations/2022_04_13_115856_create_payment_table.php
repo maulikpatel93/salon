@@ -23,6 +23,20 @@ return new class extends Migration
         //     $table->id();
         //     $table->timestamps();
         // });
+        Schema::create('payment', function (Blueprint $table) {
+            $table->id();
+            $table->enum('type', ['Membership', 'Subscription', 'Voucher'])->default(null)->nullable();
+            $table->enum('paidby', ['StripeCreditCard', 'CreditCard', 'Cash', 'Voucher'])->default(null)->nullable()->comment('');
+            $table->decimal('amount', 10, 2)->nullable()->comment('');
+            $table->date('payment_date', 10, 2)->nullable()->comment('');
+            $table->enum('status', ['Pending', 'Paid', 'Failed'])->default(null)->nullable();
+            $table->string('transaction_id', 255)->default(null)->nullable();
+            $table->timestamps();
+        });
+        Schema::table('payment', function (Blueprint $table) {
+            $table->unsignedBigInteger('sale_id')->after('id')->nullable()->comment('Type Of Sale');
+            $table->foreign('sale_id')->references('id')->on('sale')->onUpdate('cascade')->onDelete('cascade');
+        });
     }
 
     /**

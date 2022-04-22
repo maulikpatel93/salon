@@ -5,7 +5,7 @@ namespace App\Models\Api;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Membership extends Model
+class Subscription extends Model
 {
     use HasFactory;
 
@@ -14,7 +14,7 @@ class Membership extends Model
      *
      * @var string
      */
-    protected $table = 'membership';
+    protected $table = 'subscription';
     /**
      * The attributes that are mass assignable.
      *
@@ -23,8 +23,10 @@ class Membership extends Model
     protected $fillable = [
         'salon_id',
         'name',
-        'credit',
-        'cost',
+        'amount',
+        'repeats',
+        'repeat_time',
+        'repeat_time_option',
         'is_active',
         'is_active_at',
     ];
@@ -50,6 +52,15 @@ class Membership extends Model
     public function salon()
     {
         return $this->belongsTo(Salons::class, 'salon_id', 'id');
+    }
+
+    public function subservice()
+    {
+        $witharray = [
+            'salon:id,business_name',
+            'services:id,name',
+        ];
+        return $this->hasMany(SubscriptionServices::class, 'subscription_id', 'id')->with($witharray);
     }
 
 }

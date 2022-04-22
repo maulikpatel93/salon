@@ -13,8 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('stripe_customer_account_id', 255)->nullable()->comment('stripe salon customer(client) account setup id ');
+        Schema::table('subscription', function (Blueprint $table) {
+            $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
+            $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

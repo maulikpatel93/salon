@@ -17,8 +17,6 @@ return new class extends Migration
             $table->id();
             $table->date('eventdate')->nullable()->comment('calendar event date');
             $table->date('invoicedate')->nullable()->comment('sale Invoice date');
-            $table->enum('paidby', ['CreditCard', 'Cash', 'Voucher'])->default(null)->nullable()->comment('');
-            $table->boolean('is_stripe')->default(0)->nullable()->comment('stripe payment flag');
             $table->decimal('totalprice', 10, 2)->nullable()->comment('Sale total price');
             $table->enum('status', ['Pending', 'Paid', 'Failed'])->default(null)->nullable();
             $table->timestamps();
@@ -40,7 +38,6 @@ return new class extends Migration
             $table->enum('type', ['Appointment', 'Service', 'Product', 'Voucher', 'Membership', 'Subscription', 'OnOffVoucher'])->default(null)->nullable();
             $table->decimal('cost', 10, 2)->nullable()->comment('depend on type, Booked Appointment or Service or Product sale cost');
             $table->integer('qty', false, true)->nullable()->comment('only product use');
-            $table->text('recipient', 10, 2)->nullable();
             $table->timestamps();
         });
 

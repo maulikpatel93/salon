@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\v1;
 use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\SalonRequest;
+use App\Models\Api\PriceTier;
 use App\Models\Api\Salons;
 use App\Models\Api\SalonWorkingHours;
 use App\Models\Api\Users;
@@ -94,6 +95,14 @@ class SalonsApiController extends Controller
                 $model->is_active_at = currentDateTime();
                 $model->save();
                 if ($model) {
+                    $priceTietmodel = new PriceTier;
+                    $priceTietmodel->salon_id = $model->id;
+                    $priceTietmodel->name = 'General';
+                    $priceTietmodel->is_default = 1;
+                    $priceTietmodel->is_active = 1;
+                    $priceTietmodel->is_active_at = currentDateTime();
+                    $priceTietmodel->save();
+
                     $days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
                     if ($salon_working_hours) {
                         foreach ($salon_working_hours as $key => $value) {
