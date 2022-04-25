@@ -13,4 +13,5 @@ return [
     "busytime_check_appointment" => "The staff is busy for the time being. Please change the time or staff for appointment booking.",
     "busytime_check_appointment2" => "This time the staff appointment is already booked. For busy times please change the time or staff.",
     "otp_send" => "OTP is sent to Your Email",
+    "error_PaymentIntent_status" => "Invalid PaymentIntent status",
 ];

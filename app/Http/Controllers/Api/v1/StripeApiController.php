@@ -72,13 +72,14 @@ class StripeApiController extends Controller
     public function customerCreate(Request $request)
     {
         $requestAll = $request->all();
+        $requestAll['stripe_account_id'] = $request->stripe_account_id = auth()->user()->stripe_account_id;
         $validator = Validator::make($requestAll, [
             'client_id' => 'required',
             'email' => 'required',
             'phone' => 'required',
-            'stipeToken' => 'required',
+            'stripe_account_id' => 'required',
+            // 'stipeToken' => 'required',
         ]);
-
         if ($validator->passes()) {
             $client_id = $request->client_id;
             $country = $request->country;
@@ -114,14 +115,16 @@ class StripeApiController extends Controller
                     'phone' => $phone,
                     'address' => $addressData,
                     'description' => $description,
-                    'source' => $stipeToken,
-                ]
+                    // 'source' => $stipeToken,
+                ],
+                ['stripe_account' => $requestAll['stripe_account_id']]
             );
             if ($customer) {
                 Users::where('id', $client_id)->update(['stripe_customer_account_id' => $customer->id]);
                 return $customer;
                 // return response()->json(['stripe_customer_account_id' => $customer->id, 'message' => __('messages.success')], $this->successStatus);
             }
+
         }
         return response()->json(['message' => __('messages.failed')], $this->errorStatus);
     }
