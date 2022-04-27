@@ -48,6 +48,7 @@ return new class extends Migration
         });
         Schema::table('sale', function (Blueprint $table) {
             $table->text('description')->nullable();
+            $table->dropColumn('paidby');
         });
         Schema::table('price_tier', function (Blueprint $table) {
             $table->boolean('is_default')->default(0);
