@@ -10,6 +10,7 @@ use App\Models\Modules;
 use App\Models\Permissions;
 use App\Models\RoleAccess;
 use App\Models\Salons;
+use Barryvdh\DomPDF\PDF;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
@@ -373,6 +374,11 @@ if (!function_exists('sendMail')) {
                         $data['business_email'] = $user->email;
                         $data['business_phone_number'] = $salon->business_phone_number;
                         $data['business_address'] = $salon->business_address;
+                        $data['generated_pdf_output'] = "";
+                        if (isset($data['is_stripe']) && empty($data['is_stripe'])) {
+                            $pdf = PDF::loadView('files.voucherPdf', ['data' => $data]);
+                            $data['generated_pdf_output'] = $pdf->output();
+                        }
                         Mail::to($toEmail)->send(new GiftVoucher($data));
                     }
                     if ($template === "Invoice") {

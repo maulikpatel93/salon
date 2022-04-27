@@ -27,6 +27,12 @@ class GiftVoucher extends Mailable
      */
     public function build()
     {
+        $generated_pdf_output = (isset($this->request['generated_pdf_output'])) ? $this->request['generated_pdf_output'] : "";
+        // $generated_pdf_link = (isset($this->request['generated_pdf_link'])) ? asset($this->request['generated_pdf_link']) : "";
+        if ($generated_pdf_output) {
+            // return $this->markdown('emails.GiftVoucher', ['request' => $this->request])->attach(asset($generated_pdf_link));
+            return $this->markdown('emails.GiftVoucher', ['request' => $this->request])->attachData($generated_pdf_output, 'voucher.pdf', ['mime' => 'application/pdf']);
+        }
         return $this->markdown('emails.GiftVoucher', ['request' => $this->request]);
     }
 }

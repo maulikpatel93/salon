@@ -233,8 +233,10 @@ Route::prefix('v1')->group(function () {
             Route::post('/products', 'products')->name('products');
             Route::post('/vouchers', 'vouchers')->name('vouchers');
             Route::post('/membership', 'membership')->name('membership');
+            Route::post('/subscription', 'subscription')->name('subscription');
             Route::post('/store', 'store')->name('store');
             Route::post('/sendEmailInvoice', 'sendEmailInvoice')->name('sendEmailInvoice');
+            Route::post('/voucherapply', 'voucherapply');
         });
 
         //Stripe

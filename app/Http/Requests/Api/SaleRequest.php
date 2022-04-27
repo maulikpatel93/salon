@@ -30,7 +30,6 @@ class SaleRequest extends FormRequest
             'client_id' => 'required|integer',
             'eventdate' => 'nullable|date',
             'invoicedate' => 'nullable|date',
-            'paidby' => 'nullable',
             'totalprice' => 'nullable',
             'status' => 'nullable',
         ];
