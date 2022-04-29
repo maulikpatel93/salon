@@ -13,10 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('payment', function (Blueprint $table) {
-            $table->string('payment_intent', 255)->nullable()->comment('Only Stripe Payment Use');
-            $table->string('payment_intent_client_secret', 400)->nullable()->comment('Only Stripe Payment Use');
-            $table->string('redirect_status', 255)->nullable()->comment('Only Stripe Payment Use');
+        Schema::table('salons', function (Blueprint $table) {
+            $table->string('business_website', 500)->nullable();
         });
     }
 

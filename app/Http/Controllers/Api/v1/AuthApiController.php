@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\SalonRequest;
+use App\Models\Api\Salons;
 use App\Models\Api\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class AuthApiController extends Controller
 {
-
     protected $successStatus = 200;
     protected $badrequestStatus = 400;
     protected $errorStatus = 422;
@@ -24,6 +26,7 @@ class AuthApiController extends Controller
         'business_email',
         'business_phone_number',
         'business_address',
+        'business_website',
         'salon_type',
         'logo',
         'timezone',
@@ -68,4 +71,23 @@ class AuthApiController extends Controller
         return response()->json(['message' => __('messages.failed')], $this->errorStatus);
     }
 
+    public function timezone(Request $request)
+    {
+        $requestAll = $request->all();
+        return config('params.timezones');
+    }
+    public function businessupdate(SalonRequest $request, $id)
+    {
+        $requestAll = $request->all();
+        $model = Salons::find($id);
+        $model->fill($requestAll);
+        $file = $request->file('logo');
+        if ($file) {
+            Storage::delete('/public/salons/' . $model->logo);
+            $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $filePath = $file->storeAs('salons', $fileName, 'public');
+            $model->logo = $fileName;
+        }
+        $model->save();
+    }
 }

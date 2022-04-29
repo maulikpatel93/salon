@@ -23,7 +23,7 @@ class SalonRequest extends FormRequest
      */
     public function rules()
     {
-        $id = decode($this->id);
+        $id = $this->id;
         $rules = [
             'business_name' => 'required',
             'business_phone_number' => "required|regex:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/|unique:salons,business_phone_number," . $id,
@@ -31,9 +31,11 @@ class SalonRequest extends FormRequest
             'business_address' => 'required',
             'salon_type' => 'required',
             'timezone' => 'nullable',
-            'terms' => 'required',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
         ];
+        if (empty($id)) {
+            $rules['terms'] = 'required';
+        }
         return $rules;
     }
 }

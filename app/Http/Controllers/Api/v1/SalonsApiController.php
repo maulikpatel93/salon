@@ -264,5 +264,4 @@ class SalonsApiController extends Controller
         return response()->json($this->successStatus);
         // $model = Salons::where(['is_active' => '1', 'business_name' => "business_name"])->whereRaw('(CASE WHEN business_email is not null THEN business_email = "' . $request->email . '" ELSE business_email is null END)')->first();
     }
-
 }

@@ -70,7 +70,8 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:api'])->prefix('afterlogin')->group(function () {
         Route::post('/user', [AuthApiController::class, 'user']);
         Route::post('/logout', [GuestApiController::class, 'logout']);
-
+        Route::post('/timezone', [AuthApiController::class, 'timezone']);
+        Route::post('/businessupdate/{id}', [AuthApiController::class, 'businessupdate']);
         //Suppliers
         Route::prefix('suppliers')->name('suppliers.')->group(function () {
             Route::post('/view', [SuppliersApiController::class, 'view'])->name('view');

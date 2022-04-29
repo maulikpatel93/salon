@@ -31,11 +31,17 @@ return new class extends Migration
             $table->date('payment_date', 10, 2)->nullable()->comment('');
             $table->enum('status', ['Pending', 'Paid', 'Failed'])->default(null)->nullable();
             $table->string('transaction_id', 255)->default(null)->nullable();
+            $table->string('payment_intent', 255)->nullable()->comment('Only Stripe Payment Use');
+            $table->string('payment_intent_client_secret', 400)->nullable()->comment('Only Stripe Payment Use');
+            $table->string('redirect_status', 255)->nullable()->comment('Only Stripe Payment Use');
             $table->timestamps();
         });
         Schema::table('payment', function (Blueprint $table) {
             $table->unsignedBigInteger('sale_id')->after('id')->nullable()->comment('Type Of Sale');
             $table->foreign('sale_id')->references('id')->on('sale')->onUpdate('cascade')->onDelete('cascade');
+        });
+        Schema::table('salons', function (Blueprint $table) {
+            $table->string('business_website', 500)->nullable();
         });
     }
 

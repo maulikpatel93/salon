@@ -39,6 +39,7 @@ class Salons extends Model
         'is_active',
         'is_active_at',
         'terms',
+        'business_website',
     ];
 
     /**
