@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\v1\ClientApiController;
 use App\Http\Controllers\Api\v1\ClientDocumentApiController;
 use App\Http\Controllers\Api\v1\ClientNoteApiController;
 use App\Http\Controllers\Api\v1\ClientPhotoApiController;
+use App\Http\Controllers\Api\v1\CloseddateApiController;
 use App\Http\Controllers\Api\v1\GuestApiController;
 use App\Http\Controllers\Api\v1\MembershipApiController;
 use App\Http\Controllers\Api\v1\PricetierApiController;
@@ -139,6 +140,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/update/{id}', [ClientApiController::class, 'update'])->name('update');
             Route::post('/delete/{id}', [ClientApiController::class, 'delete'])->name('delete');
             Route::post('/clientmembership', [ClientApiController::class, 'clientmembership'])->name('clientmembership');
+            Route::post('/clientinvoice', [ClientApiController::class, 'clientinvoice'])->name('clientinvoice');
         });
 
         //Client photo
@@ -238,12 +240,21 @@ Route::prefix('v1')->group(function () {
             Route::post('/store', 'store')->name('store');
             Route::post('/sendEmailInvoice', 'sendEmailInvoice')->name('sendEmailInvoice');
             Route::post('/voucherapply', 'voucherapply');
+            Route::post('/returnpayment', 'returnpayment');
         });
 
         //Stripe
         Route::controller(StripeApiController::class)->prefix('stripe')->name('stripe.')->group(function () {
             Route::post('/setup', 'setup');
             Route::post('/store', 'store');
+        });
+
+        //Closedate
+        Route::controller(CloseddateApiController::class)->prefix('closedate')->name('closedate.')->group(function () {
+            Route::post('/view', 'view');
+            Route::post('/store', 'store');
+            Route::post('/update/{id}', 'update');
+            Route::post('/delete/{id}', 'delete');
         });
     });
 });

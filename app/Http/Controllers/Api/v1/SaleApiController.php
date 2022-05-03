@@ -464,6 +464,7 @@ class SaleApiController extends Controller
                     'payment_method_types' => ['card'],
                     // 'payment_method' => "pm_card_visa",
                     'confirmation_method' => 'automatic', //manual/automatic
+                    "metadata" => ["sale_id" => $model->id],
                     // 'confirm' => true,
                     // 'use_stripe_sdk' => true,
                     // 'receipt_email' => $client->email,
@@ -677,6 +678,16 @@ class SaleApiController extends Controller
             $messages = $validator->messages();
             return response()->json(['errors' => $messages, 'message' => __('messages.validation_error')], $this->errorStatus);
         }
+
+    }
+
+    public function returnpayment(Request $request)
+    {
+        $requestAll = $request->all();
+        echo '<pre>';
+        print_r($requestAll);
+        echo '<pre>';
+        dd();
 
     }
 
