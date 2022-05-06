@@ -34,11 +34,21 @@ return new class extends Migration
             $table->string('payment_intent', 255)->nullable()->comment('Only Stripe Payment Use');
             $table->string('payment_intent_client_secret', 400)->nullable()->comment('Only Stripe Payment Use');
             $table->string('redirect_status', 255)->nullable()->comment('Only Stripe Payment Use');
+            $table->string('invoice', 255)->nullable()->comment('Only Stripe Payment Invoice Id');
             $table->timestamps();
         });
         Schema::table('payment', function (Blueprint $table) {
-            $table->unsignedBigInteger('sale_id')->after('id')->nullable()->comment('Type Of Sale');
+            $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
+            $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
+
+            $table->unsignedBigInteger('sale_id')->after('salon_id')->nullable()->comment('Type Of Sale');
             $table->foreign('sale_id')->references('id')->on('sale')->onUpdate('cascade')->onDelete('cascade');
+
+            $table->unsignedBigInteger('client_id')->after('sale_id')->nullable()->comment('Type Of Client');
+            $table->foreign('client_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+
+            $table->unsignedBigInteger('subscription_id')->after('client_id')->nullable()->comment('Type Of subscription');
+            $table->foreign('subscription_id')->references('id')->on('subscription')->onUpdate('cascade')->onDelete('cascade');
         });
         Schema::table('salons', function (Blueprint $table) {
             $table->string('business_website', 500)->nullable();

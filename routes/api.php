@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\v1\ClientDocumentApiController;
 use App\Http\Controllers\Api\v1\ClientNoteApiController;
 use App\Http\Controllers\Api\v1\ClientPhotoApiController;
 use App\Http\Controllers\Api\v1\CloseddateApiController;
+use App\Http\Controllers\Api\v1\DashboardApiController;
 use App\Http\Controllers\Api\v1\GuestApiController;
 use App\Http\Controllers\Api\v1\MembershipApiController;
 use App\Http\Controllers\Api\v1\PricetierApiController;
@@ -73,6 +74,13 @@ Route::prefix('v1')->group(function () {
         Route::post('/logout', [GuestApiController::class, 'logout']);
         Route::post('/timezone', [AuthApiController::class, 'timezone']);
         Route::post('/businessupdate/{id}', [AuthApiController::class, 'businessupdate']);
+
+        //Dashboard
+        Route::controller(DashboardApiController::class)->prefix('dashboard')->name('dashboard.')->group(function () {
+            Route::post('/view', 'view');
+            Route::post('/upcomingappointment', 'upcomingappointment');
+        });
+
         //Suppliers
         Route::prefix('suppliers')->name('suppliers.')->group(function () {
             Route::post('/view', [SuppliersApiController::class, 'view'])->name('view');

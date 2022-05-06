@@ -93,4 +93,9 @@ class Cart extends Model
         return $this->hasMany(VoucherTo::class, 'cart_id', 'id');
     }
 
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class, 'id', 'subscription_id')->select('id', 'name', 'amount', 'repeats', 'repeat_time', 'repeat_time_option');
+    }
+
 }
