@@ -23,6 +23,7 @@ class Sale extends Model
     protected $fillable = [
         'salon_id',
         'client_id',
+        'applied_voucher_to_id',
         'eventdate',
         'invoicedate',
         'totalprice',
@@ -39,7 +40,7 @@ class Sale extends Model
         'salon_id',
         'client_id',
         'appointment_id',
-        'voucher_id',
+        'applied_voucher_to_id',
     ];
 
     /**
@@ -65,13 +66,17 @@ class Sale extends Model
         return $this->hasOne(Appointment::class, 'id', 'appointment_id');
     }
 
+    public function appliedvouchertoid()
+    {
+        return $this->hasOne(VoucherTo::class, 'id', 'applied_voucher_to_id');
+    }
+
     public function cart()
     {
         $withArray = [
             'services',
             'staff',
             'products',
-            'vouchers',
             'membership',
             'subscription',
             'voucherto',

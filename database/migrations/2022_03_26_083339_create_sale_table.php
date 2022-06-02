@@ -35,7 +35,7 @@ return new class extends Migration
 
         Schema::create('cart', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['Appointment', 'Service', 'Product', 'Voucher', 'Membership', 'Subscription', 'OnOffVoucher'])->default(null)->nullable();
+            $table->enum('type', ['Appointment', 'Service', 'Product', 'Voucher', 'Membership', 'Subscription', 'OneOffVoucher'])->default(null)->nullable();
             $table->decimal('cost', 10, 2)->nullable()->comment('depend on type, Booked Appointment or Service or Product sale cost');
             $table->integer('qty', false, true)->nullable()->comment('only product use');
             $table->timestamps();
@@ -68,7 +68,7 @@ return new class extends Migration
             $table->string('email', 100)->nullable();
             $table->string('code', 16);
             $table->boolean('is_send')->default(0)->comment('only use email send with pdf attachment');
-            $table->decimal('amount', 10, 2)->nullable()->comment('Voucher and onoffvoucher amount');
+            $table->decimal('amount', 10, 2)->nullable()->comment('Voucher and oneoffvoucher amount');
             $table->text('message')->nullable();
             $table->timestamps();
         });

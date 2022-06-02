@@ -247,6 +247,7 @@ class SaleApiController extends Controller
         $requestAll = $request->all();
         $stripe_account_id = auth()->user()->stripe_account_id;
         $cart = $request->cart ? json_decode($request->cart, true) : [];
+        $voucher_to_id = $request->voucher_to_id;
         $is_stripe = $request->is_stripe;
         $salon_id = $request->salon_id;
         $client_id = $request->client_id;
@@ -266,7 +267,32 @@ class SaleApiController extends Controller
         $model->eventdate = $eventdate;
         $model->invoicedate = $invoicedate;
         $model->totalprice = $totalprice;
+        $model->is_stripe = $is_stripe;
         $model->status = 'Pending';
+        $remaining_balance = "0.00";
+        $voucher_discount = "0.00";
+        $total_pay = $totalprice;
+        if ($voucher_to_id) {
+            $appliedvoucherto = VoucherTo::where('id', $voucher_to_id)->first();
+            if ($appliedvoucherto) {
+                if ($totalprice >= $appliedvoucherto->remaining_balance) {
+                    $voucher_discount = $appliedvoucherto->remaining_balance;
+                    $total_pay = ($totalprice - $appliedvoucherto->remaining_balance);
+                    $appliedvoucherto->remaining_balance = $remaining_balance;
+                    $appliedvoucherto->save();
+                }
+                if ($totalprice < $appliedvoucherto->remaining_balance) {
+                    $voucher_discount = ($appliedvoucherto->remaining_balance - ($appliedvoucherto->remaining_balance - $totalprice));
+                    $total_pay = $totalprice - ($appliedvoucherto->remaining_balance - ($appliedvoucherto->remaining_balance - $totalprice));
+                    $remaining_balance = ($appliedvoucherto->remaining_balance - $totalprice);
+                    $appliedvoucherto->remaining_balance = $remaining_balance;
+                    $appliedvoucherto->save();
+                }
+            }
+        }
+        $model->applied_voucher_to_id = $voucher_to_id;
+        $model->voucher_discount = $voucher_discount;
+        $model->total_pay = $total_pay;
         $model->save();
         if ($model) {
             $client = Users::find($client_id);
@@ -438,6 +464,7 @@ class SaleApiController extends Controller
                                 // foreach ($voucher_to as $vt) {
                                 $modelCartVoucherTo = new VoucherTo;
                                 $modelCartVoucherTo->voucher_id = $value['id'];
+                                $modelCartVoucherTo->voucher_type = "Voucher";
                                 $modelCartVoucherTo->client_id = $client->id;
                                 $modelCartVoucherTo->first_name = $vt['first_name'];
                                 $modelCartVoucherTo->last_name = $vt['last_name'];
@@ -482,10 +509,11 @@ class SaleApiController extends Controller
                             $modelCart->save();
                         }
                     }
-                    if (isset($cart['onoffvouchers']) && $cart['onoffvouchers']) {
-                        foreach ($cart['onoffvouchers'] as $vt) {
+                    if (isset($cart['oneoffvoucher']) && $cart['oneoffvoucher']) {
+                        foreach ($cart['oneoffvoucher'] as $vt) {
                             $modelCartVoucherTo = new VoucherTo;
                             $modelCartVoucherTo->voucher_id = null;
+                            $modelCartVoucherTo->voucher_type = "OneOffVoucher";
                             $modelCartVoucherTo->first_name = $vt['first_name'];
                             $modelCartVoucherTo->last_name = $vt['last_name'];
                             $modelCartVoucherTo->is_send = (isset($vt['is_send']) && $vt['is_send']) ? 1 : 0;
@@ -498,7 +526,7 @@ class SaleApiController extends Controller
                             $modelCart = new Cart;
                             $modelCart->sale_id = $model->id;
                             $modelCart->voucher_to_id = $modelCartVoucherTo->id;
-                            $modelCart->type = "OnOffVoucher";
+                            $modelCart->type = "OneOffVoucher";
                             $modelCart->save();
                             if ($modelCartVoucherTo->is_send) {
                                 $field = array();
@@ -533,7 +561,8 @@ class SaleApiController extends Controller
                     $paymentModal->amount = $totalprice;
                     $paymentModal->status = "Paid";
                 } elseif ($paidby === "Voucher") {
-
+                    $paymentModal->amount = $totalprice;
+                    $paymentModal->status = "Paid";
                 }
                 $paymentModal->payment_date = currentDate();
                 $paymentModal->transaction_id = null;
@@ -554,7 +583,7 @@ class SaleApiController extends Controller
                         'payment_method_types' => ['card'],
                         // 'payment_method' => "pm_card_visa",
                         'confirmation_method' => 'automatic', //manual/automatic
-                        "metadata" => ["sale_id" => $model->id, 'client_id' => $client->id],
+                        "metadata" => ["sale_id" => $model->id, 'client_id' => $client->id, 'payment_id' => $paymentModal->id],
                         // 'confirm' => true,
                         // 'use_stripe_sdk' => true,
                         // 'receipt_email' => $client->email,
@@ -778,21 +807,24 @@ class SaleApiController extends Controller
             ['stripe_account' => $stripe_account_id]
         );
         if ($paymentIntent) {
+
             $metadata = $paymentIntent->metadata;
             $paymentModal = Payment::where(['id' => $metadata->payment_id])->first();
             if ($paymentModal) {
                 $paymentModal->payment_intent = $paymentIntent->id;
                 $paymentModal->payment_intent_client_secret = $paymentIntent->client_secret;
                 $paymentModal->redirect_status = $paymentIntent->status;
+                $paymentModal->paidby = "StripeCreditCard";
                 $paymentModal->status = $paymentIntent->status === "succeeded" ? "Paid" : "Failed";
                 $paymentModal->invoice = $paymentIntent->invoice;
                 $paymentModal->save();
+                $saleModal = Sale::where('id', $metadata->sale_id)->first();
+                if ($saleModal) {
+                    $saleModal->status = "Paid";
+                    $saleModal->save();
+                }
             }
         }
-        echo '<pre>';
-        print_r($requestAll);
-        echo '<pre>';
-        dd();
     }
 
     public function payment(Request $request)
@@ -805,22 +837,21 @@ class SaleApiController extends Controller
         $requestAll = $request->all();
         $validator = Validator::make($requestAll, [
             'client_id' => 'required|integer',
-            'client_email' => 'required|email',
             'code' => 'required',
         ]);
         if ($validator->fails()) {
             $messages = $validator->messages();
             return response()->json(['errors' => $messages, 'message' => __('messages.validation_error')], $this->errorStatus);
         }
-        $client_email = $request->client_email;
+        $client_id = $request->client_id;
         $code = $request->code;
         $action = $request->action;
         $salon_id = $request->salon_id;
 
         $currentdate = Carbon::parse()->format('Y-m-d H:i:s');
         $voucherto = VoucherTo::with('voucher')->whereHas('voucher', function ($q) use ($currentdate) {
-            $q->where(['is_active' => 1])->where('expiry_at', '>=', $currentdate);
-        })->whereNotNull('email')->where(['code' => $code, 'email' => $client_email])->first();
+            $q->where(['is_active' => 1])->where('expiry_at', '>=', $currentdate)->where('remaining_balance', '>', '0');
+        })->where(['code' => $code, 'client_id' => $client_id])->first();
 
         if ($voucherto) {
             return response()->json($voucherto, $this->successStatus);

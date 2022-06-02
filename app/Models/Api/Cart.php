@@ -26,6 +26,7 @@ class Cart extends Model
         'service_id',
         'staff_id',
         'product_id',
+        'voucher_to_id',
         'type',
         'cost',
         'qty',
@@ -42,6 +43,7 @@ class Cart extends Model
         'service_id',
         'staff_id',
         'product_id',
+        'voucher_to_id',
     ];
 
     /**
@@ -76,11 +78,6 @@ class Cart extends Model
     public function products()
     {
         return $this->hasOne(Products::class, 'id', 'product_id')->select('id', 'name');
-    }
-
-    public function vouchers()
-    {
-        return $this->hasOne(Voucher::class, 'id', 'voucher_id')->select('id', 'name');
     }
 
     public function membership()

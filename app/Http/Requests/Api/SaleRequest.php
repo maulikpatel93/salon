@@ -28,10 +28,14 @@ class SaleRequest extends FormRequest
         return [
             'salon_id' => 'required|integer',
             'client_id' => 'required|integer',
+            'applied_voucher_to_id' => 'nullable',
             'eventdate' => 'nullable|date',
             'invoicedate' => 'nullable|date',
             'totalprice' => 'nullable',
             'status' => 'nullable',
+            'description' => 'nullable',
+            'voucher_discount' => 'nullable',
+            'total_pay' => 'nullable',
         ];
     }
 }
