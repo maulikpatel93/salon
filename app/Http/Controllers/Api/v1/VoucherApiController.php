@@ -6,8 +6,8 @@ use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\VoucherRequest;
 use App\Models\Api\Voucher;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class VoucherApiController extends Controller
 {
@@ -18,7 +18,6 @@ class VoucherApiController extends Controller
     protected $field = [
         'id',
         'salon_id',
-        'code',
         'name',
         'description',
         'amount',
@@ -62,9 +61,9 @@ class VoucherApiController extends Controller
     {
         $requestAll = $request->all();
         $requestAll['is_active_at'] = currentDateTime();
-        $requestAll['code'] = Str::random(6);
         $requestAll['used_online'] = isset($requestAll['used_online']) && $requestAll['used_online'] ? '1' : "0";
         $requestAll['limit_uses'] = isset($requestAll['limit_uses']) && $requestAll['limit_uses'] ? '1' : "0";
+        $requestAll['expiry_at'] = isset($requestAll['valid']) && $requestAll['valid'] ? Carbon::parse($currentdate)->addMonth($requestAll['valid']) : null;
         // $voucher_services = ($request->service_id) ? explode(",", $request->service_id) : [];
         $model = new Voucher;
         $model->fill($requestAll);
@@ -88,6 +87,7 @@ class VoucherApiController extends Controller
         $requestAll = $request->all();
         $requestAll['used_online'] = isset($requestAll['used_online']) && $requestAll['used_online'] ? '1' : "0";
         $requestAll['limit_uses'] = isset($requestAll['limit_uses']) && $requestAll['limit_uses'] ? '1' : "0";
+        $requestAll['expiry_at'] = isset($requestAll['valid']) && $requestAll['valid'] ? Carbon::parse()->addMonth($requestAll['valid']) : null;
         // $voucher_services = ($request->service_id) ? explode(",", $request->service_id) : [];
         $model = $this->findModel($id);
         // $model->Voucherservices->map(function ($value) use ($voucher_services, $id) {

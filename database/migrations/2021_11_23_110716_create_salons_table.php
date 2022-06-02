@@ -245,7 +245,6 @@ class CreateSalonsTable extends Migration
         Schema::create('voucher', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
-            $table->string('code', 16)->unique();
             $table->text('description')->nullable();
             $table->decimal('amount', 10, 2)->nullable();
             $table->integer('valid', false, true)->comment('Valid for Months');

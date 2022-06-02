@@ -80,7 +80,7 @@ class Cart extends Model
 
     public function vouchers()
     {
-        return $this->hasOne(Voucher::class, 'id', 'voucher_id')->select('id', 'name', 'code');
+        return $this->hasOne(Voucher::class, 'id', 'voucher_id')->select('id', 'name');
     }
 
     public function membership()
@@ -90,7 +90,7 @@ class Cart extends Model
 
     public function voucherto()
     {
-        return $this->hasMany(VoucherTo::class, 'cart_id', 'id');
+        return $this->hasOne(VoucherTo::class, 'id', 'voucher_to_id');
     }
 
     public function subscription()

@@ -22,7 +22,9 @@ class VoucherTo extends Model
      * @var string[]
      */
     protected $fillable = [
-        'cart_id',
+        'voucher_id',
+        'client_id',
+        'voucher_type',
         'first_name',
         'last_name',
         'is_send',
@@ -47,8 +49,13 @@ class VoucherTo extends Model
      */
     protected $casts = [];
 
-    public function cart()
+    public function voucher()
     {
-        return $this->belongsTo(Cart::class, 'salon_id', 'id');
+        return $this->belongsTo(Voucher::class, 'voucher_id', 'id');
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'client_id', 'id');
     }
 }

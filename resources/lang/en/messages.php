@@ -14,4 +14,5 @@ return [
     "busytime_check_appointment2" => "This time the staff appointment is already booked. For busy times please change the time or staff.",
     "otp_send" => "OTP is sent to Your Email",
     "error_PaymentIntent_status" => "Invalid PaymentIntent status",
+    "code_not_match" => "Voucher Code not match",
 ];

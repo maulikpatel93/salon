@@ -13,15 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('payment', function (Blueprint $table) {
-            $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
-            $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
+        Schema::table('voucher_to', function (Blueprint $table) {
+            $table->unsignedBigInteger('voucher_id')->after('id')->nullable()->comment('Type Of Cart');
+            $table->foreign('voucher_id')->references('id')->on('voucher')->onUpdate('cascade')->onDelete('cascade');
 
-            $table->unsignedBigInteger('client_id')->after('sale_id')->nullable()->comment('Type Of Client');
+            $table->unsignedBigInteger('client_id')->after('voucher_id')->nullable()->comment('Type Of Client');
             $table->foreign('client_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
 
-            $table->unsignedBigInteger('subscription_id')->after('client_id')->nullable()->comment('Type Of subscription');
-            $table->foreign('subscription_id')->references('id')->on('subscription')->onUpdate('cascade')->onDelete('cascade');
+            $table->enum('voucher_type', ['Voucher', 'OneOffVoucher'])->after('email')->default(null)->nullable();
+        });
+
+        Schema::table('cart', function (Blueprint $table) {
+            $table->unsignedBigInteger('voucher_to_id')->after('voucher_id')->nullable()->comment('Type Of Voucher to ');
+            $table->foreign('voucher_to_id')->references('id')->on('voucher_to')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

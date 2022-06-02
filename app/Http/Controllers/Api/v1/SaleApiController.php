@@ -16,6 +16,7 @@ use App\Models\Api\Subscription;
 use App\Models\Api\Users;
 use App\Models\Api\Voucher;
 use App\Models\Api\VoucherTo;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Validator;
@@ -169,12 +170,11 @@ class SaleApiController extends Controller
         if ($salon_id) {
             if ($voucher_id) {
                 $withArray = [];
-                $vouchers = Voucher::select(['id', 'code', 'name', 'description', 'amount', 'used_online', 'terms_and_conditions'])->where('id', $voucher_id)->where('salon_id', $salon_id)->first();
+                $vouchers = Voucher::select(['id', 'name', 'description', 'amount', 'used_online', 'terms_and_conditions'])->where('id', $voucher_id)->where('salon_id', $salon_id)->first();
                 $vouchers->voucher_to = $voucher_to;
             } else {
                 $vouchers = Voucher::select(['id',
                     'salon_id',
-                    'code',
                     'name',
                     'description',
                     'amount',
@@ -423,7 +423,7 @@ class SaleApiController extends Controller
                             $modelCart->sale_id = $model->id;
                             $modelCart->product_id = $value['id'];
                             $modelCart->qty = $value['qty'];
-                            $modelCart->cost = $value['price'];
+                            $modelCart->cost = $value['cost_price'];
                             $modelCart->type = "Product";
                             $modelCart->save();
                         }
@@ -431,26 +431,29 @@ class SaleApiController extends Controller
                     if (isset($cart['vouchers']) && $cart['vouchers']) {
                         foreach ($cart['vouchers'] as $value) {
                             $voucher_to = (isset($value['voucher_to']) && $value['voucher_to']) ? $value['voucher_to'] : "";
-                            $modelCart = new Cart;
-                            $modelCart->sale_id = $model->id;
-                            $modelCart->voucher_id = $value['id'];
-                            $modelCart->cost = $value['amount'];
-                            $modelCart->type = "Voucher";
-                            $modelCart->save();
+
                             if ($voucher_to) {
-                                $voucherModal = Voucher::select(['id', 'code', 'valid', 'name', 'description', 'amount', 'used_online', 'terms_and_conditions'])->where('id', $value['id'])->where('salon_id', $salon_id)->first();
+                                $voucherModal = Voucher::select(['id', 'valid', 'name', 'description', 'amount', 'used_online', 'terms_and_conditions'])->where('id', $value['id'])->where('salon_id', $salon_id)->first();
                                 $vt = $voucher_to;
                                 // foreach ($voucher_to as $vt) {
                                 $modelCartVoucherTo = new VoucherTo;
-                                $modelCartVoucherTo->cart_id = $modelCart->id;
+                                $modelCartVoucherTo->voucher_id = $value['id'];
+                                $modelCartVoucherTo->client_id = $client->id;
                                 $modelCartVoucherTo->first_name = $vt['first_name'];
                                 $modelCartVoucherTo->last_name = $vt['last_name'];
                                 $modelCartVoucherTo->is_send = (isset($vt['is_send']) && $vt['is_send']) ? 1 : 0;
                                 $modelCartVoucherTo->email = $vt['email'] ? $vt['email'] : null;
                                 $modelCartVoucherTo->amount = $vt['amount'];
+                                $modelCartVoucherTo->remaining_balance = $vt['amount'];
                                 $modelCartVoucherTo->message = $vt['message'] ? $vt['message'] : null;
-                                $modelCartVoucherTo->code = (isset($value['code']) && $value['code']) ? $value['code'] : Str::random(6);
+                                $modelCartVoucherTo->code = Str::random(6);
                                 $modelCartVoucherTo->save();
+                                $modelCart = new Cart;
+                                $modelCart->sale_id = $model->id;
+                                $modelCart->voucher_to_id = $modelCartVoucherTo->id;
+                                $modelCart->cost = $value['amount'];
+                                $modelCart->type = "Voucher";
+                                $modelCart->save();
                                 if ($modelCartVoucherTo->is_send) {
                                     $field = array();
                                     $field['amount'] = $modelCartVoucherTo->amount;
@@ -460,10 +463,10 @@ class SaleApiController extends Controller
                                     $field['sender_name'] = $client->first_name . ' ' . $client->last_name;
                                     $field['voucherModal'] = $voucherModal->toArray();
                                     $field['is_stripe'] = $is_stripe;
-                                    $sendmail = sendMail($modelCartVoucherTo->email, ['subject' => 'Beauty- Gift Voucher', 'template' => 'GiftVoucher'], $field);
-                                    if (empty($sendmail)) {
-                                        // return response()->json(['email' => $requestAll['email'], 'message' => __('messages.wrongmail')], $this->errorStatus);
-                                    }
+                                    // $sendmail = sendMail($modelCartVoucherTo->email, ['subject' => 'Beauty- Gift Voucher', 'template' => 'GiftVoucher'], $field);
+                                    // if (empty($sendmail)) {
+                                    //     // return response()->json(['email' => $requestAll['email'], 'message' => __('messages.wrongmail')], $this->errorStatus);
+                                    // }
                                 }
                                 // }
                             }
@@ -480,21 +483,23 @@ class SaleApiController extends Controller
                         }
                     }
                     if (isset($cart['onoffvouchers']) && $cart['onoffvouchers']) {
-                        $modelCart = new Cart;
-                        $modelCart->sale_id = $model->id;
-                        $modelCart->type = "OnOffVoucher";
-                        $modelCart->save();
                         foreach ($cart['onoffvouchers'] as $vt) {
                             $modelCartVoucherTo = new VoucherTo;
-                            $modelCartVoucherTo->cart_id = $modelCart->id;
+                            $modelCartVoucherTo->voucher_id = null;
                             $modelCartVoucherTo->first_name = $vt['first_name'];
                             $modelCartVoucherTo->last_name = $vt['last_name'];
                             $modelCartVoucherTo->is_send = (isset($vt['is_send']) && $vt['is_send']) ? 1 : 0;
                             $modelCartVoucherTo->email = $vt['email'] ? $vt['email'] : null;
                             $modelCartVoucherTo->amount = $vt['amount'];
+                            $modelCartVoucherTo->remaining_balance = $vt['amount'];
                             $modelCartVoucherTo->message = $vt['message'] ? $vt['message'] : null;
-                            $modelCartVoucherTo->code = (isset($value['code']) && $value['code']) ? $value['code'] : Str::random(6);
+                            $modelCartVoucherTo->code = Str::random(6);
                             $modelCartVoucherTo->save();
+                            $modelCart = new Cart;
+                            $modelCart->sale_id = $model->id;
+                            $modelCart->voucher_to_id = $modelCartVoucherTo->id;
+                            $modelCart->type = "OnOffVoucher";
+                            $modelCart->save();
                             if ($modelCartVoucherTo->is_send) {
                                 $field = array();
                                 $field['amount'] = $modelCartVoucherTo->amount;
@@ -788,7 +793,6 @@ class SaleApiController extends Controller
         print_r($requestAll);
         echo '<pre>';
         dd();
-
     }
 
     public function payment(Request $request)
@@ -808,10 +812,20 @@ class SaleApiController extends Controller
             $messages = $validator->messages();
             return response()->json(['errors' => $messages, 'message' => __('messages.validation_error')], $this->errorStatus);
         }
+        $client_email = $request->client_email;
+        $code = $request->code;
+        $action = $request->action;
+        $salon_id = $request->salon_id;
 
-        echo '<pre>';
-        print_r($requestAll);
-        echo '<pre>';
-        dd();
+        $currentdate = Carbon::parse()->format('Y-m-d H:i:s');
+        $voucherto = VoucherTo::with('voucher')->whereHas('voucher', function ($q) use ($currentdate) {
+            $q->where(['is_active' => 1])->where('expiry_at', '>=', $currentdate);
+        })->whereNotNull('email')->where(['code' => $code, 'email' => $client_email])->first();
+
+        if ($voucherto) {
+            return response()->json($voucherto, $this->successStatus);
+        } else {
+            return response()->json(['errors' => ['code' => __('messages.code_not_match')], 'message' => __('messages.validation_error')], $this->errorStatus);
+        }
     }
 }

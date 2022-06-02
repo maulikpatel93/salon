@@ -23,7 +23,6 @@ class Voucher extends Model
      */
     protected $fillable = [
         'salon_id',
-        'code',
         'name',
         'description',
         'amount',
@@ -34,6 +33,7 @@ class Voucher extends Model
         'terms_and_conditions',
         'is_active',
         'is_active_at',
+        'expiry_at',
     ];
 
     /**
@@ -51,6 +51,7 @@ class Voucher extends Model
      */
     protected $casts = [
         'is_active_at' => 'datetime',
+        'expiry_at' => 'datetime',
     ];
 
     public function salon()
