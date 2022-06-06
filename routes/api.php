@@ -151,6 +151,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/clientinvoice', [ClientApiController::class, 'clientinvoice'])->name('clientinvoice');
             Route::post('/clientvoucher', [ClientApiController::class, 'clientvoucher'])->name('clientvoucher');
             Route::post('/clientimport', [ClientApiController::class, 'clientimport'])->name('clientimport');
+            Route::post('/clientexport', [ClientApiController::class, 'clientexport'])->name('clientexport');
         });
 
         //Client photo

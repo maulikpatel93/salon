@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Exceptions\UnsecureException;
+use App\Exports\ClientExport;
 use App\Http\Controllers\Api\v1\StripeApiController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ClientRequest;
@@ -11,11 +12,11 @@ use App\Models\Api\Client;
 use App\Models\Api\Sale;
 use App\Models\Api\VoucherTo;
 use Carbon\Carbon;
-use Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ClientApiController extends Controller
 {
@@ -410,17 +411,21 @@ class ClientApiController extends Controller
         return response()->json(['message' => __('messages.failed')], $this->errorStatus);
     }
 
-    public function exportData(Request $request)
+    public function clientexport()
     {
 
-        $data = Excel::download(new ExportUsers, 'client_export.xlsx');
-        return $data;
-        echo "hello export";
-        if ($data_export) {
-            echo "exported";
-        } else {
-            echo "not exported";
-        }
+        // $data = Excel::download(new ClientExport, 'client_export.xlsx');
+        // return $data;
+        $file_name = date('YmdHis') . rand();
+        Excel::store(new ClientExport(), $file_name . '.xlsx', 'local');
+
+        return response()->json($file_name . '.xlsx', 200);
+        // echo "hello export";
+        // if ($data_export) {
+        //     echo "exported";
+        // } else {
+        //     echo "not exported";
+        // }
 
     }
 }
