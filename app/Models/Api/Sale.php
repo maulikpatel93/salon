@@ -66,9 +66,10 @@ class Sale extends Model
         return $this->hasOne(Appointment::class, 'id', 'appointment_id');
     }
 
-    public function appliedvouchertoid()
+    public function appliedvoucherto()
     {
-        return $this->hasOne(VoucherTo::class, 'id', 'applied_voucher_to_id');
+        $withArray = ['voucher'];
+        return $this->hasOne(VoucherTo::class, 'id', 'applied_voucher_to_id')->with($withArray);
     }
 
     public function cart()

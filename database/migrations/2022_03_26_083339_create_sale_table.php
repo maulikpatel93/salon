@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('eventdate')->nullable()->comment('calendar event date');
             $table->date('invoicedate')->nullable()->comment('sale Invoice date');
             $table->decimal('totalprice', 10, 2)->nullable()->comment('Sale total price');
-            $table->enum('status', ['Pending', 'Paid', 'Failed'])->default(null)->nullable();
+            $table->enum('status', ['Pending', 'Paid', 'Failed', 'Cancel'])->default(null)->nullable();
             $table->timestamps();
         });
 

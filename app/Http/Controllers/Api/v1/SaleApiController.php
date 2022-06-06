@@ -39,6 +39,9 @@ class SaleApiController extends Controller
         'invoicedate',
         'totalprice',
         'status',
+        'applied_voucher_to_id',
+        'voucher_discount',
+        'total_pay',
     ];
 
     protected $salon_field = [
@@ -526,6 +529,7 @@ class SaleApiController extends Controller
                             $modelCart = new Cart;
                             $modelCart->sale_id = $model->id;
                             $modelCart->voucher_to_id = $modelCartVoucherTo->id;
+                            $modelCart->cost = $modelCartVoucherTo->amount;
                             $modelCart->type = "OneOffVoucher";
                             $modelCart->save();
                             if ($modelCartVoucherTo->is_send) {
@@ -551,18 +555,17 @@ class SaleApiController extends Controller
                 $paymentModal->client_id = $client->id;
                 $paymentModal->type = null;
                 $paymentModal->paidby = $request->paidby;
+                $paymentModal->amount = $totalprice;
                 if ($paidby === "StripeCreditCard") {
-                    $paymentModal->amount = $totalprice;
                     $paymentModal->status = "Paid";
                 } elseif ($paidby === "CreditCard") {
-                    $paymentModal->amount = $totalprice;
                     $paymentModal->status = "Paid";
                 } elseif ($paidby === "Cash") {
-                    $paymentModal->amount = $totalprice;
                     $paymentModal->status = "Paid";
                 } elseif ($paidby === "Voucher") {
-                    $paymentModal->amount = $totalprice;
                     $paymentModal->status = "Paid";
+                } else {
+                    $paymentModal->status = "Failed";
                 }
                 $paymentModal->payment_date = currentDate();
                 $paymentModal->transaction_id = null;
@@ -677,6 +680,7 @@ class SaleApiController extends Controller
             'salon:' . implode(',', $this->salon_field),
             'client:' . implode(',', $this->client_field),
             'cart',
+            'appliedvoucherto',
             'appointment:id,dateof,start_time,end_time,duration,cost',
         ];
         $pagination = $request->pagination ? $request->pagination : false;
@@ -711,6 +715,7 @@ class SaleApiController extends Controller
             } else {
                 $model = $query->orderByRaw($orderby)->get();
             }
+
             if ($model->count()) {
                 $successData = $model->toArray();
                 if ($successData) {
@@ -807,7 +812,6 @@ class SaleApiController extends Controller
             ['stripe_account' => $stripe_account_id]
         );
         if ($paymentIntent) {
-
             $metadata = $paymentIntent->metadata;
             $paymentModal = Payment::where(['id' => $metadata->payment_id])->first();
             if ($paymentModal) {
@@ -820,7 +824,7 @@ class SaleApiController extends Controller
                 $paymentModal->save();
                 $saleModal = Sale::where('id', $metadata->sale_id)->first();
                 if ($saleModal) {
-                    $saleModal->status = "Paid";
+                    $saleModal->status = $paymentIntent->status === "succeeded" ? "Paid" : "Failed";
                     $saleModal->save();
                 }
             }

@@ -87,7 +87,8 @@ class Cart extends Model
 
     public function voucherto()
     {
-        return $this->hasOne(VoucherTo::class, 'id', 'voucher_to_id');
+        $witharray = ['voucher'];
+        return $this->hasOne(VoucherTo::class, 'id', 'voucher_to_id')->with($witharray);
     }
 
     public function subscription()

@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'success' => 'Success',
     'failed' => 'Failed',
     'validation_error' => 'Validation Errors',
     'user_email_not_available' => 'Your Email Id not available. Please enter the another Email Id.',

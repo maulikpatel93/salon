@@ -149,6 +149,8 @@ Route::prefix('v1')->group(function () {
             Route::post('/delete/{id}', [ClientApiController::class, 'delete'])->name('delete');
             Route::post('/clientmembership', [ClientApiController::class, 'clientmembership'])->name('clientmembership');
             Route::post('/clientinvoice', [ClientApiController::class, 'clientinvoice'])->name('clientinvoice');
+            Route::post('/clientvoucher', [ClientApiController::class, 'clientvoucher'])->name('clientvoucher');
+            Route::post('/clientimport', [ClientApiController::class, 'clientimport'])->name('clientimport');
         });
 
         //Client photo

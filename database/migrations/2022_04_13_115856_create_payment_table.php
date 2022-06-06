@@ -29,7 +29,7 @@ return new class extends Migration
             $table->enum('paidby', ['StripeCreditCard', 'CreditCard', 'Cash', 'Voucher'])->default(null)->nullable()->comment('');
             $table->decimal('amount', 10, 2)->nullable()->comment('');
             $table->date('payment_date', 10, 2)->nullable()->comment('');
-            $table->enum('status', ['Pending', 'Paid', 'Failed'])->default(null)->nullable();
+            $table->enum('status', ['Pending', 'Paid', 'Failed', 'Cancel'])->default(null)->nullable();
             $table->string('transaction_id', 255)->default(null)->nullable();
             $table->string('payment_intent', 255)->nullable()->comment('Only Stripe Payment Use');
             $table->string('payment_intent_client_secret', 400)->nullable()->comment('Only Stripe Payment Use');
