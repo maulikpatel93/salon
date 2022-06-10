@@ -13,15 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('sale', function (Blueprint $table) {
-            $table->decimal('voucher_discount', 10, 2)->nullable()->comment('voucher discount of total price');
-            $table->decimal('total_pay', 10, 2)->nullable()->comment('total pay = totalprice-voucher price');
+        Schema::create('cancellation_reason', function (Blueprint $table) {
+            $table->id();
+            $table->text('reason')->nullable();
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
+            $table->dateTime('is_active_at')->nullable();
+            $table->timestamps();
         });
 
-        Schema::table('sale', function (Blueprint $table) {
-            $table->unsignedBigInteger('applied_voucher_to_id')->after('appointment_id')->nullable()->comment('Type Of Applied Voucher to id');
-            $table->foreign('applied_voucher_to_id')->references('id')->on('voucher_to')->onUpdate('cascade')->onDelete('cascade');
+        Schema::table('cancellation_reason', function (Blueprint $table) {
+            $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
+            $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
         });
+
     }
 
     /**

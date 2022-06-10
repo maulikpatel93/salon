@@ -23,6 +23,8 @@
         "laravel/ui": "^3.3",
         "laravelcollective/html": "^6.2",
         "maatwebsite/excel": "^3.1",
+        "mailchimp/marketing": "^3.0",
+        "mailchimp/transactional": "^1.0",
         "orangehill/iseed": "^3.0",
         "proengsoft/laravel-jsvalidation": "^4.5",
         "psr/simple-cache": "^1.0",

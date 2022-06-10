@@ -94,6 +94,22 @@ return new class extends Migration
             $table->unsignedBigInteger('applied_voucher_to_id')->after('appointment_id')->nullable()->comment('Type Of Applied Voucher to id');
             $table->foreign('applied_voucher_to_id')->references('id')->on('voucher_to')->onUpdate('cascade')->onDelete('cascade');
         });
+
+        Schema::create('salon_settings', function (Blueprint $table) {
+            $table->id();
+            $table->string('type', 100)->nullable()->comment('Type off setting example Client Notification, salon Notification, appointment notification');
+            $table->string('title', 200)->nullable();
+            $table->text('value')->nullable();
+            $table->text('description')->nullable();
+            $table->boolean('is_value')->default(1)->comment('Only Use Of switches in active/inactive'); // 1:Active, 0:Inactive
+            $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
+            $table->dateTime('is_active_at')->nullable();
+        });
+
+        Schema::table('salon_settings', function (Blueprint $table) {
+            $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
+            $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
+        });
     }
 
     /**

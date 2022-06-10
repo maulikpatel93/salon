@@ -2,6 +2,7 @@
 use App\Http\Controllers\Api\v1\AppointmentApiController;
 use App\Http\Controllers\Api\v1\AuthApiController;
 use App\Http\Controllers\Api\v1\BusytimeApiController;
+use App\Http\Controllers\Api\v1\CancellationreasonApiController;
 use App\Http\Controllers\Api\v1\CategoriesApiController;
 use App\Http\Controllers\Api\v1\ClientApiController;
 use App\Http\Controllers\Api\v1\ClientDocumentApiController;
@@ -252,6 +253,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/sendEmailInvoice', 'sendEmailInvoice')->name('sendEmailInvoice');
             Route::post('/voucherapply', 'voucherapply');
             Route::post('/returnpayment', 'returnpayment');
+            Route::post('/sendemailvoucher', 'sendemailvoucher');
         });
 
         //Stripe
@@ -262,6 +264,14 @@ Route::prefix('v1')->group(function () {
 
         //Closedate
         Route::controller(CloseddateApiController::class)->prefix('closedate')->name('closedate.')->group(function () {
+            Route::post('/view', 'view');
+            Route::post('/store', 'store');
+            Route::post('/update/{id}', 'update');
+            Route::post('/delete/{id}', 'delete');
+        });
+
+        //Cancellation reason
+        Route::controller(CancellationreasonApiController::class)->prefix('cancellationreason')->name('cancellationreason.')->group(function () {
             Route::post('/view', 'view');
             Route::post('/store', 'store');
             Route::post('/update/{id}', 'update');

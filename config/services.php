@@ -32,4 +32,8 @@ return [
     'stripe' => [
         'secret' => env('STRIPE_SECRET'),
     ],
+
+    'mandrill' => [
+        'secret' => env('MAILCHIMP_API_KEY'),
+    ],
 ];

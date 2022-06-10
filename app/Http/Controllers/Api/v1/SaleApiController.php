@@ -7,6 +7,7 @@ use App\Http\Requests\Api\SaleRequest;
 use App\Models\Api\Appointment;
 use App\Models\Api\Cart;
 use App\Models\Api\Categories;
+use App\Models\Api\Client;
 use App\Models\Api\Membership;
 use App\Models\Api\Payment;
 use App\Models\Api\Products;
@@ -19,6 +20,7 @@ use App\Models\Api\VoucherTo;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use MailchimpTransactional\ApiClient;
 use Validator;
 
 class SaleApiController extends Controller
@@ -516,6 +518,7 @@ class SaleApiController extends Controller
                         foreach ($cart['oneoffvoucher'] as $vt) {
                             $modelCartVoucherTo = new VoucherTo;
                             $modelCartVoucherTo->voucher_id = null;
+                            $modelCartVoucherTo->client_id = $client->id;
                             $modelCartVoucherTo->voucher_type = "OneOffVoucher";
                             $modelCartVoucherTo->first_name = $vt['first_name'];
                             $modelCartVoucherTo->last_name = $vt['last_name'];
@@ -861,6 +864,65 @@ class SaleApiController extends Controller
             return response()->json($voucherto, $this->successStatus);
         } else {
             return response()->json(['errors' => ['code' => __('messages.code_not_match')], 'message' => __('messages.validation_error')], $this->errorStatus);
+        }
+    }
+
+    public function SendEmailVoucher(Request $request)
+    {
+        $requestAll = $request->all();
+        if ($request->client_id) {
+            $client = Client::find($request->client_id);
+            $data['test'] = 'hello';
+
+            try {
+                $mailchimp = new ApiClient();
+                // $mailchimp->setApiKey(env('MAILCHIMP_API_KEY'));
+                $mailchimp->setApiKey('mIfiW1VW5N-qkXB8X_7nTA');
+                // $response = $mailchimp->messages->send(["message" => 'ss']);
+                $response = $mailchimp->users->ping();
+                // print_r($response);
+                // dd();
+
+                $client = new MailchimpMarketing\ApiClient();
+                $client->setConfig([
+                    'apiKey' => 'mIfiW1VW5N-qkXB8X_7nTA',
+                    'server' => 'us18',
+                ]);
+
+                $response = $client->campaigns->sendTestEmail(51, [
+                    "test_emails" => ["EveWakefield@mailinator.com"],
+                    "send_type" => "html",
+                ]);
+                print_r($response);
+
+                $toEmail = "EveWakefield@mailinator.com";
+                $fromEmail = "programmer93.dynamicdreamz@gmail.com";
+                $subject = "Hello";
+                // $sendemail = Mail::send(new SendVoucher($data), $data, function ($message) use ($toEmail, $fromEmail, $subject) {
+                //     // echo $toEmail . ' ' . $fromEmail . ' ' . $subject;
+                //     $message->to($toEmail)->subject($subject);
+                //     $message->from($fromEmail);
+                // });
+
+                $sendemail = Mail::to($client->email)->send(new SendVoucher($data));
+                // echo '<pre>';
+                // print_r($sendemail);
+                // echo '<pre>';
+                // dd();
+
+            } catch (\Error$e) {
+                echo 'Error: ', $e->getMessage(), "\n";
+            }
+            dd();
+        }
+
+        $validator = Validator::make($requestAll, [
+            'client_id' => 'required|integer',
+            'code' => 'required',
+        ]);
+        if ($validator->fails()) {
+            $messages = $validator->messages();
+            return response()->json(['errors' => $messages, 'message' => __('messages.validation_error')], $this->errorStatus);
         }
     }
 }

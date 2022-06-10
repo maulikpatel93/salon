@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CloseddateRequest extends FormRequest
+class CancellationreasonRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,8 +27,7 @@ class CloseddateRequest extends FormRequest
         $salon_id = $this->salon_id;
         return [
             'salon_id' => 'required|integer',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
+            'reason' => 'required',
         ];
     }
 }
