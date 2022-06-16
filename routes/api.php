@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\v1\GuestApiController;
 use App\Http\Controllers\Api\v1\MembershipApiController;
 use App\Http\Controllers\Api\v1\PricetierApiController;
 use App\Http\Controllers\Api\v1\ProductsApiController;
+use App\Http\Controllers\Api\v1\ReportApiController;
 use App\Http\Controllers\Api\v1\RosterApiController;
 use App\Http\Controllers\Api\v1\SaleApiController;
 use App\Http\Controllers\Api\v1\SalonAccessApiController;
@@ -276,6 +277,11 @@ Route::prefix('v1')->group(function () {
             Route::post('/store', 'store');
             Route::post('/update/{id}', 'update');
             Route::post('/delete/{id}', 'delete');
+        });
+
+        //Report reason
+        Route::controller(ReportApiController::class)->prefix('report')->name('report.')->group(function () {
+            Route::post('/view', 'view');
         });
     });
 });

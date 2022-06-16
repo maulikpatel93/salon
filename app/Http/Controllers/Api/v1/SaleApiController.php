@@ -262,9 +262,10 @@ class SaleApiController extends Controller
         $paidby = $request->paidby;
         $invoicedate = gmdate('Y-m-d');
 
-        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
-        \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
-
+        if ($is_stripe === 1 || $is_stripe === '1') {
+            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
+            \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+        }
         $model = new Sale;
         $model->salon_id = $salon_id;
         $model->client_id = $client_id;

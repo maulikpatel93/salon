@@ -2,6 +2,7 @@
 
 namespace App\Models\Api;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -16,7 +17,7 @@ class Staff extends Model
      * @var string
      */
     protected $table = 'users';
-    protected $appends = ['isStaffChecked', 'profile_photo_url'];
+    protected $appends = ['isStaffChecked', 'profile_photo_url', "TotalCustomer", "NewCustomer", "TotalAppointment", "TotalServicesBooked", "Retained", "OnlineBookings", "TotalValue", "ServicesInvoiced", "ProductsInvoiced", "SalesTotal"];
     /**
      * The attributes that are mass assignable.
      *
@@ -116,5 +117,55 @@ class Staff extends Model
             return $this->attributes['isStaffChecked'] = $AddOnStaff ? true : false;
         }
         return $this->attributes['isStaffChecked'] = false;
+    }
+
+    public function getTotalCustomerAttribute()
+    {
+        return Appointment::where('staff_id', $this->id)->count();
+    }
+
+    public function getNewCustomerAttribute()
+    {
+        return Appointment::where('staff_id', $this->id)->whereDate('created_at', '>', Carbon::now())->count();
+    }
+
+    public function getTotalAppointmentAttribute()
+    {
+        return $this->appointment()->count();
+    }
+
+    public function getTotalServicesBookedAttribute()
+    {
+        return Appointment::where('staff_id', $this->id)->distinct('service_id')->count();
+    }
+
+    public function getRetainedAttribute()
+    {
+        return $this->appointment()->count();
+    }
+
+    public function getOnlineBookingsAttribute()
+    {
+        return Appointment::where('staff_id', $this->id)->where(["status" => "Scheduled"])->count();
+    }
+
+    public function getTotalValueAttribute()
+    {
+        return Appointment::where('staff_id', $this->id)->sum('cost');
+    }
+
+    public function getServicesInvoicedAttribute()
+    {
+        return Cart::where('staff_id', $this->id)->whereNotNull("staff_id")->whereNotNull("service_id")->sum('cost');
+    }
+
+    public function getProductsInvoicedAttribute()
+    {
+        return Cart::where('staff_id', $this->id)->whereNotNull("staff_id")->whereNotNull("product_id")->sum('cost');
+    }
+
+    public function getSalesTotalAttribute()
+    {
+        return Cart::where('staff_id', $this->id)->whereNotNull("staff_id")->sum('cost');
     }
 }
