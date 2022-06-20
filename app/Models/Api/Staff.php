@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Storage;
 class Staff extends Model
 {
     use HasFactory;
-
     /**
      * The table associated with the model.
      *
@@ -121,7 +120,11 @@ class Staff extends Model
 
     public function getTotalCustomerAttribute()
     {
-        return Appointment::where('staff_id', $this->id)->count();
+        if ($this->startdate && $this->enddate) {
+            return Appointment::where('staff_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->count();
+        } else {
+            return Appointment::where('staff_id', $this->id)->count();
+        }
     }
 
     public function getNewCustomerAttribute()
@@ -136,7 +139,11 @@ class Staff extends Model
 
     public function getTotalServicesBookedAttribute()
     {
-        return Appointment::where('staff_id', $this->id)->distinct('service_id')->count();
+        if ($this->startdate && $this->enddate) {
+            return Appointment::where('staff_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->distinct('service_id')->count();
+        } else {
+            return Appointment::where('staff_id', $this->id)->distinct('service_id')->count();
+        }
     }
 
     public function getRetainedAttribute()
@@ -146,26 +153,46 @@ class Staff extends Model
 
     public function getOnlineBookingsAttribute()
     {
-        return Appointment::where('staff_id', $this->id)->where(["status" => "Scheduled"])->count();
+        if ($this->startdate && $this->enddate) {
+            return Appointment::where('staff_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->where(["status" => "Scheduled"])->count();
+        } else {
+            return Appointment::where('staff_id', $this->id)->where(["status" => "Scheduled"])->count();
+        }
     }
 
     public function getTotalValueAttribute()
     {
-        return Appointment::where('staff_id', $this->id)->sum('cost');
+        if ($this->startdate && $this->enddate) {
+            return Appointment::where('staff_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->sum('cost');
+        } else {
+            return Appointment::where('staff_id', $this->id)->sum('cost');
+        }
     }
 
     public function getServicesInvoicedAttribute()
     {
-        return Cart::where('staff_id', $this->id)->whereNotNull("staff_id")->whereNotNull("service_id")->sum('cost');
+        if ($this->startdate && $this->enddate) {
+            return Cart::where('staff_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->whereNotNull("staff_id")->whereNotNull("service_id")->sum('cost');
+        } else {
+            return Cart::where('staff_id', $this->id)->whereNotNull("staff_id")->whereNotNull("service_id")->sum('cost');
+        }
     }
 
     public function getProductsInvoicedAttribute()
     {
-        return Cart::where('staff_id', $this->id)->whereNotNull("staff_id")->whereNotNull("product_id")->sum('cost');
+        if ($this->startdate && $this->enddate) {
+            return Cart::where('staff_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->whereNotNull("staff_id")->whereNotNull("product_id")->sum('cost');
+        } else {
+            return Cart::where('staff_id', $this->id)->whereNotNull("staff_id")->whereNotNull("product_id")->sum('cost');
+        }
     }
 
     public function getSalesTotalAttribute()
     {
-        return Cart::where('staff_id', $this->id)->whereNotNull("staff_id")->sum('cost');
+        if ($this->startdate && $this->enddate) {
+            return Cart::where('staff_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->whereNotNull("staff_id")->sum('cost');
+        } else {
+            return Cart::where('staff_id', $this->id)->whereNotNull("staff_id")->sum('cost');
+        }
     }
 }

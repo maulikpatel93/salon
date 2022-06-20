@@ -84,4 +84,14 @@ class Client extends Model
         // return $this->hasOne(Salons::class, 'salon_id', 'id');
         return $this->belongsTo(Salons::class);
     }
+
+    public function appointment()
+    {
+        return $this->hasMany(Appointment::class, 'client_id', 'id');
+    }
+
+    public function lastappointment()
+    {
+        return $this->hasOne(Appointment::class, 'client_id', 'id')->latest();
+    }
 }
