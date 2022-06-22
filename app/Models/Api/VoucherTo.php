@@ -22,6 +22,7 @@ class VoucherTo extends Model
      * @var string[]
      */
     protected $fillable = [
+        'salon_id',
         'voucher_id',
         'client_id',
         'voucher_type',

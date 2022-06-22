@@ -38,7 +38,6 @@ class Sale extends Model
      */
     protected $hidden = [
         'salon_id',
-        'client_id',
         'appointment_id',
         'applied_voucher_to_id',
     ];

@@ -328,6 +328,7 @@ class SaleApiController extends Controller
             if ($cart && isset($cart['subscription']) && $cart['subscription']) {
                 $subscriptionCheckout = $cart['subscription'][0];
                 $modelCart = new Cart;
+                $modelCart->salon_id = $salon_id;
                 $modelCart->sale_id = $model->id;
                 $modelCart->subscription_id = $subscriptionCheckout['id'];
                 $modelCart->cost = $subscriptionCheckout['amount'];
@@ -428,6 +429,7 @@ class SaleApiController extends Controller
                     $appointment = Appointment::where('id', $model->appointment_id)->first();
                     if ($appointment) {
                         $modelCart = new Cart;
+                        $modelCart->salon_id = $salon_id;
                         $modelCart->sale_id = $model->id;
                         $modelCart->service_id = $appointment->service_id;
                         $modelCart->staff_id = $appointment->staff_id;
@@ -441,6 +443,7 @@ class SaleApiController extends Controller
                     if (isset($cart['services']) && $cart['services']) {
                         foreach ($cart['services'] as $value) {
                             $modelCart = new Cart;
+                            $modelCart->salon_id = $salon_id;
                             $modelCart->sale_id = $model->id;
                             $modelCart->service_id = $value['id'];
                             $modelCart->staff_id = ($value['staff_id']) ? $value['staff_id'] : null;
@@ -452,12 +455,23 @@ class SaleApiController extends Controller
                     if (isset($cart['products']) && $cart['products']) {
                         foreach ($cart['products'] as $value) {
                             $modelCart = new Cart;
+                            $modelCart->salon_id = $salon_id;
                             $modelCart->sale_id = $model->id;
                             $modelCart->product_id = $value['id'];
                             $modelCart->qty = $value['qty'];
                             $modelCart->cost = $value['cost_price'];
                             $modelCart->type = "Product";
                             $modelCart->save();
+                            if ($modelCart && $modelCart->product_id) {
+                                $modelProduct = Products::where(['id' => $modelCart->product_id, 'manage_stock' => 1])->first();
+                                if ($modelProduct) {
+                                    if ($modelProduct->stock_quantity >= $modelCart->qty) {
+                                        $modelProduct->stock_quantity = $modelProduct->stock_quantity - $modelCart->qty;
+                                        $modelProduct->save();
+                                    }
+                                }
+                            }
+
                         }
                     }
                     if (isset($cart['vouchers']) && $cart['vouchers']) {
@@ -469,6 +483,7 @@ class SaleApiController extends Controller
                                 $vt = $voucher_to;
                                 // foreach ($voucher_to as $vt) {
                                 $modelCartVoucherTo = new VoucherTo;
+                                $modelCartVoucherTo->salon_id = $salon_id;
                                 $modelCartVoucherTo->voucher_id = $value['id'];
                                 $modelCartVoucherTo->voucher_type = "Voucher";
                                 $modelCartVoucherTo->client_id = $client->id;
@@ -482,6 +497,7 @@ class SaleApiController extends Controller
                                 $modelCartVoucherTo->code = Str::random(6);
                                 $modelCartVoucherTo->save();
                                 $modelCart = new Cart;
+                                $modelCart->salon_id = $salon_id;
                                 $modelCart->sale_id = $model->id;
                                 $modelCart->voucher_to_id = $modelCartVoucherTo->id;
                                 $modelCart->cost = $value['amount'];
@@ -508,6 +524,7 @@ class SaleApiController extends Controller
                     if (isset($cart['membership']) && $cart['membership']) {
                         foreach ($cart['membership'] as $value) {
                             $modelCart = new Cart;
+                            $modelCart->salon_id = $salon_id;
                             $modelCart->sale_id = $model->id;
                             $modelCart->membership_id = $value['id'];
                             $modelCart->cost = $value['cost'];
@@ -518,6 +535,7 @@ class SaleApiController extends Controller
                     if (isset($cart['oneoffvoucher']) && $cart['oneoffvoucher']) {
                         foreach ($cart['oneoffvoucher'] as $vt) {
                             $modelCartVoucherTo = new VoucherTo;
+                            $modelCartVoucherTo->salon_id = $salon_id;
                             $modelCartVoucherTo->voucher_id = null;
                             $modelCartVoucherTo->client_id = $client->id;
                             $modelCartVoucherTo->voucher_type = "OneOffVoucher";

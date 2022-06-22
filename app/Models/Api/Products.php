@@ -83,4 +83,9 @@ class Products extends Model
     {
         return $this->belongsTo(Tax::class, 'tax_id', 'id');
     }
+
+    public function stocksold()
+    {
+        return $this->hasMany(Cart::class, 'product_id', 'id');
+    }
 }

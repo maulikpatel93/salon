@@ -4,6 +4,7 @@ namespace App\Models\Api;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class Client extends Model
@@ -17,7 +18,7 @@ class Client extends Model
      */
     protected $table = 'users';
 
-    protected $appends = ['profile_photo_url'];
+    protected $appends = ['profile_photo_url', "TotalSales", "TotalStaff", "TotalAppointments", "TotalProducts"];
 
     /**
      * The attributes that are mass assignable.
@@ -93,5 +94,81 @@ class Client extends Model
     public function lastappointment()
     {
         return $this->hasOne(Appointment::class, 'client_id', 'id')->latest();
+    }
+
+    public function lastproduct()
+    {
+        return $this->hasOne(Cart::class, 'client_id', 'id')->latest();
+    }
+
+    public function getTotalSalesAttribute()
+    {
+        if ($this->service_id) {
+            if ($this->startdate && $this->enddate) {
+                return Cart::where('client_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->whereNotNull('service_id')->where('service_id', $this->service_id)->sum("cost");
+            } else {
+                return Cart::where('client_id', $this->id)->whereNotNull('service_id')->where('service_id', $this->service_id)->sum("cost");
+            }
+        } else if ($this->product_id) {
+            if ($this->startdate && $this->enddate) {
+                return Cart::where('client_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->whereNotNull('product_id')->where('product_id', $this->product_id)->sum(DB::raw('cost * qty'));
+            } else {
+                return Cart::where('client_id', $this->id)->whereNotNull('product_id')->where('product_id', $this->product_id)->sum(DB::raw('cost * qty'));
+            }
+        } else {
+            if ($this->ScreenReport === "clients_by_service") {
+                if ($this->startdate && $this->enddate) {
+                    return Cart::where('client_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->whereNotNull('service_id')->sum("cost");
+                } else {
+                    return Cart::where('client_id', $this->id)->whereNotNull('service_id')->sum("cost");
+                }
+            } else if ($this->ScreenReport === "clients_by_product") {
+                if ($this->startdate && $this->enddate) {
+                    return Cart::where('client_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->whereNotNull('product_id')->sum(DB::raw('cost * qty'));
+                } else {
+                    return Cart::where('client_id', $this->id)->whereNotNull('product_id')->sum(DB::raw('cost * qty'));
+                }
+            } else {
+                if ($this->startdate && $this->enddate) {
+                    return Sale::where('client_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->sum("total_pay");
+                } else {
+                    return Sale::where('client_id', $this->id)->sum("total_pay");
+                }
+            }
+
+        }
+
+    }
+
+    public function getTotalStaffAttribute()
+    {
+        if ($this->startdate && $this->enddate) {
+            return Sale::where('sale.client_id', $this->id)->leftJoin('cart', 'cart.sale_id', '=', 'sale.id')->whereDate('sale.created_at', '>=', $this->startdate)->whereDate('sale.created_at', '<=', $this->enddate)->distinct('cart.staff_id')->count();
+        } else {
+            return Sale::where('sale.client_id', $this->id)->leftJoin('cart', 'cart.sale_id', '=', 'sale.id')->distinct('cart.staff_id')->count();
+        }
+    }
+
+    public function getTotalAppointmentsAttribute()
+    {
+        if ($this->startdate && $this->enddate) {
+            return Appointment::where('client_id', $this->id)->whereDate('dateof', '>=', $this->startdate)->whereDate('dateof', '<=', $this->enddate)->count();
+        } else {
+            return Appointment::where('client_id', $this->id)->count();
+        }
+    }
+
+    public function getTotalProductsAttribute()
+    {
+        if ($this->startdate && $this->enddate) {
+            return Cart::where('client_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->whereNotNull('product_id')->count();
+        } else {
+            return Cart::where('client_id', $this->id)->whereNotNull('product_id')->count();
+        }
+    }
+
+    public function cart()
+    {
+        return $this->hasMany(Cart::class, 'client_id', 'id');
     }
 }

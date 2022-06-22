@@ -21,6 +21,7 @@ class Cart extends Model
      * @var string[]
      */
     protected $fillable = [
+        'salon_id',
         'sale_id',
         'appointment_id',
         'service_id',
