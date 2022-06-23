@@ -4,10 +4,15 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Api\Appointment;
+use App\Models\Api\Cart;
 use App\Models\Api\Client;
 use App\Models\Api\Products;
+use App\Models\Api\Services;
 use App\Models\Api\Staff;
+use App\Models\Api\Tax;
 use App\Models\Api\VoucherTo;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -92,6 +97,22 @@ class ReportApiController extends Controller
         'message',
     ];
 
+    protected $cart_field = [
+        'id',
+        'service_id',
+        'product_id',
+        'voucher_to_id',
+        'staff_id',
+        'type',
+        'cost',
+        'qty',
+    ];
+
+    protected $service_field = [
+        'id',
+        'name',
+    ];
+
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -106,6 +127,8 @@ class ReportApiController extends Controller
         $appointment_field = $this->appointment_field;
         $product_field = $this->product_field;
         $voucherto_field = $this->voucherto_field;
+        $cart_field = $this->cart_field;
+        $service_field = $this->service_field;
 
         $validator = Validator::make($requestAll, [
             'auth_key' => 'required',
@@ -371,6 +394,170 @@ class ReportApiController extends Controller
             if ($ScreenReport) {
                 $queryData->addSelect(DB::raw('"' . $ScreenReport . '" as ScreenReport'));
             }
+            if ($pagination == true) {
+                $model = $queryData->paginate($limit);
+            } else {
+                $model = $queryData->get();
+            }
+        }
+
+        $tax = Tax::where(['name' => 'GST', 'is_active' => 1])->first();
+        $taxpercentage = $tax ? $tax->percentage : 0;
+
+        if ($ScreenReport === "sales_by_type") {
+            $serviceCart = Cart::where(['salon_id' => $salon_id])->whereNotNull('service_id');
+            if ($daterange) {
+                $serviceCart->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+            }
+            $service_item_sold = $serviceCart->count();
+            $service_gross_sale = $serviceCart->sum("cost");
+            $service_taxvalue = ($service_gross_sale / $taxpercentage);
+            $service_net_sales = ($service_gross_sale - $service_taxvalue);
+
+            $productCart = Cart::where(['salon_id' => $salon_id, 'type' => 'Product'])->whereNotNull('product_id');
+            if ($daterange) {
+                $productCart->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+            }
+            $product_item_sold = $productCart->count();
+            $product_gross_sale = $productCart->sum("cost");
+            $product_taxvalue = ($product_gross_sale / $taxpercentage);
+            $product_net_sales = ($product_gross_sale - $product_taxvalue);
+
+            $voucherCart = Cart::where(['salon_id' => $salon_id])->whereNotNull('voucher_to_id');
+            if ($daterange) {
+                $voucherCart->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+            }
+            $voucher_item_sold = $voucherCart->count();
+            $voucher_gross_sale = $voucherCart->sum("cost");
+            $voucher_taxvalue = ($voucher_gross_sale / $taxpercentage);
+            $voucher_net_sales = ($voucher_gross_sale - $voucher_taxvalue);
+
+            $membershipCart = Cart::where(['salon_id' => $salon_id, 'type' => 'Membership'])->whereNotNull('membership_id');
+            if ($daterange) {
+                $membershipCart->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+            }
+            $membership_item_sold = $membershipCart->count();
+            $membership_gross_sale = $membershipCart->sum("cost");
+            $membership_taxvalue = ($membership_gross_sale / $taxpercentage);
+            $membership_net_sales = ($membership_gross_sale - $membership_taxvalue);
+
+            $subscriptionCart = Cart::where(['salon_id' => $salon_id, 'type' => 'Subscription'])->whereNotNull('subscription_id');
+            if ($daterange) {
+                $subscriptionCart->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+            }
+            $subscription_item_sold = $subscriptionCart->count();
+            $subscription_gross_sale = $subscriptionCart->sum("cost");
+            $subscription_taxvalue = ($subscription_gross_sale / $taxpercentage);
+            $subscription_net_sales = ($subscription_gross_sale - $subscription_taxvalue);
+
+            $dataSales = [
+                [
+                    "type" => "Services",
+                    "item_sold" => $service_item_sold,
+                    "net_sales" => $service_net_sales,
+                    "tax" => $service_taxvalue,
+                    "gross_sale" => $service_gross_sale,
+                ],
+                [
+                    "type" => "Products",
+                    "item_sold" => $product_item_sold,
+                    "net_sales" => $product_net_sales,
+                    "tax" => $product_taxvalue,
+                    "gross_sale" => $product_gross_sale,
+                ],
+                [
+                    "type" => "Gift Vouchers",
+                    "item_sold" => $voucher_item_sold,
+                    "net_sales" => $voucher_net_sales,
+                    "tax" => $voucher_taxvalue,
+                    "gross_sale" => $voucher_taxvalue,
+                ],
+                [
+                    "type" => "Memberships",
+                    "item_sold" => $membership_item_sold,
+                    "net_sales" => $membership_net_sales,
+                    "tax" => $membership_taxvalue,
+                    "gross_sale" => $membership_gross_sale,
+                ],
+                [
+                    "type" => "Subsciption",
+                    "item_sold" => $subscription_item_sold,
+                    "net_sales" => $subscription_net_sales,
+                    "tax" => $subscription_taxvalue,
+                    "gross_sale" => $subscription_gross_sale,
+                ],
+            ];
+            $successData = $dataSales;
+            if ($successData) {
+                return response()->json($successData, $this->successStatus);
+            }
+        }
+
+        if ($ScreenReport === "sales_by_service") {
+            $queryData = Services::select($service_field)->where(['salon_id' => $salon_id])->has("cart")->orderByRaw($orderby);
+            if ($daterange) {
+                $queryData->addSelect(DB::raw('"' . $daterange[0] . '" as startdate, "' . $daterange[1] . '" as enddate'));
+            }
+            if ($pagination == true) {
+                $model = $queryData->paginate($limit);
+            } else {
+                $model = $queryData->get();
+            }
+        }
+
+        if ($ScreenReport === "sales_by_product") {
+            $queryData = Products::select($service_field)->where(['salon_id' => $salon_id])->has("cart")->orderByRaw($orderby);
+            if ($daterange) {
+                $queryData->addSelect(DB::raw('"' . $daterange[0] . '" as startdate, "' . $daterange[1] . '" as enddate'));
+            }
+            if ($pagination == true) {
+                $model = $queryData->paginate($limit);
+            } else {
+                $model = $queryData->get();
+            }
+        }
+
+        if ($ScreenReport === "sales_by_staffmember") {
+            $queryData = Staff::select($staff_field)->where(['salon_id' => $salon_id])->has("cart")->orderByRaw($orderby);
+            if ($daterange) {
+                $queryData->addSelect(DB::raw('"' . $daterange[0] . '" as startdate, "' . $daterange[1] . '" as enddate'));
+            }
+            if ($pagination == true) {
+                $model = $queryData->paginate($limit);
+            } else {
+                $model = $queryData->get();
+            }
+        }
+
+        if ($ScreenReport === "sales_by_day") {
+            $start = Carbon::parse()->subDays(30)->toDateString();
+            $end = Carbon::now()->toDateString();
+            $period = CarbonPeriod::create($start, $end);
+            $period = array_reverse(iterator_to_array($period));
+
+            // $period = Carbon::parse('2018-04-27')->daysUntil('2018-04-21');
+            foreach ($period as $date) {
+                echo $date->format('Y-m-d');
+            }
+
+            echo '<pre>';
+            print_r($period);
+            echo '<pre>';
+            dd();
+
+            // for ($i = 0; $i < 30; $i++) {
+            //     $date = Carbon::now()->subDays($i)->toDateString();
+            //     // $queryData = Cart::select($cart_field)->where(['salon_id' => $salon_id])->where('created_at', '>=', $date . ' 00:00:00')->where('created_at', '<=', $date . ' 23:59:59')->orderByRaw($orderby);
+            //     $dayCart = Cart::where(['salon_id' => $salon_id])->where('created_at', '>=', $date . ' 00:00:00')->where('created_at', '<=', $date . ' 23:59:59');
+            //     if ($date) {
+            //         $dayCart->where('created_at', '>=', $date . ' 00:00:00')->where('created_at', '<=', $date . ' 23:59:59');
+            //     }
+            //     $day_item_sold = $dayCart->count();
+            //     $day_gross_sale = $dayCart->sum("cost");
+            //     $day_taxvalue = ($day_gross_sale / $taxpercentage);
+            //     $day_net_sales = ($day_gross_sale - $day_taxvalue);
+            // }
+
             if ($pagination == true) {
                 $model = $queryData->paginate($limit);
             } else {

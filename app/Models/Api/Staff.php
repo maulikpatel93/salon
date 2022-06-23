@@ -5,6 +5,7 @@ namespace App\Models\Api;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class Staff extends Model
@@ -16,7 +17,7 @@ class Staff extends Model
      * @var string
      */
     protected $table = 'users';
-    protected $appends = ['isStaffChecked', 'profile_photo_url', "TotalCustomer", "NewCustomer", "TotalAppointment", "TotalServicesBooked", "Retained", "OnlineBookings", "TotalValue", "ServicesInvoiced", "ProductsInvoiced", "SalesTotal"];
+    protected $appends = ['isStaffChecked', 'profile_photo_url', "TotalCustomer", "NewCustomer", "TotalAppointment", "TotalServicesBooked", "Retained", "OnlineBookings", "TotalValue", "ServicesInvoiced", "ProductsInvoiced", "SalesTotal", "TotalServiceSold", "TotalProductSold", "TotalNetSale", "TotalTax", "TotalGrossSale"];
     /**
      * The attributes that are mass assignable.
      *
@@ -181,9 +182,9 @@ class Staff extends Model
     public function getProductsInvoicedAttribute()
     {
         if ($this->startdate && $this->enddate) {
-            return Cart::where('staff_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->whereNotNull("staff_id")->whereNotNull("product_id")->sum('cost');
+            return Cart::where('staff_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->whereNotNull("staff_id")->whereNotNull("product_id")->sum(DB::raw('cost * qty'));
         } else {
-            return Cart::where('staff_id', $this->id)->whereNotNull("staff_id")->whereNotNull("product_id")->sum('cost');
+            return Cart::where('staff_id', $this->id)->whereNotNull("staff_id")->whereNotNull("product_id")->sum(DB::raw('cost * qty'));
         }
     }
 
@@ -194,5 +195,69 @@ class Staff extends Model
         } else {
             return Cart::where('staff_id', $this->id)->whereNotNull("staff_id")->sum('cost');
         }
+    }
+
+    public function cart()
+    {
+        return $this->hasMany(Cart::class, 'staff_id', 'id');
+    }
+
+    public function getTotalServiceSoldAttribute()
+    {
+        $serviceCart = Cart::where(['staff_id' => $this->id])->whereNotNull('staff_id')->whereNotNull('service_id');
+        if ($this->startdate && $this->enddate) {
+            $serviceCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
+        }
+        $service_item_sold = $serviceCart->count();
+        return $service_item_sold;
+    }
+
+    public function getTotalProductSoldAttribute()
+    {
+        $productCart = Cart::where(['staff_id' => $this->id])->whereNotNull('staff_id')->whereNotNull('product_id');
+        if ($this->startdate && $this->enddate) {
+            $productCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
+        }
+        $product_item_sold = $productCart->count();
+        return $product_item_sold;
+    }
+
+    public function getTotalNetSaleAttribute()
+    {
+        $staffCart = Cart::where(['staff_id' => $this->id])->whereNotNull('staff_id')->whereNotNull('service_id');
+        if ($this->startdate && $this->enddate) {
+            $staffCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
+        }
+        $staff_gross_sale = $staffCart->sum('cost');
+
+        $tax = Tax::where(['name' => 'GST', 'is_active' => 1])->first();
+        $taxpercentage = $tax ? $tax->percentage : 0;
+        $staff_taxvalue = ($staff_gross_sale / $taxpercentage);
+        $staff_net_sales = ($staff_gross_sale - $staff_taxvalue);
+        return $staff_net_sales;
+    }
+
+    public function getTotalTaxAttribute()
+    {
+        $staffCart = Cart::where(['staff_id' => $this->id])->whereNotNull('staff_id')->whereNotNull('service_id');
+        if ($this->startdate && $this->enddate) {
+            $staffCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
+        }
+        $staff_gross_sale = $staffCart->sum('cost');
+
+        $tax = Tax::where(['name' => 'GST', 'is_active' => 1])->first();
+        $taxpercentage = $tax ? $tax->percentage : 0;
+        $staff_taxvalue = ($staff_gross_sale / $taxpercentage);
+        return $staff_taxvalue;
+    }
+
+    public function getTotalGrossSaleAttribute()
+    {
+        $staffCart = Cart::where(['staff_id' => $this->id])->whereNotNull('staff_id')->whereNotNull('service_id');
+        if ($this->startdate && $this->enddate) {
+            $staffCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
+        }
+        $staff_gross_sale = $staffCart->sum("cost");
+        return $staff_gross_sale;
     }
 }

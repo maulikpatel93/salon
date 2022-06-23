@@ -85,7 +85,8 @@ class TaxApiController extends Controller
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
-        $where = ['is_active' => '1', 'salon_id' => $request->salon_id];
+        // $where = ['is_active' => '1', 'salon_id' => $request->salon_id];
+        $where = ['is_active' => '1'];
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
         $whereLike = $request->q ? explode(' ', $request->q) : '';

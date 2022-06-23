@@ -4,6 +4,7 @@ namespace App\Models\Api;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class Products extends Model
@@ -17,7 +18,7 @@ class Products extends Model
      */
     protected $table = 'products';
 
-    protected $appends = ['isNewRecord', 'image_url'];
+    protected $appends = ['isNewRecord', 'image_url', "TotalItemSold", "TotalNetSale", "TotalTax", "TotalGrossSale"];
     /**
      * The attributes that are mass assignable.
      *
@@ -88,4 +89,59 @@ class Products extends Model
     {
         return $this->hasMany(Cart::class, 'product_id', 'id');
     }
+
+    public function cart()
+    {
+        return $this->hasMany(Cart::class, 'product_id', 'id');
+    }
+
+    public function getTotalItemSoldAttribute()
+    {
+        $productCart = Cart::where(['product_id' => $this->id])->whereNotNull('product_id');
+        if ($this->startdate && $this->enddate) {
+            $productCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
+        }
+        $product_item_sold = $productCart->count();
+        return $product_item_sold;
+    }
+
+    public function getTotalNetSaleAttribute()
+    {
+        $productCart = Cart::where(['product_id' => $this->id])->whereNotNull('product_id');
+        if ($this->startdate && $this->enddate) {
+            $productCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
+        }
+        $product_gross_sale = $productCart->sum(DB::raw('cost * qty'));
+
+        $tax = Tax::where(['name' => 'GST', 'is_active' => 1])->first();
+        $taxpercentage = $tax ? $tax->percentage : 0;
+        $product_taxvalue = ($product_gross_sale / $taxpercentage);
+        $product_net_sales = ($product_gross_sale - $product_taxvalue);
+        return $product_net_sales;
+    }
+
+    public function getTotalTaxAttribute()
+    {
+        $productCart = Cart::where(['product_id' => $this->id])->whereNotNull('product_id');
+        if ($this->startdate && $this->enddate) {
+            $productCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
+        }
+        $product_gross_sale = $productCart->sum(DB::raw('cost * qty'));
+
+        $tax = Tax::where(['name' => 'GST', 'is_active' => 1])->first();
+        $taxpercentage = $tax ? $tax->percentage : 0;
+        $product_taxvalue = ($product_gross_sale / $taxpercentage);
+        return $product_taxvalue;
+    }
+
+    public function getTotalGrossSaleAttribute()
+    {
+        $productCart = Cart::where(['product_id' => $this->id])->whereNotNull('product_id');
+        if ($this->startdate && $this->enddate) {
+            $productCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
+        }
+        $product_gross_sale = $productCart->sum("cost");
+        return $product_gross_sale;
+    }
+
 }

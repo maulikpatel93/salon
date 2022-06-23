@@ -17,7 +17,7 @@ class Services extends Model
      * @var string
      */
     protected $table = 'services';
-    protected $appends = ['isNotId', 'isServiceChecked'];
+    protected $appends = ['isNotId', 'isServiceChecked', "TotalItemSold", "TotalNetSale", "TotalTax", "TotalGrossSale"];
 
     /**
      * The attributes that are mass assignable.
@@ -128,4 +128,59 @@ class Services extends Model
         }
         return $this->attributes['isServiceChecked'] = false;
     }
+
+    public function cart()
+    {
+        return $this->hasMany(Cart::class, 'service_id', 'id');
+    }
+
+    public function getTotalItemSoldAttribute()
+    {
+        $serviceCart = Cart::where(['service_id' => $this->id])->whereNotNull('service_id');
+        if ($this->startdate && $this->enddate) {
+            $serviceCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
+        }
+        $service_item_sold = $serviceCart->count();
+        return $service_item_sold;
+    }
+
+    public function getTotalNetSaleAttribute()
+    {
+        $serviceCart = Cart::where(['service_id' => $this->id])->whereNotNull('service_id');
+        if ($this->startdate && $this->enddate) {
+            $serviceCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
+        }
+        $service_gross_sale = $serviceCart->sum("cost");
+
+        $tax = Tax::where(['name' => 'GST', 'is_active' => 1])->first();
+        $taxpercentage = $tax ? $tax->percentage : 0;
+        $service_taxvalue = ($service_gross_sale / $taxpercentage);
+        $service_net_sales = ($service_gross_sale - $service_taxvalue);
+        return $service_net_sales;
+    }
+
+    public function getTotalTaxAttribute()
+    {
+        $serviceCart = Cart::where(['service_id' => $this->id])->whereNotNull('service_id');
+        if ($this->startdate && $this->enddate) {
+            $serviceCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
+        }
+        $service_gross_sale = $serviceCart->sum("cost");
+
+        $tax = Tax::where(['name' => 'GST', 'is_active' => 1])->first();
+        $taxpercentage = $tax ? $tax->percentage : 0;
+        $service_taxvalue = ($service_gross_sale / $taxpercentage);
+        return $service_taxvalue;
+    }
+
+    public function getTotalGrossSaleAttribute()
+    {
+        $serviceCart = Cart::where(['service_id' => $this->id])->whereNotNull('service_id');
+        if ($this->startdate && $this->enddate) {
+            $serviceCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
+        }
+        $service_gross_sale = $serviceCart->sum("cost");
+        return $service_gross_sale;
+    }
+
 }
