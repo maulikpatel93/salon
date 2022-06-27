@@ -15,7 +15,7 @@ class Voucher extends Model
      * @var string
      */
     protected $table = 'voucher';
-
+    protected $appends = ["TotalQuantity", "TotalValue", "TotalValueRedeemed"];
     /**
      * The attributes that are mass assignable.
      *
@@ -58,6 +58,10 @@ class Voucher extends Model
     {
         return $this->belongsTo(Salons::class, 'salon_id', 'id');
     }
+    public function voucherto()
+    {
+        return $this->hasMany(VoucherTo::class, 'voucher_id', 'id');
+    }
 
     // public function voucherservices()
     // {
@@ -65,4 +69,34 @@ class Voucher extends Model
     //     return $this->belongsToMany(Services::class, 'voucher_services', 'voucher_id', 'service_id');
     //     // return $this->hasMany(Voucherservices::class, 'service_id', 'id');
     // }
+
+    public function getTotalQuantityAttribute()
+    {
+        $voucherCart = VoucherTo::where(['voucher_id' => $this->id, "salon_id" => $this->salon_id])->whereNotNull('voucher_id');
+        if ($this->startdate && $this->enddate) {
+            $voucherCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
+        }
+        $total = $voucherCart->count();
+        return $total;
+    }
+
+    public function getTotalValueAttribute()
+    {
+        $voucherCart = VoucherTo::where(['voucher_id' => $this->id, "salon_id" => $this->salon_id])->whereNotNull('voucher_id');
+        if ($this->startdate && $this->enddate) {
+            $voucherCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
+        }
+        $total = $voucherCart->sum("amount");
+        return $total;
+    }
+
+    public function getTotalValueRedeemedAttribute()
+    {
+        $voucherCart = VoucherTo::where(['voucher_id' => $this->id, "salon_id" => $this->salon_id])->whereNotNull('voucher_id');
+        if ($this->startdate && $this->enddate) {
+            $voucherCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
+        }
+        $total = $voucherCart->sum("remaining_balance");
+        return $total;
+    }
 }

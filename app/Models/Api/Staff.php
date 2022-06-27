@@ -122,15 +122,15 @@ class Staff extends Model
     public function getTotalCustomerAttribute()
     {
         if ($this->startdate && $this->enddate) {
-            return Appointment::where('staff_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->count();
+            return Appointment::where(['staff_id' => $this->id, 'salon_id' => $this->salon_id])->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->count();
         } else {
-            return Appointment::where('staff_id', $this->id)->count();
+            return Appointment::where(['staff_id' => $this->id, 'salon_id' => $this->salon_id])->count();
         }
     }
 
     public function getNewCustomerAttribute()
     {
-        return Appointment::where('staff_id', $this->id)->whereDate('created_at', '>', Carbon::now())->count();
+        return Appointment::where(['staff_id' => $this->id, 'salon_id' => $this->salon_id])->whereDate('created_at', '>', Carbon::now())->count();
     }
 
     public function getTotalAppointmentAttribute()
@@ -141,9 +141,9 @@ class Staff extends Model
     public function getTotalServicesBookedAttribute()
     {
         if ($this->startdate && $this->enddate) {
-            return Appointment::where('staff_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->distinct('service_id')->count();
+            return Appointment::where(['staff_id' => $this->id, 'salon_id' => $this->salon_id])->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->distinct('service_id')->count();
         } else {
-            return Appointment::where('staff_id', $this->id)->distinct('service_id')->count();
+            return Appointment::where(['staff_id' => $this->id, 'salon_id' => $this->salon_id])->distinct('service_id')->count();
         }
     }
 
@@ -155,45 +155,45 @@ class Staff extends Model
     public function getOnlineBookingsAttribute()
     {
         if ($this->startdate && $this->enddate) {
-            return Appointment::where('staff_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->where(["status" => "Scheduled"])->count();
+            return Appointment::where(['staff_id' => $this->id, 'salon_id' => $this->salon_id])->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->where(["status" => "Scheduled"])->count();
         } else {
-            return Appointment::where('staff_id', $this->id)->where(["status" => "Scheduled"])->count();
+            return Appointment::where(['staff_id' => $this->id, 'salon_id' => $this->salon_id])->where(["status" => "Scheduled"])->count();
         }
     }
 
     public function getTotalValueAttribute()
     {
         if ($this->startdate && $this->enddate) {
-            return Appointment::where('staff_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->sum('cost');
+            return Appointment::where(['staff_id' => $this->id, 'salon_id' => $this->salon_id])->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->sum('cost');
         } else {
-            return Appointment::where('staff_id', $this->id)->sum('cost');
+            return Appointment::where(['staff_id' => $this->id, 'salon_id' => $this->salon_id])->sum('cost');
         }
     }
 
     public function getServicesInvoicedAttribute()
     {
         if ($this->startdate && $this->enddate) {
-            return Cart::where('staff_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->whereNotNull("staff_id")->whereNotNull("service_id")->sum('cost');
+            return Cart::where(['staff_id' => $this->id, 'salon_id' => $this->salon_id])->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->whereNotNull("staff_id")->whereNotNull("service_id")->sum('cost');
         } else {
-            return Cart::where('staff_id', $this->id)->whereNotNull("staff_id")->whereNotNull("service_id")->sum('cost');
+            return Cart::where(['staff_id' => $this->id, 'salon_id' => $this->salon_id])->whereNotNull("staff_id")->whereNotNull("service_id")->sum('cost');
         }
     }
 
     public function getProductsInvoicedAttribute()
     {
         if ($this->startdate && $this->enddate) {
-            return Cart::where('staff_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->whereNotNull("staff_id")->whereNotNull("product_id")->sum(DB::raw('cost * qty'));
+            return Cart::where(['staff_id' => $this->id, 'salon_id' => $this->salon_id])->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->whereNotNull("staff_id")->whereNotNull("product_id")->sum(DB::raw('cost * qty'));
         } else {
-            return Cart::where('staff_id', $this->id)->whereNotNull("staff_id")->whereNotNull("product_id")->sum(DB::raw('cost * qty'));
+            return Cart::where(['staff_id' => $this->id, 'salon_id' => $this->salon_id])->whereNotNull("staff_id")->whereNotNull("product_id")->sum(DB::raw('cost * qty'));
         }
     }
 
     public function getSalesTotalAttribute()
     {
         if ($this->startdate && $this->enddate) {
-            return Cart::where('staff_id', $this->id)->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->whereNotNull("staff_id")->sum('cost');
+            return Cart::where(['staff_id' => $this->id, 'salon_id' => $this->salon_id])->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate)->whereNotNull("staff_id")->sum('cost');
         } else {
-            return Cart::where('staff_id', $this->id)->whereNotNull("staff_id")->sum('cost');
+            return Cart::where(['staff_id' => $this->id, 'salon_id' => $this->salon_id])->whereNotNull("staff_id")->sum('cost');
         }
     }
 

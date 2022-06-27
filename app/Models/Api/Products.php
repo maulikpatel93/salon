@@ -97,7 +97,7 @@ class Products extends Model
 
     public function getTotalItemSoldAttribute()
     {
-        $productCart = Cart::where(['product_id' => $this->id])->whereNotNull('product_id');
+        $productCart = Cart::where(['product_id' => $this->id, 'salon_id' => $this->salon_id])->whereNotNull('product_id');
         if ($this->startdate && $this->enddate) {
             $productCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
         }
@@ -107,7 +107,7 @@ class Products extends Model
 
     public function getTotalNetSaleAttribute()
     {
-        $productCart = Cart::where(['product_id' => $this->id])->whereNotNull('product_id');
+        $productCart = Cart::where(['product_id' => $this->id, 'salon_id' => $this->salon_id])->whereNotNull('product_id');
         if ($this->startdate && $this->enddate) {
             $productCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
         }
@@ -122,7 +122,7 @@ class Products extends Model
 
     public function getTotalTaxAttribute()
     {
-        $productCart = Cart::where(['product_id' => $this->id])->whereNotNull('product_id');
+        $productCart = Cart::where(['product_id' => $this->id, 'salon_id' => $this->salon_id])->whereNotNull('product_id');
         if ($this->startdate && $this->enddate) {
             $productCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
         }
@@ -136,7 +136,7 @@ class Products extends Model
 
     public function getTotalGrossSaleAttribute()
     {
-        $productCart = Cart::where(['product_id' => $this->id])->whereNotNull('product_id');
+        $productCart = Cart::where(['product_id' => $this->id, 'salon_id' => $this->salon_id])->whereNotNull('product_id');
         if ($this->startdate && $this->enddate) {
             $productCart->whereDate('created_at', '>=', $this->startdate)->whereDate('created_at', '<=', $this->enddate);
         }

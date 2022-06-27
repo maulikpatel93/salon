@@ -5,7 +5,7 @@ namespace App\Models\Api;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Consultation extends Model
+class FormElementType extends Model
 {
     use HasFactory;
 
@@ -14,15 +14,19 @@ class Consultation extends Model
      *
      * @var string
      */
-    protected $table = 'consultation';
+    protected $table = 'form_element_type';
     /**
      * The attributes that are mass assignable.
      *
      * @var string[]
      */
     protected $fillable = [
-        'salon_id',
-        'title',
+        'name',
+        'icon',
+        'section_type',
+        'can_repeat',
+        'caption',
+        'form_type',
         'is_active',
         'is_active_at',
     ];
@@ -44,9 +48,4 @@ class Consultation extends Model
     protected $casts = [
         'is_active_at' => 'datetime',
     ];
-
-    public function salon()
-    {
-        return $this->belongsTo(Salons::class, 'salon_id', 'id');
-    }
 }

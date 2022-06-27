@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\v1\ClientNoteApiController;
 use App\Http\Controllers\Api\v1\ClientPhotoApiController;
 use App\Http\Controllers\Api\v1\CloseddateApiController;
 use App\Http\Controllers\Api\v1\DashboardApiController;
+use App\Http\Controllers\Api\v1\FormApiController;
 use App\Http\Controllers\Api\v1\GuestApiController;
 use App\Http\Controllers\Api\v1\MembershipApiController;
 use App\Http\Controllers\Api\v1\PricetierApiController;
@@ -283,5 +284,15 @@ Route::prefix('v1')->group(function () {
         Route::controller(ReportApiController::class)->prefix('report')->name('report.')->group(function () {
             Route::post('/view', 'view');
         });
+
+        //Cancellation reason
+        Route::controller(FormApiController::class)->prefix('form')->name('form.')->group(function () {
+            Route::post('/view', 'view');
+            Route::post('/store', 'store');
+            Route::post('/update/{id}', 'update');
+            Route::post('/delete/{id}', 'delete');
+            Route::post('/formelementtype', 'formelementtype');
+        });
+
     });
 });

@@ -4,11 +4,12 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\ConsultationRequest;
-use App\Models\Api\Consultation;
+use App\Http\Requests\Api\FormCreateRequest;
+use App\Models\Api\Form;
+use App\Models\Api\FormElementType;
 use Illuminate\Http\Request;
 
-class ConsultationApiController extends Controller
+class FormApiController extends Controller
 {
     protected $successStatus = 200;
     protected $badrequestStatus = 400;
@@ -19,9 +20,7 @@ class ConsultationApiController extends Controller
     protected $field = [
         'id',
         'salon_id',
-        'start_date',
-        'end_date',
-        'reason',
+        'title',
     ];
 
     protected $salon_field = [
@@ -42,18 +41,18 @@ class ConsultationApiController extends Controller
         return $this->returnResponse($request, $id);
     }
 
-    public function store(ConsultationRequest $request)
+    public function store(FormCreateRequest $request)
     {
         $requestAll = $request->all();
         $requestAll['is_active_at'] = currentDateTime();
-        $model = new Consultation;
+        $model = new Form;
         $model->fill($requestAll);
         $model->reason = isset($requestAll['reason']) ? $requestAll['reason'] : '';
         $model->save();
         return $this->returnResponse($request, $model->id);
     }
 
-    public function update(ConsultationRequest $request, $id)
+    public function update(FormCreateRequest $request, $id)
     {
         $requestAll = $request->all();
         $model = $this->findModel($id);
@@ -67,13 +66,13 @@ class ConsultationApiController extends Controller
     {
         $requestAll = $request->all();
         $model = $this->findModel($id);
-        Consultation::where('id', $id)->delete();
+        Form::where('id', $id)->delete();
         return response()->json(['id' => $id, 'message' => __('messages.success')], $this->successStatus);
     }
 
     protected function findModel($id)
     {
-        if (($model = Consultation::find($id)) !== null) {
+        if (($model = Form::find($id)) !== null) {
             return $model;
         }
         throw new UnsecureException('The requested page does not exist.');
@@ -120,34 +119,34 @@ class ConsultationApiController extends Controller
         }
 
         if ($option) {
-            $successData = Consultation::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where($where)->get()->toArray();
+            $successData = Form::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where($where)->get()->toArray();
             return response()->json($successData, $this->successStatus);
         }
         if ($id) {
             if ($request->result == 'result_array') {
-                $model = Consultation::with($withArray)->select($field)->where($where)->get();
+                $model = Form::with($withArray)->select($field)->where($where)->get();
             } else {
-                $model = Consultation::with($withArray)->select($field)->where($where)->first();
+                $model = Form::with($withArray)->select($field)->where($where)->first();
             }
             $successData = $model->toArray();
             return response()->json($successData, $this->successStatus);
         } else {
             if ($pagination == true) {
                 if ($whereLike) {
-                    $model = Consultation::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                    $model = Form::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
                         if ($whereLike) {
-                            $query->where('name', "like", "%" . $whereLike[0] . "%");
+                            $query->where('title', "like", "%" . $whereLike[0] . "%");
                             foreach ($whereLike as $row) {
-                                $query->orWhere('name', "like", "%" . $row . "%");
+                                $query->orWhere('title', "like", "%" . $row . "%");
                             }
                         }
                     })->where($where)->orderByRaw($orderby)->paginate($limit);
                 } else {
-                    $model = Consultation::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
+                    $model = Form::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
                 }
             } else {
                 if ($whereLike) {
-                    $model = Consultation::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                    $model = Form::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
                         if ($whereLike) {
                             $query->where('title', "like", "%" . $whereLike[0] . "%");
                             foreach ($whereLike as $row) {
@@ -156,7 +155,7 @@ class ConsultationApiController extends Controller
                         }
                     })->where($where)->orderByRaw($orderby)->get();
                 } else {
-                    $model = Consultation::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                    $model = Form::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
                 }
             }
             if ($model->count()) {
@@ -165,6 +164,17 @@ class ConsultationApiController extends Controller
                     return response()->json($successData, $this->successStatus);
                 }
             }
+        }
+        return response()->json(['message' => __('messages.failed')], $this->errorStatus);
+    }
+
+    public function formelementtype(Request $request)
+    {
+        $requestAll = $request->all();
+        $model = FormElementType::select(['id', 'name', 'icon', 'section_type', 'can_repeat', 'form_type', "caption"])->where(['is_active' => 1])->get();
+        $successData = $model->toArray();
+        if ($successData) {
+            return response()->json($successData, $this->successStatus);
         }
         return response()->json(['message' => __('messages.failed')], $this->errorStatus);
     }

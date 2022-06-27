@@ -10,6 +10,7 @@ use App\Models\Api\Products;
 use App\Models\Api\Services;
 use App\Models\Api\Staff;
 use App\Models\Api\Tax;
+use App\Models\Api\Voucher;
 use App\Models\Api\VoucherTo;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -56,6 +57,7 @@ class ReportApiController extends Controller
 
     protected $appointment_field = [
         'id',
+        'salon_id',
         'client_id',
         'service_id',
         'staff_id',
@@ -70,6 +72,7 @@ class ReportApiController extends Controller
 
     protected $product_field = [
         'id',
+        'salon_id',
         'supplier_id',
         'tax_id',
         'name',
@@ -84,6 +87,7 @@ class ReportApiController extends Controller
 
     protected $voucherto_field = [
         'id',
+        'salon_id',
         'voucher_id',
         'client_id',
         'first_name',
@@ -99,6 +103,7 @@ class ReportApiController extends Controller
 
     protected $cart_field = [
         'id',
+        'salon_id',
         'service_id',
         'product_id',
         'voucher_to_id',
@@ -110,6 +115,13 @@ class ReportApiController extends Controller
 
     protected $service_field = [
         'id',
+        'salon_id',
+        'name',
+    ];
+
+    protected $voucher_field = [
+        'id',
+        'salon_id',
         'name',
     ];
 
@@ -129,6 +141,7 @@ class ReportApiController extends Controller
         $voucherto_field = $this->voucherto_field;
         $cart_field = $this->cart_field;
         $service_field = $this->service_field;
+        $voucher_field = $this->voucher_field;
 
         $validator = Validator::make($requestAll, [
             'auth_key' => 'required',
@@ -530,34 +543,58 @@ class ReportApiController extends Controller
         }
 
         if ($ScreenReport === "sales_by_day") {
-            $start = Carbon::parse()->subDays(30)->toDateString();
-            $end = Carbon::now()->toDateString();
+            if ($daterange) {
+                $start = $daterange[0];
+                $end = $daterange[1];
+            } else {
+                $start = Carbon::parse()->subDays(30)->toDateString();
+                $end = Carbon::now()->toDateString();
+            }
             $period = CarbonPeriod::create($start, $end);
             $period = array_reverse(iterator_to_array($period));
+            $data = [];
+            if ($period) {
+                foreach ($period as $date) {
+                    $daydate = $date->format('M d, Y');
+                    $startdate = $date->format('Y-m-d 00:00:00');
+                    $enddate = $date->format('Y-m-d 23:59:59');
 
-            // $period = Carbon::parse('2018-04-27')->daysUntil('2018-04-21');
-            foreach ($period as $date) {
-                echo $date->format('Y-m-d');
+                    $dayCart = Cart::where(['salon_id' => $salon_id])->where('created_at', '>=', $startdate)->where('created_at', '<=', $enddate);
+                    $day_item_sold = $dayCart->count();
+                    $day_gross_sale = $dayCart->sum("cost");
+                    $day_taxvalue = ($day_gross_sale / $taxpercentage);
+                    $day_net_sales = ($day_gross_sale - $day_taxvalue);
+
+                    $day_service_item_sold = Cart::where(['salon_id' => $salon_id])->where('created_at', '>=', $startdate)->where('created_at', '<=', $enddate)->whereNotNull("service_id")->count();
+                    $day_product_item_sold = Cart::where(['salon_id' => $salon_id])->where('created_at', '>=', $startdate)->where('created_at', '<=', $enddate)->whereNotNull("product_id")->count();
+                    $data[] = [
+                        "day" => $daydate,
+                        "item_sold" => $day_item_sold,
+                        "service_item_sold" => $day_service_item_sold,
+                        "product_item_sold" => $day_product_item_sold,
+                        "net_sales" => $day_net_sales,
+                        "tax" => $day_taxvalue,
+                        "gross_sale" => $day_gross_sale,
+                    ];
+                }
             }
+            $successData = $data;
+            if ($successData) {
+                return response()->json($successData, $this->successStatus);
+            }
+        }
 
-            echo '<pre>';
-            print_r($period);
-            echo '<pre>';
-            dd();
-
-            // for ($i = 0; $i < 30; $i++) {
-            //     $date = Carbon::now()->subDays($i)->toDateString();
-            //     // $queryData = Cart::select($cart_field)->where(['salon_id' => $salon_id])->where('created_at', '>=', $date . ' 00:00:00')->where('created_at', '<=', $date . ' 23:59:59')->orderByRaw($orderby);
-            //     $dayCart = Cart::where(['salon_id' => $salon_id])->where('created_at', '>=', $date . ' 00:00:00')->where('created_at', '<=', $date . ' 23:59:59');
-            //     if ($date) {
-            //         $dayCart->where('created_at', '>=', $date . ' 00:00:00')->where('created_at', '<=', $date . ' 23:59:59');
-            //     }
-            //     $day_item_sold = $dayCart->count();
-            //     $day_gross_sale = $dayCart->sum("cost");
-            //     $day_taxvalue = ($day_gross_sale / $taxpercentage);
-            //     $day_net_sales = ($day_gross_sale - $day_taxvalue);
+        if ($ScreenReport === "gift_voucher_activity") {
+            $queryData = Voucher::select($voucher_field)->where(['salon_id' => $salon_id])->has("voucherto")->orderByRaw($orderby);
+            // if ($daterange) {
+            //     $queryData->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
             // }
-
+            if ($daterange) {
+                $queryData->addSelect(DB::raw('"' . $daterange[0] . '" as startdate, "' . $daterange[1] . '" as enddate'));
+            }
+            if ($ScreenReport) {
+                $queryData->addSelect(DB::raw('"' . $ScreenReport . '" as ScreenReport'));
+            }
             if ($pagination == true) {
                 $model = $queryData->paginate($limit);
             } else {
