@@ -154,10 +154,11 @@ return new class extends Migration
             $table->id();
             $table->string('name', 1000)->nullable();
             $table->string('icon', 1000)->nullable();
-            $table->text('caption')->nullable()->comment('label text example Heading: Title 1 of the Most');
+            $table->text('captionholder')->nullable()->comment('label text example Heading: Title 1 of the Most');
             $table->string('form_type', 255)->nullable()->comment('text,select,multiselect,checkbox,date,radio,textarea,multicheckbox,multiradio');
             $table->enum('section_type', ['ClientDetail', 'FormSection'])->default(null)->nullable();
             $table->boolean('can_repeat')->default(0);
+            $table->boolean('is_edit')->default(0)->comment("Just show the edit button and use the update form");
             $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();

@@ -171,7 +171,7 @@ class FormApiController extends Controller
     public function formelementtype(Request $request)
     {
         $requestAll = $request->all();
-        $model = FormElementType::select(['id', 'name', 'icon', 'section_type', 'can_repeat', 'form_type', "caption"])->where(['is_active' => 1])->get();
+        $model = FormElementType::select(['id', 'name', 'icon', 'section_type', 'can_repeat', 'form_type', "captionholder", "is_edit"])->where(['is_active' => 1])->get();
         $successData = $model->toArray();
         if ($successData) {
             return response()->json($successData, $this->successStatus);

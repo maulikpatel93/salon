@@ -15,6 +15,7 @@ class FormElementType extends Model
      * @var string
      */
     protected $table = 'form_element_type';
+    protected $appends = ['caption', "options"];
     /**
      * The attributes that are mass assignable.
      *
@@ -25,8 +26,9 @@ class FormElementType extends Model
         'icon',
         'section_type',
         'can_repeat',
-        'caption',
+        'captionholder',
         'form_type',
+        'is_edit',
         'is_active',
         'is_active_at',
     ];
@@ -48,4 +50,13 @@ class FormElementType extends Model
     protected $casts = [
         'is_active_at' => 'datetime',
     ];
+
+    public function getCaptionAttribute()
+    {
+        return $this->attributes['caption'] = "";
+    }
+    public function getOptionsAttribute()
+    {
+        return $this->attributes['caption'] = [];
+    }
 }
