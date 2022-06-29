@@ -5,16 +5,18 @@ namespace App\Models\Api;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Form extends Model
+class FormElementOptions extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'form';
+    protected $table = 'form_element_options';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -22,9 +24,8 @@ class Form extends Model
      */
     protected $fillable = [
         'salon_id',
-        'title',
-        'is_active',
-        'is_active_at',
+        'form_element_id',
+        'optvalue',
     ];
 
     /**
@@ -41,21 +42,14 @@ class Form extends Model
      *
      * @var array
      */
-    protected $casts = [
-        'is_active_at' => 'datetime',
-    ];
+    protected $casts = [];
 
     public function salon()
     {
         return $this->belongsTo(Salons::class, 'salon_id', 'id');
     }
-
     public function form_element()
     {
-        $withArray = [
-            'form_element_type:id,name,icon,section_type,can_repeat,is_edit,form_type,questionholder',
-            'form_element_options:id,form_element_id,optvalue',
-        ];
-        return $this->hasMany(FormElement::class, 'form_id', 'id')->with($withArray);
+        return $this->hasOne(FormElement::class, 'id', 'form_element_id');
     }
 }

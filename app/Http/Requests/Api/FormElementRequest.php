@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class FormCreateRequest extends FormRequest
+class FormElementRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,7 +27,12 @@ class FormCreateRequest extends FormRequest
         $salon_id = $this->salon_id;
         return [
             'salon_id' => 'required|integer',
-            'title' => 'required',
+            'form_element_type_id' => 'required|integer',
+            'form_id' => 'required|integer',
+            'section_type' => 'required',
+            'is_edit' => 'integer',
+            'form_type' => 'required',
+            'question' => 'required_if:is_edit,1',
         ];
     }
 }

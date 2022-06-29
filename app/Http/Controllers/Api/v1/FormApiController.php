@@ -6,6 +6,8 @@ use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\FormCreateRequest;
 use App\Models\Api\Form;
+use App\Models\Api\FormElement;
+use App\Models\Api\FormElementOptions;
 use App\Models\Api\FormElementType;
 use Illuminate\Http\Request;
 
@@ -44,21 +46,87 @@ class FormApiController extends Controller
     public function store(FormCreateRequest $request)
     {
         $requestAll = $request->all();
+        $formdata = $request->formdata ? \json_decode($request->formdata, true) : "";
         $requestAll['is_active_at'] = currentDateTime();
         $model = new Form;
         $model->fill($requestAll);
-        $model->reason = isset($requestAll['reason']) ? $requestAll['reason'] : '';
         $model->save();
+        if ($formdata) {
+            foreach ($formdata as $key => $value) {
+                if ($value) {
+                    $value['salon_id'] = $model->salon_id;
+                    $value['form_id'] = $model->id;
+                    $value['is_active_at'] = currentDateTime();
+                    $formElementModal = new FormElement;
+                    $formElementModal->fill($value);
+                    $formElementModal->save();
+                    if ($formElementModal && isset($value['options']) && $value['options']) {
+                        foreach ($value['options'] as $kopt => $vopt) {
+                            $vopt['salon_id'] = $model->salon_id;
+                            $vopt['form_element_id'] = $formElementModal->id;
+                            $FormElementOptionsModal = new FormElementOptions;
+                            $FormElementOptionsModal->fill($vopt);
+                            $FormElementOptionsModal->save();
+                        }
+                    }
+                }
+            }
+        }
         return $this->returnResponse($request, $model->id);
     }
 
     public function update(FormCreateRequest $request, $id)
     {
         $requestAll = $request->all();
+        $formdata = $request->formdata ? \json_decode($request->formdata, true) : "";
+        $delete_form_element_id = $request->formdata ? \json_decode($request->delete_form_element_id, true) : "";
+        $collection = collect($delete_form_element_id);
+        $deletedElementId = $collection->pluck("form_element_id")->toArray();
+        if ($deletedElementId) {
+            FormElement::whereIn('id', $deletedElementId)->delete();
+        }
         $model = $this->findModel($id);
         $model->fill($requestAll);
-        $model->reason = isset($requestAll['reason']) ? $requestAll['reason'] : '';
         $model->save();
+        if ($formdata) {
+            foreach ($formdata as $key => $value) {
+                if ($value) {
+                    $value['salon_id'] = $model->salon_id;
+                    $value['form_id'] = $model->id;
+                    $formElementModal = FormElement::where('id', $value['form_element_id'])->first();
+                    if (empty($formElementModal)) {
+                        $formElementModal = new FormElement;
+                    }
+                    $formElementModal->fill($value);
+                    $formElementModal->save();
+                    if ($formElementModal && isset($value['options']) && $value['options']) {
+                        $beforeoption = $formElementModal->form_element_options->pluck('id')->toArray();
+                        $collectionOpt = collect($value['options']);
+                        $deletedOptId = $collectionOpt->pluck("id")->filter()->toArray();
+                        if ($beforeoption) {
+                            foreach ($beforeoption as $bopt) {
+                                if (!in_array($bopt, $deletedOptId)) {
+                                    FormElementOptions::where('id', $bopt)->delete();
+                                }
+                            }
+                        }
+                        foreach ($value['options'] as $kopt => $vopt) {
+                            $vopt['salon_id'] = $model->salon_id;
+                            $vopt['form_element_id'] = $formElementModal->id;
+                            $FormElementOptionsModal = "";
+                            if (isset($vopt['id']) && $vopt['id']) {
+                                $FormElementOptionsModal = FormElementOptions::where('id', $vopt['id'])->first();
+                            }
+                            if (empty($FormElementOptionsModal)) {
+                                $FormElementOptionsModal = new FormElementOptions;
+                            }
+                            $FormElementOptionsModal->fill($vopt);
+                            $FormElementOptionsModal->save();
+                        }
+                    }
+                }
+            }
+        }
         return $this->returnResponse($request, $model->id);
     }
 
@@ -99,6 +167,7 @@ class FormApiController extends Controller
         if ($salon_field) {
             $withArray[] = 'salon:' . implode(',', $salon_field);
         }
+        $withArray[] = 'form_element:id,salon_id,form_element_type_id,form_id,question,form_type';
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
@@ -171,7 +240,7 @@ class FormApiController extends Controller
     public function formelementtype(Request $request)
     {
         $requestAll = $request->all();
-        $model = FormElementType::select(['id', 'name', 'icon', 'section_type', 'can_repeat', 'form_type', "captionholder", "is_edit"])->where(['is_active' => 1])->get();
+        $model = FormElementType::select(['id', 'name', 'icon', 'section_type', 'can_repeat', 'form_type', "questionholder", "is_edit"])->where(['is_active' => 1])->get();
         $successData = $model->toArray();
         if ($successData) {
             return response()->json($successData, $this->successStatus);

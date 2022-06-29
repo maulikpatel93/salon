@@ -154,7 +154,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 1000)->nullable();
             $table->string('icon', 1000)->nullable();
-            $table->text('captionholder')->nullable()->comment('label text example Heading: Title 1 of the Most');
+            $table->text('questionholder')->nullable()->comment('label text example Heading: Title 1 of the Most');
             $table->string('form_type', 255)->nullable()->comment('text,select,multiselect,checkbox,date,radio,textarea,multicheckbox,multiradio');
             $table->enum('section_type', ['ClientDetail', 'FormSection'])->default(null)->nullable();
             $table->boolean('can_repeat')->default(0);
@@ -168,7 +168,7 @@ return new class extends Migration
             $table->id();
             $table->enum('section_type', ['ClientDetail', 'FormSection'])->default(null)->nullable();
             // $table->string('label', 255)->nullable()->comment('ClientDetail(First Name, Last Name, Email, Mobile, Address, Birthday) FormSection(Heading, Text Block, Dropdwon, Multiple Choice, Short Answer, Long Answer, Yes or No, CheckBox)');
-            $table->text('caption')->nullable()->comment('label text example Heading: Title 1 of the Most');
+            $table->text('question')->nullable()->comment('label text example Heading: Title 1 of the Most');
             $table->string('form_type', 255)->nullable()->comment('text,select,multiselect,checkbox,date,radio,textarea');
             $table->integer('position', false, true)->nullable()->comment('position');
             $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
@@ -185,6 +185,19 @@ return new class extends Migration
 
             $table->unsignedBigInteger('form_element_type_id')->after('salon_id')->nullable()->comment('Type Of Form Element');
             $table->foreign('form_element_type_id')->references('id')->on('form_element_type')->onUpdate('cascade')->onDelete('cascade');
+        });
+
+        Schema::create('form_element_options', function (Blueprint $table) {
+            $table->id();
+            $table->string('optvalue', 1000)->nullable()->comment('question optionvalue');
+        });
+
+        Schema::table('form_element_options', function (Blueprint $table) {
+            $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
+            $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
+
+            $table->unsignedBigInteger('form_element_id')->after('salon_id')->nullable()->comment('Type Of From Element');
+            $table->foreign('form_element_id')->references('id')->on('form_element')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

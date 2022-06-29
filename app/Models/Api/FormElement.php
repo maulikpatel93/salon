@@ -25,8 +25,7 @@ class FormElement extends Model
         'form_element_type_id',
         'form_id',
         'section_type',
-        'caption',
-        'labeltext',
+        'question',
         'form_type',
         'position',
     ];
@@ -60,5 +59,10 @@ class FormElement extends Model
     public function form_element_type()
     {
         return $this->hasOne(FormElementType::class, 'id', 'form_element_type_id');
+    }
+
+    public function form_element_options()
+    {
+        return $this->hasMany(FormElementOptions::class, 'form_element_id', 'id');
     }
 }
