@@ -62,6 +62,8 @@ class DashboardApiController extends Controller
             'dateof',
             'start_time',
             'end_time',
+            'start_datetime',
+            'end_datetime',
             'duration',
             'cost',
             'repeats',

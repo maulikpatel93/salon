@@ -433,3 +433,10 @@ if (!function_exists('HoursToMinutes')) {
         return "";
     }
 }
+
+if (!function_exists('localtimezone')) {
+    function localtimezone()
+    {
+        return auth()->user() && auth()->user()->salon ? auth()->user()->salon->timezone : "";
+    }
+}

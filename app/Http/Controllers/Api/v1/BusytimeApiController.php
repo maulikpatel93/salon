@@ -28,6 +28,8 @@ class BusytimeApiController extends Controller
         'dateof',
         'start_time',
         'end_time',
+        'start_datetime',
+        'end_datetime',
         'repeats',
         'repeat_time',
         'repeat_time_option',
@@ -65,19 +67,34 @@ class BusytimeApiController extends Controller
     {
         $requestAll = $request->all();
         $requestAll['is_active_at'] = currentDateTime();
-        $requestAll['dateof'] = Carbon::parse($requestAll['dateof'])->format('Y-m-d');
+
+        $startdatetime = $request->dateof . ' ' . $request->start_time;
+        $enddatetime = $request->dateof . ' ' . $request->end_time;
+        $start_datetime = Carbon::parse($startdatetime)->format('Y-m-d H:i:s');
+        $end_datetime = Carbon::parse($enddatetime)->format('Y-m-d H:i:s');
+
         if ($requestAll['repeats'] === "Yes") {
-            $requestAll['ending'] = isset($requestAll['ending']) ? Carbon::parse($requestAll['ending'])->format('Y-m-d') : null;
+            $requestAll['ending'] = isset($requestAll['ending']) ? Carbon::parse($requestAll['ending'] . " 00:00:00", localtimezone())->setTimezone('UTC')->format('Y-m-d') : null;
         } else {
             $requestAll['repeat_time'] = null;
             $requestAll['repeat_time_option'] = null;
             $requestAll['ending'] = null;
         }
+
+        $requestAll['dateof'] = Carbon::parse($startdatetime, localtimezone())->setTimezone('UTC')->format('Y-m-d');
+        $requestAll['start_time'] = Carbon::parse($startdatetime, localtimezone())->setTimezone('UTC')->format('H:i:s');
+        $requestAll['end_time'] = Carbon::parse($enddatetime, localtimezone())->setTimezone('UTC')->format('H:i:s');
+        $requestAll['start_datetime'] = Carbon::parse($startdatetime, localtimezone())->setTimezone('UTC')->toDateTimeString();
+        $requestAll['end_datetime'] = Carbon::parse($enddatetime, localtimezone())->setTimezone('UTC')->toDateTimeString();
+
         $dateof = $requestAll['dateof'];
         $start_time = $requestAll['start_time'];
         $end_time = $requestAll['end_time'];
-        $Appointment = Appointment::select(["dateof", "start_time", "end_time"])->addSelect(DB::raw('"' . $dateof . '" as showdate'))->where(['is_active' => '1', 'salon_id' => $request->salon_id, 'staff_id' => $request->staff_id])->whereRaw("
-        ((start_time between '" . $start_time . "' and '" . $end_time . "') or (end_time between '" . $start_time . "' and '" . $end_time . "')) and
+        $start_datetime = $requestAll['start_datetime'];
+        $end_datetime = $requestAll['end_datetime'];
+
+        $Appointment = Appointment::select(["dateof", "start_time", "end_time", "start_datetime", "end_datetime"])->addSelect(DB::raw('"' . $dateof . '" as showdate'))->where(['is_active' => '1', 'salon_id' => $request->salon_id, 'staff_id' => $request->staff_id])->whereRaw("
+        ((start_datetime between '" . $start_datetime . "' and '" . $end_datetime . "') or (end_datetime between '" . $start_datetime . "' and '" . $end_datetime . "')) and
         (
             CASE repeats
             WHEN 'Yes' THEN
@@ -90,6 +107,22 @@ class BusytimeApiController extends Controller
             ELSE repeats = 'No' and dateof = '" . $dateof . "'
             END
         )")->get();
+
+        // $Appointment = Appointment::select(["dateof", "start_time", "end_time", "start_datetime", "end_datetime"])->addSelect(DB::raw('"' . $dateof . '" as showdate'))->where(['is_active' => '1', 'salon_id' => $request->salon_id, 'staff_id' => $request->staff_id])->whereRaw("
+        // ((start_time between '" . $start_time . "' and '" . $end_time . "') or (end_time between '" . $start_time . "' and '" . $end_time . "')) and
+        // (
+        //     CASE repeats
+        //     WHEN 'Yes' THEN
+        //         dateof <= '" . $dateof . "' and (ending is null or ending >= '" . $dateof . "') and
+        //         (CASE repeat_time_option
+        //             WHEN 'Weekly' THEN (DATEDIFF(dateof, '" . $dateof . "') % (repeat_time * 7) = 0)
+        //             WHEN 'Monthly' THEN (DATEDIFF(dateof, '" . $dateof . "') % (repeat_time * 31) = 0)
+        //             ELSE repeat_time_option is null
+        //         END)
+        //     ELSE repeats = 'No' and dateof = '" . $dateof . "'
+        //     END
+        // )")->get();
+
         if ($Appointment->count() > 0) {
             $alreadyBooked = $Appointment->toArray();
             return response()->json(["booked" => $alreadyBooked, "message" => __('messages.busytime_check_appointment2')], $this->warningStatus);
@@ -103,19 +136,33 @@ class BusytimeApiController extends Controller
     public function update(BusytimeRequest $request, $id)
     {
         $requestAll = $request->all();
-        $requestAll['dateof'] = Carbon::parse($requestAll['dateof'])->format('Y-m-d');
+        $startdatetime = Carbon::parse($request->dateof)->format('Y-m-d') . ' ' . $request->start_time;
+        $enddatetime = Carbon::parse($request->dateof)->format('Y-m-d') . ' ' . $request->end_time;
+        $start_datetime = Carbon::parse($startdatetime)->format('Y-m-d H:i:s');
+        $end_datetime = Carbon::parse($enddatetime)->format('Y-m-d H:i:s');
+
+        // $requestAll['dateof'] = Carbon::parse($requestAll['dateof'])->format('Y-m-d');
         if ($requestAll['repeats'] === "Yes") {
-            $requestAll['ending'] = isset($requestAll['ending']) ? Carbon::parse($requestAll['ending'])->format('Y-m-d') : null;
+            $requestAll['ending'] = isset($requestAll['ending']) ? Carbon::parse($requestAll['ending'] . " 00:00:00", localtimezone())->setTimezone('UTC')->format('Y-m-d') : null;
         } else {
             $requestAll['repeat_time'] = null;
             $requestAll['repeat_time_option'] = null;
             $requestAll['ending'] = null;
         }
+        $requestAll['dateof'] = Carbon::parse($startdatetime, localtimezone())->setTimezone('UTC')->format('Y-m-d');
+        $requestAll['start_time'] = Carbon::parse($startdatetime, localtimezone())->setTimezone('UTC')->format('H:i:s');
+        $requestAll['end_time'] = Carbon::parse($enddatetime, localtimezone())->setTimezone('UTC')->format('H:i:s');
+        $requestAll['start_datetime'] = Carbon::parse($startdatetime, localtimezone())->setTimezone('UTC')->toDateTimeString();
+        $requestAll['end_datetime'] = Carbon::parse($enddatetime, localtimezone())->setTimezone('UTC')->toDateTimeString();
+
         $dateof = $requestAll['dateof'];
         $start_time = $requestAll['start_time'];
         $end_time = $requestAll['end_time'];
-        $Appointment = Appointment::select(["dateof", "start_time", "end_time"])->addSelect(DB::raw('"' . $dateof . '" as showdate'))->where(['is_active' => '1', 'salon_id' => $request->salon_id, 'staff_id' => $request->staff_id])->whereRaw("
-        ((start_time between '" . $start_time . "' and '" . $end_time . "') or (end_time between '" . $start_time . "' and '" . $end_time . "')) and
+        $start_datetime = $requestAll['start_datetime'];
+        $end_datetime = $requestAll['end_datetime'];
+
+        $Appointment = Appointment::select(["dateof", "start_time", "end_time", "start_datetime", "end_datetime"])->addSelect(DB::raw('"' . $dateof . '" as showdate'))->where(['is_active' => '1', 'salon_id' => $request->salon_id, 'staff_id' => $request->staff_id])->whereRaw("
+        ((start_datetime between '" . $start_datetime . "' and '" . $end_datetime . "') or (end_datetime between '" . $start_datetime . "' and '" . $end_datetime . "')) and
         (
             CASE repeats
             WHEN 'Yes' THEN
@@ -128,6 +175,22 @@ class BusytimeApiController extends Controller
             ELSE repeats = 'No' and dateof = '" . $dateof . "'
             END
         )")->get();
+
+        // $Appointment = Appointment::select(["dateof", "start_time", "end_time"])->addSelect(DB::raw('"' . $dateof . '" as showdate'))->where(['is_active' => '1', 'salon_id' => $request->salon_id, 'staff_id' => $request->staff_id])->whereRaw("
+        // ((start_time between '" . $start_time . "' and '" . $end_time . "') or (end_time between '" . $start_time . "' and '" . $end_time . "')) and
+        // (
+        //     CASE repeats
+        //     WHEN 'Yes' THEN
+        //         dateof <= '" . $dateof . "' and (ending is null or ending >= '" . $dateof . "') and
+        //         (CASE repeat_time_option
+        //             WHEN 'Weekly' THEN (DATEDIFF(dateof, '" . $dateof . "') % (repeat_time * 7) = 0)
+        //             WHEN 'Monthly' THEN (DATEDIFF(dateof, '" . $dateof . "') % (repeat_time * 31) = 0)
+        //             ELSE repeat_time_option is null
+        //         END)
+        //     ELSE repeats = 'No' and dateof = '" . $dateof . "'
+        //     END
+        // )")->get();
+
         if ($Appointment->count() > 0) {
             $alreadyBooked = $Appointment->toArray();
             return response()->json(["booked" => $alreadyBooked, "message" => __('messages.busytime_check_appointment2')], $this->warningStatus);
@@ -162,8 +225,8 @@ class BusytimeApiController extends Controller
         //Start Calender View Client base
         $client_id = ($request->client_id) ? $request->client_id : "";
         $staff_id = ($request->staff_id) ? $request->staff_id : "";
-        $start_date = ($request->start_date) ? Carbon::parse($request->start_date)->format('Y-m-d') : "";
-        $end_date = ($request->end_date) ? Carbon::parse($request->end_date)->format('Y-m-d') : "";
+        $start_date = ($request->start_date) ? $request->start_date : "";
+        $end_date = ($request->end_date) ? $request->end_date : "";
         $start_time = ($request->start_time) ? Carbon::parse($request->start_time)->format('H:i') : "";
         $end_time = ($request->end_time) ? Carbon::parse($request->end_time)->format('H:i') : "";
         $timezone = ($request->timezone) ? $request->timezone : "";
@@ -241,6 +304,12 @@ class BusytimeApiController extends Controller
                     $period = CarbonPeriod::create($start_date, $end_date);
                     foreach ($period as $date) {
                         $rangedate = $date->format('Y-m-d');
+                        // $rangedate = Carbon::parse($rangedate, localtimezone())->setTimezone('UTC')->format('Y-m-d');
+                        // echo '<pre>';
+                        // print_r($rangedate);
+                        // echo '<pre>';
+                        // dd();
+
                         $modelrange = Busytime::with($withArray)->select($field)->addSelect(DB::raw('"' . $rangedate . '" as showdate'))->where($where)->whereRaw("
                         (
                             CASE repeats

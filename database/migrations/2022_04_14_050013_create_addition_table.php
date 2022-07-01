@@ -13,17 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('form_element_options', function (Blueprint $table) {
-            $table->id();
-            $table->string('optvalue', 1000)->nullable()->comment('question optionvalue');
+        Schema::table('appointment', function (Blueprint $table) {
+            $table->datetime('start_datetime')->after('end_time')->nullable()->comment('start datetime-UTC');
+            $table->datetime('end_datetime')->after('start_datetime')->nullable()->comment('end datetime-UTC');
         });
 
-        Schema::table('form_element_options', function (Blueprint $table) {
-            $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
-            $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
-
-            $table->unsignedBigInteger('form_element_id')->after('salon_id')->nullable()->comment('Type Of From Element');
-            $table->foreign('form_element_id')->references('id')->on('form_element')->onUpdate('cascade')->onDelete('cascade');
+        Schema::table('busy_time', function (Blueprint $table) {
+            $table->datetime('start_datetime')->after('end_time')->nullable()->comment('start datetime-UTC');
+            $table->datetime('end_datetime')->after('start_datetime')->nullable()->comment('end datetime-UTC');
         });
 
     }

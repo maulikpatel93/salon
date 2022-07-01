@@ -199,6 +199,17 @@ return new class extends Migration
             $table->unsignedBigInteger('form_element_id')->after('salon_id')->nullable()->comment('Type Of From Element');
             $table->foreign('form_element_id')->references('id')->on('form_element')->onUpdate('cascade')->onDelete('cascade');
         });
+
+        Schema::table('appointment', function (Blueprint $table) {
+            $table->datetime('start_datetime')->after('end_time')->nullable()->comment('start datetime-UTC');
+            $table->datetime('end_datetime')->after('start_datetime')->nullable()->comment('end datetime-UTC');
+        });
+
+        Schema::table('busy_time', function (Blueprint $table) {
+            $table->datetime('start_datetime')->after('end_time')->nullable()->comment('start datetime-UTC');
+            $table->datetime('end_datetime')->after('start_datetime')->nullable()->comment('end datetime-UTC');
+        });
+
     }
 
     /**
