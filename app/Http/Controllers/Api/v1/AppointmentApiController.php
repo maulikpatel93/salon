@@ -116,9 +116,9 @@ class AppointmentApiController extends Controller
             $requestAll['ending'] = null;
         }
 
-        $requestAll['dateof'] = Carbon::parse($startdatetime, localtimezone())->setTimezone('UTC')->format('Y-m-d');
-        $requestAll['start_time'] = Carbon::parse($startdatetime, localtimezone())->setTimezone('UTC')->format('H:i:s');
-        $requestAll['end_time'] = Carbon::parse($end_datetime, localtimezone())->setTimezone('UTC')->format('H:i:s');
+        $requestAll['dateof'] = Carbon::parse($start_datetime, localtimezone())->setTimezone('UTC')->toDateString();
+        $requestAll['start_time'] = Carbon::parse($start_datetime, localtimezone())->setTimezone('UTC')->toTimeString();
+        $requestAll['end_time'] = Carbon::parse($end_datetime, localtimezone())->setTimezone('UTC')->toTimeString();
         $requestAll['start_datetime'] = Carbon::parse($start_datetime, localtimezone())->setTimezone('UTC')->toDateTimeString();
         $requestAll['end_datetime'] = Carbon::parse($end_datetime, localtimezone())->setTimezone('UTC')->toDateTimeString();
 
@@ -183,9 +183,9 @@ class AppointmentApiController extends Controller
             $requestAll['ending'] = null;
         }
 
-        $requestAll['dateof'] = Carbon::parse($startdatetime, localtimezone())->setTimezone('UTC')->format('Y-m-d');
-        $requestAll['start_time'] = Carbon::parse($start_datetime, localtimezone())->setTimezone('UTC')->format('H:i:s');
-        $requestAll['end_time'] = Carbon::parse($end_datetime, localtimezone())->setTimezone('UTC')->format('H:i:s');
+        $requestAll['dateof'] = Carbon::parse($start_datetime, localtimezone())->setTimezone('UTC')->toDateString();
+        $requestAll['start_time'] = Carbon::parse($start_datetime, localtimezone())->setTimezone('UTC')->toTimeString();
+        $requestAll['end_time'] = Carbon::parse($end_datetime, localtimezone())->setTimezone('UTC')->toTimeString();
         $requestAll['start_datetime'] = Carbon::parse($start_datetime, localtimezone())->setTimezone('UTC')->toDateTimeString();
         $requestAll['end_datetime'] = Carbon::parse($end_datetime, localtimezone())->setTimezone('UTC')->toDateTimeString();
 
@@ -239,16 +239,20 @@ class AppointmentApiController extends Controller
         $start_time = $request->start_time;
         $end_time = Carbon::parse($dateof . ' ' . $start_time)->addMinutes($requestAll['duration'])->format('H:i:s');
 
+        $startdatetime = $request->dateof . ' ' . $request->start_time;
+        $start_datetime = Carbon::parse($startdatetime)->format('Y-m-d H:i:s');
+        $end_datetime = Carbon::parse($startdatetime)->addMinutes($requestAll['duration'])->format('Y-m-d H:i:s');
+
         // $requestAll['dateof'] = Carbon::parse($requestAll['dateof'])->format('Y-m-d');
         // $requestAll['start_time'] = $requestAll['start_time'];
         $requestAll['reschedule'] = '1';
         $requestAll['reschedule_at'] = currentDateTime();
 
-        $requestAll['dateof'] = Carbon::parse($dateof, localtimezone())->setTimezone('UTC')->format('Y-m-d');
-        $requestAll['start_time'] = Carbon::parse($dateof . ' ' . $start_time, localtimezone())->setTimezone('UTC')->format('H:i:s');
-        $requestAll['end_time'] = Carbon::parse($dateof . ' ' . $end_time, localtimezone())->setTimezone('UTC')->format('H:i:s');
-        $requestAll['start_datetime'] = Carbon::parse($dateof . ' ' . $start_time, localtimezone())->setTimezone('UTC')->toDateTimeString();
-        $requestAll['end_datetime'] = Carbon::parse($dateof . ' ' . $end_time, localtimezone())->setTimezone('UTC')->toDateTimeString();
+        $requestAll['dateof'] = Carbon::parse($start_datetime, localtimezone())->setTimezone('UTC')->toDateString();
+        $requestAll['start_time'] = Carbon::parse($start_datetime, localtimezone())->setTimezone('UTC')->toTimeString();
+        $requestAll['end_time'] = Carbon::parse($end_datetime, localtimezone())->setTimezone('UTC')->toTimeString();
+        $requestAll['start_datetime'] = Carbon::parse($start_datetime, localtimezone())->setTimezone('UTC')->toDateTimeString();
+        $requestAll['end_datetime'] = Carbon::parse($end_datetime, localtimezone())->setTimezone('UTC')->toDateTimeString();
 
         $dateof = $requestAll['dateof'];
         $start_datetime = $requestAll['start_datetime'];

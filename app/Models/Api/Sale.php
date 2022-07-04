@@ -2,6 +2,8 @@
 
 namespace App\Models\Api;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -82,6 +84,29 @@ class Sale extends Model
             'voucherto',
         ];
         return $this->hasMany(Cart::class, 'sale_id', 'id')->with($withArray);
+    }
+
+    protected function invoicedate(): Attribute
+    {
+        return Attribute::make(
+            get:fn($value) => $this->datetimevalue($value, "date"),
+            set:fn($value) => $value
+        );
+    }
+
+    public function datetimevalue($value, $type = "")
+    {
+        $time = $value;
+        if ($type === "start") {
+            $time = $this->start_datetime;
+        } else if ($type === "end") {
+            $time = $this->end_datetime;
+        } else if ($type === "date") {
+            // $time = Carbon::parse($value, localtimezone())->setTimezone('UTC')->format('Y-m-d H:i:s');
+            return Carbon::parse($time, 'UTC')->setTimezone(localtimezone())->format('Y-m-d');
+            // return $time;
+        }
+        return Carbon::parse($time)->format('H:i:s');
     }
 
 }

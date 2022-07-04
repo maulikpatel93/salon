@@ -1,5 +1,5 @@
 const mix = require("laravel-mix");
-require('dotenv').config();
+require("dotenv").config();
 /*
  |--------------------------------------------------------------------------
  | Mix Asset Management
@@ -36,11 +36,8 @@ require('dotenv').config();
 //     .sass("resources/sass/styles.scss", "public/css");
 mix.js("resources/js/app.js", "public/js")
     .js("resources/js/jquery.js", "public/js")
-     //image
-     .copyDirectory(
-        "resources/assets/images/",
-        "public/images"
-    )
+    //image
+    .copyDirectory("resources/assets/images/", "public/images")
     //jquery-form
     .copy("vendor/jquery-form/form/dist/jquery.form.min.js", "public/js")
     //jquery-pjax
@@ -72,10 +69,7 @@ mix.js("resources/js/app.js", "public/js")
         "public/plugins/sweetalert2"
     )
     //summernote
-    .copyDirectory(
-        "node_modules/summernote/dist/",
-        "public/plugins/summernote"
-    )
+    .copyDirectory("node_modules/summernote/dist/", "public/plugins/summernote")
     //jsvalidation
     .copyDirectory(
         "resources/assets/jsvalidation/",
@@ -97,10 +91,10 @@ mix.js("resources/js/app.js", "public/js")
     .webpackConfig({
         devServer: {
             open: true,
-            host: 'localhost',
+            host: "localhost",
         },
         // module: {
-        //     rules: [ 
+        //     rules: [
         //         {
         //             test: /\.s[ac]ss$/i,
         //             use: [stylesHandler, 'css-loader', 'postcss-loader', 'sass-loader'],
@@ -113,7 +107,7 @@ mix.js("resources/js/app.js", "public/js")
         //             test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
         //             type: 'asset',
         //         },
-    
+
         //         // Add your rules for custom modules here
         //         // Learn more about loaders from https://webpack.js.org/loaders/
         //     ],

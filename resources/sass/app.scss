@@ -22,6 +22,6 @@
 $utilities: map-merge( $utilities,
 ( "cursor": ( property: cursor, values: auto default pointer wait text move help not-allowed, ), ));
 // Bootstrap
-@import "~bootstrap/scss/bootstrap";
+// @import "~bootstrap/scss/bootstrap";
 // @import "bootstrap";
 // @import "../../src/scss/theme";

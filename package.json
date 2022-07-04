@@ -12,8 +12,9 @@
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.4",
         "@popperjs/core": "^2.10.2",
+        "autoprefixer": "10.4.5",
         "axios": "^0.24.0",
-        "bootstrap": "^5.1.3",
+        "bootstrap": "^5.2.0-beta1",
         "dependent-dropdown": "^1.4.9",
         "dotenv": "^10.0.0",
         "firebase": "^9.8.3",

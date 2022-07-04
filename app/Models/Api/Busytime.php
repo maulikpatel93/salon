@@ -140,7 +140,7 @@ class Busytime extends Model
             $time = $this->end_datetime;
         } else if ($type === "date") {
             $time = $this->start_datetime;
-            return Carbon::parse($time, 'UTC')->setTimezone(localtimezone())->format('Y-m-d');
+            return Carbon::parse($time)->format('Y-m-d');
         }
         return Carbon::parse($time)->format('H:i:s');
     }

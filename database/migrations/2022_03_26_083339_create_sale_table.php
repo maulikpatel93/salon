@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('sale', function (Blueprint $table) {
             $table->id();
             $table->date('eventdate')->nullable()->comment('calendar event date');
-            $table->date('invoicedate')->nullable()->comment('sale Invoice date');
+            $table->dateTime('invoicedate')->nullable()->comment('sale Invoice date');
             $table->decimal('totalprice', 10, 2)->nullable()->comment('Sale total price');
             $table->enum('status', ['Pending', 'Paid', 'Failed', 'Cancel'])->default(null)->nullable();
             $table->timestamps();

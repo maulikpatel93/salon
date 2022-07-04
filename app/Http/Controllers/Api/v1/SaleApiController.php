@@ -260,7 +260,7 @@ class SaleApiController extends Controller
         $eventdate = $request->eventdate;
         $totalprice = $request->totalprice;
         $paidby = $request->paidby;
-        $invoicedate = gmdate('Y-m-d');
+        $invoicedate = Carbon::parse(currentDateTime(), localtimezone())->setTimezone('UTC')->format('Y-m-d H:i:s');
 
         if ($is_stripe === 1 || $is_stripe === '1') {
             $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
@@ -391,7 +391,7 @@ class SaleApiController extends Controller
                     $paymentModal->type = 'Subscription';
                     $paymentModal->paidby = 'StripeCreditCard';
                     $paymentModal->status = 'Pending';
-                    $paymentModal->payment_date = currentDate();
+                    $paymentModal->payment_date = Carbon::parse(currentDateTime(), localtimezone())->setTimezone('UTC')->format('Y-m-d H:i:s');
                     $paymentModal->transaction_id = null;
                     $paymentModal->amount = $price->unit_amount; // unit_amount , unit_amount_decimal
                     $paymentModal->payment_intent = null;
@@ -589,7 +589,7 @@ class SaleApiController extends Controller
                 } else {
                     $paymentModal->status = "Failed";
                 }
-                $paymentModal->payment_date = currentDate();
+                $paymentModal->payment_date = Carbon::parse(currentDateTime(), localtimezone())->setTimezone('UTC')->format('Y-m-d H:i:s');
                 $paymentModal->transaction_id = null;
                 $paymentModal->payment_intent = null;
                 $paymentModal->payment_intent_client_secret = null;
@@ -786,8 +786,8 @@ class SaleApiController extends Controller
             $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
             $query = Appointment::with($withArray)->select($field)->where($where);
             if ($daterange) {
-                $startdate = $daterange[0] . ' 00:00:00';
-                $enddate = $daterange[1] . ' 23:59:59';
+                $startdate = Carbon::parse($daterange[0] . ' 00:00:00', localtimezone())->setTimezone('UTC')->format('Y-m-d 00:00:00');
+                $enddate = Carbon::parse($daterange[1] . ' 23:59:59', localtimezone())->setTimezone('UTC')->format('Y-m-d 23:59:59');
                 $query->whereBetween("dateof", [$startdate, $enddate]);
             }
             $model = $query->orderByRaw('id desc')->paginate($limit);

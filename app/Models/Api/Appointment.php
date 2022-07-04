@@ -99,6 +99,7 @@ class Appointment extends Model
     {
         return Attribute::make(
             get:fn($value) => $this->datetimevalue($value, "date"),
+            set:fn($value) => $value
         );
     }
 
@@ -114,6 +115,7 @@ class Appointment extends Model
     {
         return Attribute::make(
             get:fn($value) => $value ? Carbon::parse($value . " 00:00:00", 'UTC')->setTimezone(localtimezone())->format('Y-m-d') : "",
+            set:fn($value) => $value
         );
     }
 
@@ -122,6 +124,7 @@ class Appointment extends Model
         return Attribute::make(
             // get:fn($value) => Carbon::parse($value, 'UTC')->setTimezone(localtimezone())->format('H:i:s'),
             get:fn($value) => $this->datetimevalue($value, "start"),
+            set:fn($value) => $value
         );
     }
 
@@ -130,6 +133,7 @@ class Appointment extends Model
         return Attribute::make(
             // get:fn($value) => Carbon::parse($value, 'UTC')->setTimezone(localtimezone())->format('H:i:s'),
             get:fn($value) => $this->datetimevalue($value, "end"),
+            set:fn($value) => $value
         );
     }
 
@@ -137,6 +141,7 @@ class Appointment extends Model
     {
         return Attribute::make(
             get:fn($value) => Carbon::parse($value, 'UTC')->setTimezone(localtimezone())->format('Y-m-d H:i:s'),
+            set:fn($value) => $value
         );
     }
 
@@ -144,6 +149,7 @@ class Appointment extends Model
     {
         return Attribute::make(
             get:fn($value) => Carbon::parse($value, 'UTC')->setTimezone(localtimezone())->format('Y-m-d H:i:s'),
+            set:fn($value) => $value
         );
     }
 
@@ -156,7 +162,7 @@ class Appointment extends Model
             $time = $this->end_datetime;
         } else if ($type === "date") {
             $time = $this->start_datetime;
-            return Carbon::parse($time, 'UTC')->setTimezone(localtimezone())->format('Y-m-d');
+            return Carbon::parse($time)->format('Y-m-d');
         }
         return Carbon::parse($time)->format('H:i:s');
 
