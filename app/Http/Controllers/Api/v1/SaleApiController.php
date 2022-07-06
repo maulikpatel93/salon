@@ -894,25 +894,37 @@ class SaleApiController extends Controller
             $data['test'] = 'hello';
 
             try {
-                $mailchimp = new ApiClient();
-                // $mailchimp->setApiKey(env('MAILCHIMP_API_KEY'));
-                $mailchimp->setApiKey('mIfiW1VW5N-qkXB8X_7nTA');
+                $message = [
+                    "from_email" => "programmer93.dynamicdreamz@gmail.com",
+                    "subject" => "Hello world",
+                    "text" => "Welcome to Mailchimp Transactional!",
+                    "to" => [
+                        [
+                            "email" => "EveWakefield@mailinator.com",
+                            "type" => "to",
+                        ],
+                    ],
+                ];
+                $this->run($message);
+                dd();
+                // $mailchimp = new ApiClient();
+                // // $mailchimp->setApiKey(env('MAILCHIMP_API_KEY'));
+                // $mailchimp->setApiKey('mIfiW1VW5N-qkXB8X_7nTA');
                 // $response = $mailchimp->messages->send(["message" => 'ss']);
-                $response = $mailchimp->users->ping();
+                // // $response = $mailchimp->users->ping();
                 // print_r($response);
                 // dd();
 
-                $client = new MailchimpMarketing\ApiClient();
-                $client->setConfig([
-                    'apiKey' => 'mIfiW1VW5N-qkXB8X_7nTA',
-                    'server' => 'us18',
-                ]);
-
-                $response = $client->campaigns->sendTestEmail(51, [
-                    "test_emails" => ["EveWakefield@mailinator.com"],
-                    "send_type" => "html",
-                ]);
-                print_r($response);
+                // $client = new ApiClient();
+                // $client->setConfig([
+                //     'apiKey' => 'mIfiW1VW5N-qkXB8X_7nTA',
+                //     'server' => 'us18',
+                // ]);
+                // $response = $client->campaigns->sendTestEmail(51, [
+                //     "test_emails" => ["EveWakefield@mailinator.com"],
+                //     "send_type" => "html",
+                // ]);
+                // print_r($client->ping->get());
 
                 $toEmail = "EveWakefield@mailinator.com";
                 $fromEmail = "programmer93.dynamicdreamz@gmail.com";
@@ -942,6 +954,22 @@ class SaleApiController extends Controller
         if ($validator->fails()) {
             $messages = $validator->messages();
             return response()->json(['errors' => $messages, 'message' => __('messages.validation_error')], $this->errorStatus);
+        }
+    }
+
+    public function run($message)
+    {
+        try {
+            $mailchimp = new ApiClient();
+            $mailchimp->setApiKey('mIfiW1VW5N-qkXB8X_7nTA');
+
+            $response = $mailchimp->messages->send(["message" => $message]);
+            echo '<pre>';
+            print_r($response);
+            echo '<pre>';
+            dd();
+        } catch (Error $e) {
+            echo 'Error: ', $e->getMessage(), "\n";
         }
     }
 }

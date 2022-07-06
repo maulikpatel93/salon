@@ -342,6 +342,7 @@ class ServicesApiController extends Controller
         $field = ($request->field) ? array_merge(['id', 'salon_id', 'category_id', 'tax_id'], explode(',', $request->field)) : $this->field;
         $sort = ($request->sort) ? $request->sort : "";
         $option = ($request->option) ? $request->option : "";
+        $category_id = ($request->category_id) ? $request->category_id : "";
 
         $salon_field = $this->salon_field;
         if (isset($requestAll['salon_field']) && empty($requestAll['salon_field'])) {
@@ -424,6 +425,9 @@ class ServicesApiController extends Controller
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
         $where = ['is_active' => '1', 'salon_id' => $request->salon_id];
+        if ($category_id) {
+            $where['category_id'] = $category_id;
+        }
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
         $whereLike = $request->q ? explode(' ', $request->q) : '';
 
@@ -439,7 +443,6 @@ class ServicesApiController extends Controller
                 $orderby = implode(", ", $sd);
             }
         }
-
         if ($option) {
             $successData = Services::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where($where)->whereNotNull('category_id')->get()->makeHidden(['isServiceChecked', 'isNotId'])->toArray();
             return response()->json($successData, $this->successStatus);
