@@ -17,6 +17,8 @@ return new class extends Migration
             $table->enum('payment_mode', ['Live', 'Test'])->default(null)->nullable();
             $table->string('stripe_account_id', 255)->nullable()->comment('stripe salon account setup id ');
             $table->string('stripe_customer_account_id', 255)->nullable()->comment('stripe salon customer(client) account setup id ');
+            $table->string('mailchimp_subscribe_id', 255)->nullable()->comment('mailchimp salon subscribe(salon-user) account setup id ');
+            $table->string('canva_subscribe_id', 255)->nullable()->comment('canva salon subscribe(salon-user) account setup id ');
         });
 
         // Schema::create('payment', function (Blueprint $table) {

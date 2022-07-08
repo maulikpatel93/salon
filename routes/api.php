@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\v1\CloseddateApiController;
 use App\Http\Controllers\Api\v1\DashboardApiController;
 use App\Http\Controllers\Api\v1\FormApiController;
 use App\Http\Controllers\Api\v1\GuestApiController;
+use App\Http\Controllers\Api\v1\MailchimpApiController;
 use App\Http\Controllers\Api\v1\MembershipApiController;
 use App\Http\Controllers\Api\v1\PricetierApiController;
 use App\Http\Controllers\Api\v1\ProductsApiController;
@@ -294,5 +295,9 @@ Route::prefix('v1')->group(function () {
             Route::post('/formelementtype', 'formelementtype');
         });
 
+        //Mailchimp
+        Route::prefix('mailchimp')->name('mailchimp.')->group(function () {
+            Route::post('/subscribe', [MailchimpApiController::class, 'subscribe']);
+        });
     });
 });
