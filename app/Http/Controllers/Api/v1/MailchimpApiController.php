@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 
 // use App\Http\Requests\Api\MailchimpRequest;
 // use App\Models\Api\Mailchimp;
+use App\Models\Api\Users;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -26,7 +27,6 @@ class MailchimpApiController extends Controller
     public function subscribe(Request $request)
     {
         $requestAll = $request->all();
-
         $validator = Validator::make($requestAll, [
             'auth_key' => 'required',
             'salon_id' => 'required|integer',
@@ -50,11 +50,12 @@ class MailchimpApiController extends Controller
         // $mandrill_api_key = 'mIfiW1VW5N-qkXB8X_7nTA';
         $email = $request->email;
         $status = 'subscribed';
+        // $api_key = env('MAILCHIMP_APIKEY');
         $api_key = 'aec792bcfc29c483b3cf231dc079b384-us18';
         $data_center = substr($api_key, strpos($api_key, '-') + 1); //us18
-        $u = '738df287faf364f07c3d7433a';
+        $u = env('MAILCHIMP_USER_KEY');
+        // $list_id = env('MAILCHIMP_LIST_ID');
         $list_id = '238f6786b9';
-
         // "subscribed" or "unsubscribed" or "cleaned" or "pending"
         // $list_id = '238f6786b9'; // where to get it read above
         // $api_key = 'aec792bcfc29c483b3cf231dc079b384-us18'; // where to get it read above
@@ -62,17 +63,16 @@ class MailchimpApiController extends Controller
 
         $response = $this->rudr_mailchimp_subscriber_status($email, $status, $list_id, $api_key, $merge_fields);
 
-        echo '<pre>';
-        print_r(\json_decode($response, true));
-        echo '<pre>';
-        dd();
+        $respondearray = \json_decode($response, true);
 
-        $get_data = $this->callAPI('GET', 'https://gmail.us18.list-manage.com/subscribe/post-json?u=' . $u . '&amp;id=' . $list_id . '&EMAIL=' . $email, false);
-        $response = json_decode($get_data, true);
+        Users::where('id', auth()->user()->id)->update(['mailchimp_subscribe_id' => $respondearray['id']]);
+        // $get_data = $this->callAPI('GET', 'https://gmail.us18.list-manage.com/subscribe/post-json?u=' . $u . '&amp;id=' . $list_id . '&EMAIL=' . $email, false);
+        // $response = json_decode($get_data, true);
 
-        $result = isset($response['result']) ? $response['result'] : "";
-        if ($result && $result === "success") {
-            $successData['message'] = $response['msg'];
+        $result = isset($respondearray['status']) ? $respondearray['status'] : "";
+
+        if ($result && $result === "subscribed") {
+            $successData = $respondearray;
             return response()->json($successData, $this->successStatus);
         }
         if ($result && $result === "error") {
@@ -149,4 +149,5 @@ class MailchimpApiController extends Controller
         $result = curl_exec($mch_api);
         return $result;
     }
+
 }
