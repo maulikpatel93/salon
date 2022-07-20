@@ -20,6 +20,36 @@ class DashboardController extends Controller
         // $phone_number = "+919624810855";
         // $sms = "User registration successful!!";
         // $this->sendMessage($sms, $phone_number);
+
+        $request = new HttpRequest();
+        $request->setUrl('http://openapi.airtel.in/gateway/airtel-iq-sms-utility/sendSingleSms');
+        $request->setMethod(HTTP_METH_GET);
+
+        $request->setQueryData([
+            'customerId' => 'SOME_STRING_VALUE',
+            'destinationAddress' => 'SOME_STRING_VALUE',
+            'dltTemplateId' => 'SOME_STRING_VALUE',
+            'entityId' => 'SOME_STRING_VALUE',
+            'filterBlacklistNumbers' => 'SOME_BOOLEAN_VALUE',
+            'message' => 'SOME_STRING_VALUE',
+            'messageType' => 'SOME_STRING_VALUE',
+            'metaMap' => 'SOME_OBJECT_VALUE',
+            'priority' => 'SOME_BOOLEAN_VALUE',
+            'sourceAddress' => 'SOME_STRING_VALUE',
+        ]);
+
+        $request->setHeaders([
+            'content-type' => 'application/json',
+        ]);
+
+        try {
+            $response = $request->send();
+
+            echo $response->getBody();
+        } catch (HttpException $ex) {
+            echo $ex;
+        }
+
         return view('admin.dashboard');
     }
 

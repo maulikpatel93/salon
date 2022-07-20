@@ -1,0 +1,98 @@
+Git Use
+
+Need Clone Required then below command
+git clone https://github.com/maulikpatel93/salon.git
+
+No available Token then follow url: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
+Personal access tokens: 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
+
+===============================
+
+
+Server file buid in laravel
+
+1.Create .env file
+2.php artisan migrate
+3.php artisan db:seed (Data insert in datatable)
+2.Api use command - php artisan passport:install
+
+//Please Copy and paste in .env file
+
+APP_NAME=FreedomSalon
+APP_ENV=staging
+APP_KEY=base64:fKpJ65I3L1UQhjbuLkDpQIJ54t+fJQ2pmsw4CenBEIk=
+APP_DEBUG=true
+APP_URL=https://dddemo.net/php/2022/salon
+APP_PATH=/php/2022/salon/
+# APP_TIMEZONE=Asia/Kolkata
+
+LOG_CHANNEL=stack
+LOG_DEPRECATIONS_CHANNEL=null
+LOG_LEVEL=debug
+
+DB_CONNECTION=mysql
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=freedom_salon
+DB_USERNAME=root
+DB_PASSWORD=
+
+BROADCAST_DRIVER=log
+CACHE_DRIVER=file
+FILESYSTEM_DRIVER=local
+QUEUE_CONNECTION=sync
+SESSION_DRIVER=file
+SESSION_LIFETIME=120
+
+MEMCACHED_HOST=127.0.0.1
+
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=programmer93.dynamicdreamz@gmail.com
+MAIL_PASSWORD=dynamic@2021
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=programmer93.dynamicdreamz@gmail.com
+MAIL_FROM_NAME="${APP_NAME}"
+
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=us-east-1
+AWS_BUCKET=
+AWS_USE_PATH_STYLE_ENDPOINT=false
+
+PUSHER_APP_ID=
+PUSHER_APP_KEY=
+PUSHER_APP_SECRET=
+PUSHER_APP_CLUSTER=mt1
+
+MIX_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
+MIX_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
+
+
+#react Js
+SKIP_PREFLIGHT_CHECK=true
+
+#stripe payment
+STRIPE_CLIENT_ID=ca_LV3v2uGjEvKr9WgYrj2opG1ZMbU14RRI 
+STRIPE_KEY=pk_test_51Ko2rOSFsrov7HTSarhjgTN7nrsYLEVvOKqhMM3lq8b4ZOdIbP5Pj7TgUbZxr9C3apilJAmeSvEH9HcwLWbj6Nw400febhX2Ig 
+STRIPE_SECRET=sk_test_51Ko2rOSFsrov7HTSJAkhuTXyQiUGw5kfiU67lVR7riELEoXvcoUI6duFWM6djjYVNwmvGMec5OhyVeZyy5X3eRcj00r1l2zaoX
+
+#mailchimp
+MANRILL_API_KEY=mIfiW1VW5N-qkXB8X_7nTA
+MAILCHIMP_USER_KEY=738df287faf364f07c3d7433a
+MAILCHIMP_APIKEY=aec792bcfc29c483b3cf231dc079b384-us18
+MAILCHIMP_LIST_ID=238f6786b9
+
+#INSERT YOUR TWILIO SID HERE
+TWILIO_SID="AC25a1224c3acc5ec107b37b802d432081"
+#INSERT YOUR TWILIO TOKEN HERE
+TWILIO_AUTH_TOKEN="56101ec8d30ea1a6ca5844b3ab494457"
+#INSERT YOUR TWILIO NUMBER IN [E.164] FORMAT
+TWILIO_NUMBER="+9163548002439"
+
+
