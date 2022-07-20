@@ -182,8 +182,8 @@ return new class extends Migration
             $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
             $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
 
-            $table->unsignedBigInteger('form')->after('salon_id')->nullable()->comment('Type Of Form');
-            $table->foreign('form')->references('id')->on('form')->onUpdate('cascade')->onDelete('cascade');
+            $table->unsignedBigInteger('form_id')->after('salon_id')->nullable()->comment('Type Of Form');
+            $table->foreign('form_id')->references('id')->on('form')->onUpdate('cascade')->onDelete('cascade');
 
             $table->unsignedBigInteger('form_element_type_id')->after('salon_id')->nullable()->comment('Type Of Form Element');
             $table->foreign('form_element_type_id')->references('id')->on('form_element_type')->onUpdate('cascade')->onDelete('cascade');
@@ -234,6 +234,7 @@ return new class extends Migration
 
         Schema::create('nofify_detail', function (Blueprint $table) {
             $table->id();
+            $table->string('icon', 200)->nullable()->comment('icon ');
             $table->string('title', 255)->nullable()->comment('stripe salon account setup id ');
             $table->enum('nofify', ['Email', 'SMS'])->default(null)->nullable();
             $table->enum('type', ['NewAppointment', 'AppointmentReminder', 'CancelledAppointment', 'NoShow', 'ReplyYesToConfirm'])->default(null)->nullable();
@@ -241,6 +242,7 @@ return new class extends Migration
             $table->text('appointment_times_description')->nullable()->comment('appointmnet times description');
             $table->text('cancellation_description')->nullable()->comment('appointmnet cancellation description');
             $table->longText('preview')->nullable()->comment('preview Template html code only');
+            $table->text('sms_template')->nullable()->comment('sms_template');
             $table->boolean('is_active')->default(1); // 1:Active, 0:Inactive
             $table->dateTime('is_active_at')->nullable();
             $table->timestamps();
@@ -250,8 +252,8 @@ return new class extends Migration
             $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
             $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
 
-            $table->unsignedBigInteger('user_id')->after('salon_id')->nullable()->comment('Type Of User');
-            $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->unsignedBigInteger('form_id')->after('salon_id')->nullable()->comment('Type Of Form');
+            $table->foreign('form_id')->references('id')->on('form')->onUpdate('cascade')->onDelete('cascade');
         });
 
     }

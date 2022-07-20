@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use App\Exceptions\UnsecureException;
 use App\Http\Controllers\Controller;
-use App\Models\Api\Notifcation;
+use App\Http\Requests\Api\NotifyRequest;
+use App\Models\Api\Notification;
 use Illuminate\Http\Request;
 
-class NotifcationApiController extends Controller
+class NotificationApiController extends Controller
 {
     protected $successStatus = 200;
+    protected $badrequestStatus = 400;
     protected $errorStatus = 422;
     protected $unauthorizedStatus = 401;
+    protected $warningStatus = 410;
 
     protected $field = [
         'id',
@@ -26,8 +30,6 @@ class NotifcationApiController extends Controller
         'business_name',
     ];
 
-    protected $product_field = [];
-
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -38,12 +40,40 @@ class NotifcationApiController extends Controller
     {
         $requestAll = $request->all();
         $id = $request->id;
+
         return $this->returnResponse($request, $id);
+    }
+
+    public function store(NotifyRequest $request)
+    {
+        $requestAll = $request->all();
+        $requestAll['is_active_at'] = currentDateTime();
+        $model = new Notification;
+        $model->fill($requestAll);
+        $model->save();
+        return $this->returnResponse($request, $model->id);
+    }
+
+    public function update(NotifyRequest $request, $id)
+    {
+        $requestAll = $request->all();
+        $model = $this->findModel($id);
+        $model->fill($requestAll);
+        $model->save();
+        return $this->returnResponse($request, $model->id);
+    }
+
+    public function delete(Request $request, $id)
+    {
+        $requestAll = $request->all();
+        $model = $this->findModel($id);
+        Notification::where('id', $id)->delete();
+        return response()->json(['id' => $id, 'message' => __('messages.success')], $this->successStatus);
     }
 
     protected function findModel($id)
     {
-        if (($model = Notifcation::find($id)) !== null) {
+        if (($model = Notification::find($id)) !== null) {
             return $model;
         }
         throw new UnsecureException('The requested page does not exist.');
@@ -65,29 +95,15 @@ class NotifcationApiController extends Controller
         } else if ($request->salon_field) {
             $salon_field = array_merge(['id'], explode(',', $request->salon_field));
         }
-
-        $product_field = $this->product_field;
-        if (isset($requestAll['product_field']) && empty($requestAll['product_field'])) {
-            $product_field = false;
-        } else if ($request->product_field == '*') {
-            $product_field = [$request->product_field];
-        } else if ($request->product_field) {
-            $product_field = array_merge(['id', 'supplier_id'], explode(',', $request->product_field));
-        }
-
         $withArray = [];
         if ($salon_field) {
             $withArray[] = 'salon:' . implode(',', $salon_field);
-        }
-        if ($product_field) {
-            $withArray[] = 'products:' . implode(',', $product_field);
         }
 
         $pagination = $request->pagination ? $request->pagination : false;
         $limit = $request->limit ? $request->limit : config('params.apiPerPage');
 
-        // $where = ['is_active' => '1', 'salon_id' => $request->salon_id];
-        $where = ['is_active' => '1'];
+        $where = ['is_active' => '1', 'salon_id' => $request->salon_id];
         $where = ($id) ? array_merge($where, ['id' => $id]) : $where;
 
         $whereLike = $request->q ? explode(' ', $request->q) : '';
@@ -104,27 +120,34 @@ class NotifcationApiController extends Controller
         }
 
         if ($option) {
-            $successData = Notifcation::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where($where)->get()->makeHidden(['isNewRecord'])->toArray();
+            $successData = Notification::with($withArray)->selectRaw($option['valueField'] . ' as value, ' . $option['labelField'] . ' as label')->where($where)->get()->toArray();
             return response()->json($successData, $this->successStatus);
         }
         if ($id) {
             if ($request->result == 'result_array') {
-                $model = Notifcation::with($withArray)->select($field)->where($where)->get();
+                $model = Notification::with($withArray)->select($field)->where($where)->get();
             } else {
-                $model = Notifcation::with($withArray)->select($field)->where($where)->first();
+                $model = Notification::with($withArray)->select($field)->where($where)->first();
             }
             $successData = $model->toArray();
             return response()->json($successData, $this->successStatus);
         } else {
             if ($pagination == true) {
                 if ($whereLike) {
-                    $model = Notifcation::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
+                    $model = Notification::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                        if ($whereLike) {
+                            $query->where('name', "like", "%" . $whereLike[0] . "%");
+                            foreach ($whereLike as $row) {
+                                $query->orWhere('name', "like", "%" . $row . "%");
+                            }
+                        }
+                    })->where($where)->orderByRaw($orderby)->paginate($limit);
                 } else {
-                    $model = Notifcation::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
+                    $model = Notification::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->paginate($limit);
                 }
             } else {
                 if ($whereLike) {
-                    $model = Notifcation::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
+                    $model = Notification::with($withArray)->select($field)->where(function ($query) use ($whereLike) {
                         if ($whereLike) {
                             $query->where('name', "like", "%" . $whereLike[0] . "%");
                             foreach ($whereLike as $row) {
@@ -133,7 +156,7 @@ class NotifcationApiController extends Controller
                         }
                     })->where($where)->orderByRaw($orderby)->get();
                 } else {
-                    $model = Notifcation::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
+                    $model = Notification::with($withArray)->select($field)->where($where)->orderByRaw($orderby)->get();
                 }
             }
             if ($model->count()) {
@@ -145,4 +168,5 @@ class NotifcationApiController extends Controller
         }
         return response()->json(['message' => __('messages.failed')], $this->errorStatus);
     }
+
 }

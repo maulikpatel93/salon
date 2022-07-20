@@ -14,7 +14,7 @@ class NotifyDetail extends Model
      *
      * @var string
      */
-    protected $table = 'tax';
+    protected $table = 'nofify_detail';
 
     protected $appends = ['isNewRecord'];
     /**
@@ -24,7 +24,8 @@ class NotifyDetail extends Model
      */
     protected $fillable = [
         'salon_id',
-        'user_id',
+        'form_id',
+        'icon',
         'title',
         'nofify',
         'type',
@@ -32,6 +33,7 @@ class NotifyDetail extends Model
         'appointment_times_description',
         'cancellation_description',
         'preview',
+        'sms_template',
         'is_active',
         'is_active_at',
     ];
@@ -61,5 +63,10 @@ class NotifyDetail extends Model
     public function salon()
     {
         return $this->belongsTo(Salons::class, 'salon_id', 'id');
+    }
+
+    public function form()
+    {
+        return $this->hasOne(Form::class, 'id', 'form_id');
     }
 }

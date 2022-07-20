@@ -14,6 +14,8 @@ use App\Http\Controllers\Api\v1\FormApiController;
 use App\Http\Controllers\Api\v1\GuestApiController;
 use App\Http\Controllers\Api\v1\MailchimpApiController;
 use App\Http\Controllers\Api\v1\MembershipApiController;
+use App\Http\Controllers\Api\v1\NotificationApiController;
+use App\Http\Controllers\Api\v1\NotifyDetailApiController;
 use App\Http\Controllers\Api\v1\PricetierApiController;
 use App\Http\Controllers\Api\v1\ProductsApiController;
 use App\Http\Controllers\Api\v1\ReportApiController;
@@ -263,6 +265,7 @@ Route::prefix('v1')->group(function () {
         Route::controller(StripeApiController::class)->prefix('stripe')->name('stripe.')->group(function () {
             Route::post('/setup', 'setup');
             Route::post('/store', 'store');
+            Route::post('/oauth', 'oauth');
         });
 
         //Closedate
@@ -298,6 +301,24 @@ Route::prefix('v1')->group(function () {
         //Mailchimp
         Route::prefix('mailchimp')->name('mailchimp.')->group(function () {
             Route::post('/subscribe', [MailchimpApiController::class, 'subscribe']);
+        });
+
+        //Notification
+        Route::controller(NotificationApiController::class)->prefix('notification')->name('notification.')->group(function () {
+            Route::post('/view', 'view');
+            Route::post('/store', 'store');
+            Route::post('/update/{id}', 'update')->whereNumber('id');
+            Route::post('/status/{id}', 'status')->whereNumber('id');
+            // Route::post('/delete/{id}', 'delete')->whereNumber('id');
+        });
+
+        //NotifyDetail
+        Route::controller(NotifyDetailApiController::class)->prefix('notifydetail')->name('notifydetail.')->group(function () {
+            Route::post('/view', 'view');
+            Route::post('/store', 'store');
+            Route::post('/update/{id}', 'update')->whereNumber('id');
+            Route::post('/status/{id}', 'status')->whereNumber('id');
+            // Route::post('/delete/{id}', 'delete')->whereNumber('id');
         });
     });
 });

@@ -898,6 +898,27 @@ class SaleApiController extends Controller
             $api_key = 'mIfiW1VW5N-qkXB8X_7nTA';
 
             $data_center = substr($api_key, strpos($api_key, '-') + 1);
+            $content = "Hello";
+            $listId = config('params.MAILCHIMP_LIST_ID');
+            $mailchimp = new \Mailchimp(config('params.MAILCHIMP_APIKEY'));
+            $campaign = $mailchimp->campaigns->create('regular', [
+                'list_id' => $listId,
+                'subject' => 'Example Mail',
+                'from_email' => 'programmer93.dynamicdreamz@gmail.com',
+                'from_name' => 'programmer93',
+                'to_name' => 'AlexandraClose@mailinator.com',
+            ], [
+                'html' => $content,
+                'text' => strip_tags($content),
+            ]);
+            //Send campaign
+            $mailchimp->campaigns->send($campaign['id']);
+            echo '<pre>';
+            print_r($mailchimp);
+            echo '<pre>';
+            dd();
+
+            dd('Campaign send successfully.');
 
             $url = 'https://' . $data_center . '.api.mailchimp.com/3.0/lists/' . $list_id . '/members';
 

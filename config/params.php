@@ -135,4 +135,8 @@ return [
         'Pacific/Auckland' => "(GMT+12:00) Auckland",
         'Pacific/Fiji' => "(GMT+12:00) Fiji",
     ),
+    'MAILCHIMP_USER_KEY' => env('MAILCHIMP_USER_KEY', '738df287faf364f07c3d7433a'),
+    'MAILCHIMP_APIKEY' => env('MAILCHIMP_APIKEY', 'aec792bcfc29c483b3cf231dc079b384-us18'),
+    'MAILCHIMP_LIST_ID' => env('MAILCHIMP_LIST_ID', '238f6786b9'),
+    'STRIPE_CLIENT_ID' => env('STRIPE_CLIENT_ID', 'ca_LV3v2uGjEvKr9WgYrj2opG1ZMbU14RRI'),
 ];

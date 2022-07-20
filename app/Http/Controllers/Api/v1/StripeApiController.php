@@ -39,6 +39,27 @@ class StripeApiController extends Controller
         $id = $request->id;
         return $this->returnResponse($request, $id);
     }
+    public function oauth(Request $request)
+    {
+        $requestAll = $request->all();
+        // $validator = Validator::make($requestAll, [
+        //     'url' => 'required',
+        // ]);
+        // if ($validator->fails()) {
+        //     return response()->json(['error' => $validator->errors(), 'message' => __('messages.failed')], $this->errorStatus);
+        // }
+        $state = bin2hex(random_bytes('16'));
+        $params = array(
+            'redirect_uri' => 'http://localhost:3000',
+            'response_type' => 'code',
+            'scope' => 'read_write',
+            'client_id' => config('params.STRIPE_CLIENT_ID'),
+            'stripe_user[country]' => "IN",
+        );
+        $url = 'https://connect.stripe.com/oauth/authorize?' . http_build_query($params);
+        return response()->json(['url' => $url, 'message' => __('messages.success')], $this->successStatus);
+    }
+
     public function setup(StripeSetupRequest $request)
     {
         $requestAll = $request->all();
@@ -46,7 +67,8 @@ class StripeApiController extends Controller
         $email = $request->email;
         $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
         $account = $stripe->accounts->create([
-            'type' => 'custom',
+            // 'type' => 'custom',
+            'type' => 'express',
             'country' => $country ? $country : 'AU',
             'email' => $email,
             'capabilities' => [

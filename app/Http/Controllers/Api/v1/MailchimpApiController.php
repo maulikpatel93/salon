@@ -32,45 +32,25 @@ class MailchimpApiController extends Controller
             'salon_id' => 'required|integer',
             'email' => 'required|email',
         ]);
+
         if ($validator->fails()) {
             $messages = $validator->messages();
             return response()->json(['errors' => $messages, 'message' => __('messages.validation_error')], $this->errorStatus);
         }
         $email = $request->email;
-        $postData = array(
-            "email_address" => $request->email,
-            "status" => "subscribed",
-            "merge_fields" => array(
-                "FNAME" => $request->name,
-                "PHONE" => $request->phone),
-        );
-
-        // $email = 'programmer93.dynamicdreamz@gmail.com';
-        // $list_id = 'qkXB8X_7nTA';
-        // $mandrill_api_key = 'mIfiW1VW5N-qkXB8X_7nTA';
-        $email = $request->email;
         $status = 'subscribed';
-        // $api_key = env('MAILCHIMP_APIKEY');
-        $api_key = 'aec792bcfc29c483b3cf231dc079b384-us18';
+        $api_key = config('params.MAILCHIMP_APIKEY');
         $data_center = substr($api_key, strpos($api_key, '-') + 1); //us18
-        $u = env('MAILCHIMP_USER_KEY');
-        // $list_id = env('MAILCHIMP_LIST_ID');
-        $list_id = '238f6786b9';
-        // "subscribed" or "unsubscribed" or "cleaned" or "pending"
-        // $list_id = '238f6786b9'; // where to get it read above
-        // $api_key = 'aec792bcfc29c483b3cf231dc079b384-us18'; // where to get it read above
-        $merge_fields = array('FNAME' => 'Misha', 'LNAME' => 'Rudrastyh');
-
+        $u = config('params.MAILCHIMP_USER_KEY');
+        $list_id = config('params.MAILCHIMP_LIST_ID');
+        $merge_fields = array('FNAME' => $request->first_name, 'LNAME' => $request->last_name, "PHONE" => $request->phone);
         $response = $this->rudr_mailchimp_subscriber_status($email, $status, $list_id, $api_key, $merge_fields);
 
         $respondearray = \json_decode($response, true);
-
         Users::where('id', auth()->user()->id)->update(['mailchimp_subscribe_id' => $respondearray['id']]);
         // $get_data = $this->callAPI('GET', 'https://gmail.us18.list-manage.com/subscribe/post-json?u=' . $u . '&amp;id=' . $list_id . '&EMAIL=' . $email, false);
         // $response = json_decode($get_data, true);
-
         $result = isset($respondearray['status']) ? $respondearray['status'] : "";
-
         if ($result && $result === "subscribed") {
             $successData = $respondearray;
             return response()->json($successData, $this->successStatus);
@@ -133,6 +113,9 @@ class MailchimpApiController extends Controller
             'email_address' => $email,
             'status' => $status,
             'merge_fields' => $merge_fields,
+            'tags' => [
+                "name" => "SalonOwner",
+            ],
         );
         $mch_api = curl_init(); // initialize cURL connection
 
