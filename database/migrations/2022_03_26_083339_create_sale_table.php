@@ -72,11 +72,6 @@ return new class extends Migration
             $table->text('message')->nullable();
             $table->timestamps();
         });
-
-        Schema::table('voucher_to', function (Blueprint $table) {
-            $table->unsignedBigInteger('voucher_id')->after('id')->nullable()->comment('Type Of Cart');
-            $table->foreign('voucher_id')->references('id')->on('voucher')->onUpdate('cascade')->onDelete('cascade');
-        });
     }
 
     /**

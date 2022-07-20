@@ -20,17 +20,17 @@ class DatabaseSeeder extends Seeder
         $this->call(RolesAccessTableSeeder::class);
         $this->call([
             CompaniesSeeder::class,
-            UserSeeder::class,
+            // UserSeeder::class,
             TaxSeeder::class,
         ]);
         $this->call(SalonModulesTableSeeder::class);
         $this->call(SalonPermissionsTableSeeder::class);
         $this->call(SalonAccessTableSeeder::class);
         $this->call(NofifyDetailTableSeeder::class);
+        $this->call(PriceTierTableSeeder::class);
         $this->call(UsersTableSeeder::class);
         $this->call(TaxTableSeeder::class);
         $this->call(FormElementTypeTableSeeder::class);
-        $this->call(PriceTierTableSeeder::class);
         $this->call(CloseddateTableSeeder::class);
         $this->call(CategoriesTableSeeder::class);
         $this->call(ServicesTableSeeder::class);

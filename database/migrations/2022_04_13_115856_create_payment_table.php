@@ -72,7 +72,10 @@ return new class extends Migration
         });
 
         Schema::table('voucher_to', function (Blueprint $table) {
-            $table->unsignedBigInteger('voucher_id')->after('id')->nullable()->comment('Type Of Cart');
+            $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
+            $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
+
+            $table->unsignedBigInteger('voucher_id')->after('salon_id')->nullable()->comment('Type Of Voucher');
             $table->foreign('voucher_id')->references('id')->on('voucher')->onUpdate('cascade')->onDelete('cascade');
 
             $table->unsignedBigInteger('client_id')->after('voucher_id')->nullable()->comment('Type Of Client');
@@ -132,11 +135,6 @@ return new class extends Migration
 
             $table->unsignedBigInteger('client_id')->after('salon_id')->nullable()->comment('Type Of Client');
             $table->foreign('client_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
-        });
-
-        Schema::table('voucher_to', function (Blueprint $table) {
-            $table->unsignedBigInteger('salon_id')->after('id')->nullable()->comment('Type Of Salon');
-            $table->foreign('salon_id')->references('id')->on('salons')->onUpdate('cascade')->onDelete('cascade');
         });
 
         Schema::create('form', function (Blueprint $table) {

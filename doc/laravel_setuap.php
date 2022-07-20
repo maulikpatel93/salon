@@ -160,11 +160,12 @@ php artisan iseed salon_modules
 php artisan iseed salon_permissions
 php artisan iseed salon_access
 php artisan iseed nofify_detail
+php artisan iseed price_tier
 php artisan iseed users
 php artisan iseed tax
 php artisan iseed form_element_type
 
-php artisan iseed price_tier
+
 php artisan iseed closeddate
 
 php artisan iseed categories
