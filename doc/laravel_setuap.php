@@ -155,10 +155,23 @@ php artisan iseed modules
 php artisan iseed permissions
 php artisan iseed roles_access
 
+php artisan iseed salons
 php artisan iseed salon_modules
 php artisan iseed salon_permissions
 php artisan iseed salon_access
+php artisan iseed nofify_detail
+php artisan iseed users
+php artisan iseed tax
+php artisan iseed form_element_type
 
+php artisan iseed price_tier
+php artisan iseed closeddate
+
+php artisan iseed categories
+php artisan iseed services
+php artisan iseed services_price
+php artisan iseed staff_services
+php artisan iseed staff_working_hours
 
 Server file buid in laravel
 
