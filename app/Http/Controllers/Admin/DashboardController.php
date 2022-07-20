@@ -17,9 +17,9 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $phone_number = "+919624810855";
-        $sms = "User registration successful!!";
-        $this->sendMessage($sms, $phone_number);
+        // $phone_number = "+919624810855";
+        // $sms = "User registration successful!!";
+        // $this->sendMessage($sms, $phone_number);
         return view('admin.dashboard');
     }
 
