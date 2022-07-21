@@ -19,7 +19,7 @@ class DashboardController extends Controller
     {
         $phone_number = "+919624810855";
         $sms = "User registration successful!!";
-        $this->sendMessage($sms, $phone_number);
+        // $this->sendMessage($sms, $phone_number);
 
         // $request = new HttpRequest();
         // $request->setUrl('http://openapi.airtel.in/gateway/airtel-iq-sms-utility/sendSingleSms');
