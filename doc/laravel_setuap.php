@@ -15,6 +15,8 @@ Laravel Project setuap
 9. composer require doctrine/dbal
 10. php artisan migrate:status
 
+git rm -rf --cached .
+
 cache:clearCommand
 php artisan cache:clear
 php artisan route:cache

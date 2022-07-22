@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\SaleRequest;
+use App\Mail\SendVoucher;
 use App\Models\Api\Appointment;
 use App\Models\Api\Cart;
 use App\Models\Api\Categories;
@@ -19,6 +20,7 @@ use App\Models\Api\Voucher;
 use App\Models\Api\VoucherTo;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use MailchimpTransactional\ApiClient;
 use Validator;
@@ -894,66 +896,66 @@ class SaleApiController extends Controller
             $data['test'] = 'hello';
 
             $email = 'programmer93.dynamicdreamz@gmail.com';
-            $list_id = 'LIST_ID';
-            $api_key = 'mIfiW1VW5N-qkXB8X_7nTA';
+            // $list_id = 'LIST_ID';
+            // $api_key = 'mIfiW1VW5N-qkXB8X_7nTA';
 
-            $data_center = substr($api_key, strpos($api_key, '-') + 1);
-            $content = "Hello";
-            $listId = config('params.MAILCHIMP_LIST_ID');
-            $mailchimp = new \Mailchimp(config('params.MAILCHIMP_APIKEY'));
-            $campaign = $mailchimp->campaigns->create('regular', [
-                'list_id' => $listId,
-                'subject' => 'Example Mail',
-                'from_email' => 'programmer93.dynamicdreamz@gmail.com',
-                'from_name' => 'programmer93',
-                'to_name' => 'AlexandraClose@mailinator.com',
-            ], [
-                'html' => $content,
-                'text' => strip_tags($content),
-            ]);
-            //Send campaign
-            $mailchimp->campaigns->send($campaign['id']);
-            echo '<pre>';
-            print_r($mailchimp);
-            echo '<pre>';
-            dd();
+            // $data_center = substr($api_key, strpos($api_key, '-') + 1);
+            // $content = "Hello";
+            // $listId = config('params.MAILCHIMP_LIST_ID');
+            // $mailchimp = new \Mailchimp(config('params.MAILCHIMP_APIKEY'));
+            // $campaign = $mailchimp->campaigns->create('regular', [
+            //     'list_id' => $listId,
+            //     'subject' => 'Example Mail',
+            //     'from_email' => 'programmer93.dynamicdreamz@gmail.com',
+            //     'from_name' => 'programmer93',
+            //     'to_name' => 'AlexandraClose@mailinator.com',
+            // ], [
+            //     'html' => $content,
+            //     'text' => strip_tags($content),
+            // ]);
+            // //Send campaign
+            // $mailchimp->campaigns->send($campaign['id']);
+            // echo '<pre>';
+            // print_r($mailchimp);
+            // echo '<pre>';
+            // dd();
 
-            dd('Campaign send successfully.');
+            // dd('Campaign send successfully.');
 
-            $url = 'https://' . $data_center . '.api.mailchimp.com/3.0/lists/' . $list_id . '/members';
+            // $url = 'https://' . $data_center . '.api.mailchimp.com/3.0/lists/' . $list_id . '/members';
 
-            $json = json_encode([
-                'email_address' => $email,
-                'status' => 'subscribed', //pass 'subscribed' or 'pending'
-            ]);
+            // $json = json_encode([
+            //     'email_address' => $email,
+            //     'status' => 'subscribed', //pass 'subscribed' or 'pending'
+            // ]);
 
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_USERPWD, 'user:' . $api_key);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-            $result = curl_exec($ch);
-            $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-            echo $status_code;
+            // $ch = curl_init($url);
+            // curl_setopt($ch, CURLOPT_USERPWD, 'user:' . $api_key);
+            // curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            // curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+            // curl_setopt($ch, CURLOPT_POST, 1);
+            // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            // curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+            // $result = curl_exec($ch);
+            // $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            // curl_close($ch);
+            // echo $status_code;
 
             try {
-                $message = [
-                    "from_email" => "programmer93.dynamicdreamz@gmail.com",
-                    "subject" => "Hello world",
-                    "text" => "Welcome to Mailchimp Transactional!",
-                    "to" => [
-                        [
-                            "email" => "EveWakefield@mailinator.com",
-                            "type" => "to",
-                        ],
-                    ],
-                ];
-                $this->run($message);
-                dd();
+                // $message = [
+                //     "from_email" => "programmer93.dynamicdreamz@gmail.com",
+                //     "subject" => "Hello world",
+                //     "text" => "Welcome to Mailchimp Transactional!",
+                //     "to" => [
+                //         [
+                //             "email" => "EveWakefield@mailinator.com",
+                //             "type" => "to",
+                //         ],
+                //     ],
+                // ];
+                // $this->run($message);
+                // dd();
                 // $mailchimp = new ApiClient();
                 // // $mailchimp->setApiKey(env('MAILCHIMP_API_KEY'));
                 // $mailchimp->setApiKey('mIfiW1VW5N-qkXB8X_7nTA');
@@ -982,11 +984,11 @@ class SaleApiController extends Controller
                 //     $message->from($fromEmail);
                 // });
 
-                $sendemail = Mail::to($client->email)->send(new SendVoucher($data));
-                // echo '<pre>';
-                // print_r($sendemail);
-                // echo '<pre>';
-                // dd();
+                $sendemail = Mail::to($toEmail)->send(new SendVoucher($data));
+                echo '<pre>';
+                print_r($sendemail);
+                echo '<pre>';
+                dd();
 
             } catch (\Error$e) {
                 echo 'Error: ', $e->getMessage(), "\n";
